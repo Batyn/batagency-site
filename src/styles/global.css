@@ -33,6 +33,10 @@ button { font: inherit; color: inherit; }
 img, svg { display: block; max-width: 100%; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 0.1875rem; border-radius: 2px; }
 [id] { scroll-margin-top: 1.5rem; }
+/* на десктопе шапка липкая: якоря останавливаются под ней */
+@media (min-width: 761px) {
+  html { scroll-padding-top: var(--header-h); }
+}
 
 .wrap { max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
@@ -91,6 +95,28 @@ img, svg { display: block; max-width: 100%; }
   .btn--block-m { width: 100%; }
 }
 
+/* ---------- стекло липкой шапки (десктоп) ----------
+   Полупрозрачный белый и размытие того, что под шапкой, без линии снизу (Batın 2026-10-09: полоска выглядит грубо).
+   Видно только после начала прокрутки.
+   Без backdrop-filter, при «уменьшить прозрачность» и «повысить контраст» — сплошной белый. */
+.glass {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass { background: var(--bg); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (prefers-contrast: more) {
+  .glass { background: var(--bg); border-bottom: 1px solid var(--ink); }
+}
+
 /* ---------- секция: линия Ink, слева колонка 312, справа контент с x = 336 ---------- */
 .section { padding-bottom: var(--section-bottom); }
 .section-rule { height: 1px; background: var(--ink); border: 0; margin: 0; }
@@ -113,4 +139,5 @@ img, svg { display: block; max-width: 100%; }
 
 @media (prefers-reduced-motion: reduce) {
   .btn, .btn:active { transition: none; transform: none; }
+  .glass { transition: none; }
 }

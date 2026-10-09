@@ -1,15 +1,18 @@
 ---
-// Шапка внутренних страниц: слева надпись, справа меню, текущий пункт — чёрная плашка (Figma Final, «Шапка»).
-// На телефоне — «Bat Agency» и «Меню». На главной шапка встроена в первый экран (Hero).
-import { NAV, TAGLINE, type NavKey } from '../data/site';
+// Шапка внутренних страниц (Figma Components «Header · desktop», Type = Compact, 404:6059): слева логотип bat 81×40,
+// справа меню, текущий пункт — чёрная плашка. На десктопе шапка липкая, после начала прокрутки фон — матовое стекло.
+// На телефоне — логотип 76×38 и «Меню»: при прокрутке вниз шапка уезжает, при прокрутке вверх возвращается (Batın 2026-10-09).
+// На главной шапка встроена в первый экран (Hero).
+import { NAV, type NavKey } from '../data/site';
+import Logo from './Logo.astro';
 import MenuButton from './MenuButton.astro';
 
 interface Props { current?: NavKey }
 const { current } = Astro.props;
 ---
-<header class="hdr wrap">
-  <a class="hdr-tag t-label-md" href="/">{TAGLINE}</a>
-  <a class="hdr-mark" href="/">Bat Agency</a>
+<header class="hdr wrap" data-hdr>
+  <span class="glass" aria-hidden="true"></span>
+  <a class="hdr-logo" href="/" aria-label="Bat Agency — на главную"><Logo /></a>
   <nav class="nav" aria-label="Разделы">
     {NAV.map((n) => (
       <a class:list={['nav-a t-label-md', { 'is-current': n.key === current }]} href={n.href} aria-current={n.key === current ? 'page' : undefined}>{n.label}</a>
@@ -18,12 +21,32 @@ const { current } = Astro.props;
   <MenuButton />
 </header>
 
+<script>
+  import '../scripts/eye';
+  import { autoHide } from '../scripts/autohide';
+  // стекло появляется, когда под шапкой есть текст: страница прокручена хотя бы на пиксель
+  const hdr = document.querySelector<HTMLElement>('[data-hdr]')!;
+  const phone = matchMedia('(max-width: 760px)');
+  const hide = autoHide(hdr, () => hdr.offsetHeight);
+  const sync = () => {
+    const y = Math.max(0, scrollY);
+    hdr.classList.toggle('is-scrolled', y > 0);
+    if (phone.matches) hide(y); else hdr.classList.remove('is-hidden');
+  };
+  addEventListener('scroll', sync, { passive: true });
+  phone.addEventListener('change', sync);
+  sync();
+</script>
+
 <style>
   .hdr {
+    position: sticky; top: 0; z-index: 60;
     display: flex; align-items: center; justify-content: space-between;
-    min-height: 4.25rem; padding-top: 2.75rem;
+    height: var(--header-h);
   }
-  .hdr-mark { display: none; }
+  .hdr > :not(.glass) { position: relative; }
+  .hdr-logo { display: block; width: 5.0625rem; }
+  .hdr-logo :global(svg) { width: 100%; height: auto; }
   .nav { display: flex; align-items: center; gap: 1.75rem; }
   /* текущий пункт: плашка 3/8 с радиусом 6; отступ компенсируем, чтобы меню не сдвигалось */
   .nav-a { padding: 0.1875rem 0.5rem; margin: -0.1875rem -0.5rem; border-radius: var(--r-sm); transition: background-color 160ms ease, color 160ms ease; }
@@ -31,9 +54,16 @@ const { current } = Astro.props;
   @media (hover: hover) and (pointer: fine) {
     .nav-a:not(.is-current):hover { text-decoration: underline; text-underline-offset: 0.25rem; }
   }
+  .hdr.is-scrolled .glass { opacity: 1; }
+
   @media (max-width: 760px) {
-    .hdr { min-height: 2.875rem; padding-top: 1.5rem; }
-    .hdr-tag, .nav { display: none; }
-    .hdr-mark { display: inline-flex; align-items: center; min-height: 2.75rem; margin: -0.8125rem 0; font: 700 0.875rem/1.2 var(--font); }
+    /* Figma: шапка телефона 62 — отступы 16 сверху и 8 снизу, логотип 76×38 */
+    .hdr { height: auto; padding-top: 1rem; padding-bottom: 0.5rem; transition: transform 250ms var(--ease-out); }
+    .hdr.is-hidden { transform: translateY(-100%); transition-duration: 200ms; }
+    .nav { display: none; }
+    .hdr-logo { width: 4.75rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hdr { transition: none; }
   }
 </style>

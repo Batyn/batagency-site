@@ -1,7 +1,9 @@
 ---
-// Первый экран главной (Figma Final, «1 · Первый экран», 278:4646 / 278:5094).
+// Первый экран главной (Figma Final, «1 · Первый экран», 278:4646 / 278:5094; шапка — Components «Header · desktop»).
 // Десктоп 1440×900: логотип 246×122 слева сверху, меню справа, заголовок display на две строки,
-// внизу подзаголовок слева и кнопка справа. Телефон: логотип 76×38, «Меню», заголовок 40, внизу текст и кнопка.
+// внизу подзаголовок слева и кнопка справа. При прокрутке шапка липкая: логотип уменьшается до 81×40
+// (как на внутренних страницах), фон становится матовым стеклом (Figma «Header · scroll», 411:14050).
+// Телефон: логотип 76×38, «Меню», заголовок 40, внизу текст и кнопка; шапка не липкая.
 import Logo from './Logo.astro';
 import MenuButton from './MenuButton.astro';
 import { NAV, TELEGRAM_URL } from '../data/site';
@@ -10,13 +12,17 @@ import { NAV, TELEGRAM_URL } from '../data/site';
 const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 'kontakty' ? `#${n.key}` : n.href }));
 ---
 <header class="hero wrap" id="top">
-  <div class="hero-top">
-    <a class="hero-logo" href="/" aria-label="Bat Agency — на главную"><Logo /></a>
-    <nav class="nav" aria-label="Разделы">
-      {nav.map((n) => <a class="nav-a t-label-md" href={n.href}>{n.label}</a>)}
-    </nav>
-    <MenuButton />
+  <div class="hero-bar" data-bar>
+    <span class="glass" data-bar-glass aria-hidden="true"></span>
+    <div class="hero-top wrap">
+      <a class="hero-logo" href="/" aria-label="Bat Agency — на главную" data-bar-logo><Logo /></a>
+      <nav class="nav" aria-label="Разделы" data-bar-nav>
+        {nav.map((n) => <a class="nav-a t-label-md" href={n.href}>{n.label}</a>)}
+      </nav>
+      <MenuButton />
+    </div>
   </div>
+  <div class="hero-space" aria-hidden="true"></div>
   <h1 class="hero-title t-display">Маркетинг и PR для <span class="nowrap">дизайн‑ и</span> digital-агентств</h1>
   <div class="hero-bottom">
     <p class="hero-sub t-body-sm">Вы делаете проекты, мы рассказываем о них клиентам, жюри и отраслевым СМИ. Пишем кейсы и заявки на премии, ведём соцсети и рассылку, готовим спикеров и вебинары.</p>
@@ -26,20 +32,81 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
 
 <script>
   import '../scripts/eye';
+
+  // Шапка на десктопе: первые 120 px прокрутки логотип плавно уменьшается из 246×122 в 81×40 и встаёт в шапку 68,
+  // меню поднимается к середине шапки, проступает стекло. Ход привязан к прокрутке 1:1 — только transform и opacity.
+  // При reduced-motion без промежуточных кадров: вверху — большой логотип, после первого пикселя — сразу компактная шапка.
+  // Ниже начала блока «Услуги» шапка уезжает вверх при прокрутке вниз и возвращается при прокрутке вверх (Batın 2026-10-09).
+  // Телефон: шапка «bat + Меню» прячется, как только её прокрутили, и появляется при прокрутке вверх.
+  import { autoHide } from '../scripts/autohide';
+  const DIST = 120;
+  const SCALE = 81 / 246;
+  const desk = matchMedia('(min-width: 761px)');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const logo = document.querySelector<HTMLElement>('[data-bar-logo]')!;
+  const nav = document.querySelector<HTMLElement>('[data-bar-nav]')!;
+  const glass = document.querySelector<HTMLElement>('[data-bar-glass]')!;
+  const bar = document.querySelector<HTMLElement>('[data-bar]')!;
+  const services = document.getElementById('uslugi');
+  let rem = 16, navLift = 0, queued = false;
+  const hide = autoHide(bar, () => desk.matches
+    ? (services ? services.getBoundingClientRect().top + scrollY - bar.offsetHeight : Infinity)
+    : bar.offsetHeight);
+
+  function measure() {
+    rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    // в большом виде меню стоит вровень с верхом логотипа (y = 44), в шапке — по её середине
+    navLift = 2.75 * rem - nav.offsetTop;
+  }
+
+  function render() {
+    queued = false;
+    const y = Math.max(0, scrollY);
+    hide(y);
+    if (!desk.matches) { logo.style.transform = nav.style.transform = ''; glass.style.opacity = y > 0 ? '1' : '0'; return; }
+    const p = reduced.matches ? (y > 0 ? 1 : 0) : Math.min(1, y / DIST);
+    // из точки (7, 44) от поля в (0, 14): оптическая компенсация «b» нужна только крупному логотипу
+    logo.style.transform = `translate(${(-0.4375 * rem * p).toFixed(2)}px, ${(-1.875 * rem * p).toFixed(2)}px) scale(${(1 - (1 - SCALE) * p).toFixed(4)})`;
+    nav.style.transform = `translateY(${(navLift * (1 - p)).toFixed(2)}px)`;
+    glass.style.opacity = String(p);
+  }
+  const queue = () => { if (!queued) { queued = true; requestAnimationFrame(render); } };
+
+  measure(); render();
+  addEventListener('scroll', queue, { passive: true });
+  addEventListener('resize', () => { measure(); queue(); });
+  desk.addEventListener('change', () => { measure(); queue(); });
+  reduced.addEventListener('change', queue);
 </script>
 
 <style>
   .hero {
+    position: relative;
     display: grid;
     grid-template-rows: auto 1fr auto 1fr auto;
     min-height: max(40rem, min(100svh, 56.25rem));
     padding-top: 2.75rem; padding-bottom: 3rem;
   }
-  .hero-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  /* место большого логотипа в сетке: сама шапка вынесена из потока */
+  .hero-space { height: 7.625rem; }
+
+  /* без JS шапка уезжает вместе с первым экраном; с JS — липкая */
+  .hero-bar { position: absolute; top: 0; left: 0; right: 0; z-index: 60; height: var(--header-h); }
+  :global(.js) .hero-bar { position: fixed; }
+  .hero-bar .glass { transition: none; }
+  /* ниже «Услуг» шапка уезжает целиком: выход 200 мс, возврат 250 мс, ease-out */
+  .hero-bar { transition: transform 250ms var(--ease-out); }
+  .hero-bar.is-hidden { transform: translateY(-100%); transition-duration: 200ms; }
+  .hero-top { position: relative; height: 100%; display: flex; justify-content: flex-end; align-items: center; }
   /* в Figma логотип стоит на 7 px правее поля: оптическая компенсация круглой «b» */
-  .hero-logo { display: block; width: 15.375rem; margin-left: 0.4375rem; }
+  .hero-logo {
+    position: absolute; left: calc(var(--gutter) + 0.4375rem); top: 2.75rem;
+    display: block; width: 15.375rem;
+    transform-origin: 0 0;
+  }
   .hero-logo :global(svg) { width: 100%; height: auto; }
-  .nav { display: flex; gap: 1.75rem; }
+  .nav { display: flex; align-items: center; gap: 1.75rem; }
+  .nav-a { padding: 0.1875rem 0.5rem; margin: -0.1875rem -0.5rem; border-radius: var(--r-sm); }
   @media (hover: hover) and (pointer: fine) {
     .nav-a:hover { text-decoration: underline; text-underline-offset: 0.25rem; }
   }
@@ -51,12 +118,18 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
     .hero {
       grid-template-rows: auto auto 1fr auto;
       min-height: 100svh;
-      padding-top: 1rem; padding-bottom: clamp(3rem, 18svh, 9.5rem);
+      padding-top: 0; padding-bottom: clamp(3rem, 18svh, 9.5rem);
     }
-    .hero-top { align-items: center; }
-    .hero-logo { width: 4.75rem; margin: -0.1875rem 0; padding: 0.1875rem 0; }
     .nav { display: none; }
-    .hero-title { grid-row: 2; margin-top: 4.875rem; }
+    /* шапка 62: отступы 16 и 8, логотип 76×38; место под ней держит .hero-space */
+    .hero-space { height: 3.875rem; }
+    .hero-bar { height: auto; }
+    .hero-top { padding-top: 1rem; padding-bottom: 0.5rem; justify-content: space-between; }
+    .hero-logo { position: static; width: 4.75rem; margin: -0.1875rem 0; padding: 0.1875rem 0; }
+    .hero-title { grid-row: 2; margin-top: 4.375rem; }
     .hero-bottom { grid-row: 4; flex-direction: column; align-items: stretch; gap: 1rem; padding-top: 2.5rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-bar { transition: none; }
   }
 </style>

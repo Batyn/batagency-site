@@ -44,6 +44,11 @@
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --t-cell: 200ms;
   --t-accordion: 300ms;
+
+  /* Шапка десктопа: липкая, 68, фон — матовое стекло (Figma color/glass, glass/blur; решение Batın 2026-10-09) */
+  --header-h: 4.25rem;
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-blur: 24px;
 }
 
 @media (max-width: 760px) {

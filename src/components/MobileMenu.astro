@@ -1,11 +1,13 @@
 ---
 // Меню на телефоне. В Figma не нарисовано — простая версия на сверку Batın (2026-10-09):
 // белая панель на весь экран, пункты крупно, «Закрыть» текстом, внизу «Бесплатная консультация».
+// Слева сверху логотип bat с глазом — на том же месте и того же размера, что в шапке телефона (Batın 2026-10-09).
 import { NAV, TELEGRAM_URL } from '../data/site';
+import Logo from './Logo.astro';
 ---
 <div class="mm" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Меню" hidden>
   <div class="mm-top wrap">
-    <a class="mm-mark" href="/">Bat Agency</a>
+    <a class="mm-logo" href="/" aria-label="Bat Agency — на главную"><Logo id="menu-logo" /></a>
     <button class="mm-close" type="button" data-menu-close>Закрыть</button>
   </div>
   <nav class="mm-nav wrap" aria-label="Разделы">
@@ -21,6 +23,8 @@ import { NAV, TELEGRAM_URL } from '../data/site';
 <script>
   // Панель: появление opacity + сдвиг 8 px, 200 мс ease-out; закрытие быстрее. Esc и «Закрыть» закрывают, фокус возвращается.
   const menu = document.getElementById('mobile-menu')!;
+  // при reduced-motion глаз в меню тоже неподвижен
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) (document.getElementById('menu-logo') as unknown as SVGSVGElement | null)?.pauseAnimations();
   const openers = document.querySelectorAll<HTMLElement>('[data-menu-open]');
   let lastFocus: HTMLElement | null = null;
 
@@ -71,10 +75,12 @@ import { NAV, TELEGRAM_URL } from '../data/site';
     transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out);
   }
   .mm.is-open { opacity: 1; transform: none; transition-duration: 200ms; }
-  .mm-top { display: flex; align-items: center; justify-content: space-between; padding-top: 1.5rem; min-height: 2.875rem; width: 100%; }
-  .mm-mark { display: inline-flex; align-items: center; min-height: 2.75rem; margin: -0.8125rem 0; font: 700 0.875rem/1.2 var(--font); }
+  /* как шапка телефона: 62 — отступы 16 и 8, логотип 76×38 */
+  .mm-top { display: flex; align-items: center; justify-content: space-between; padding-top: 1rem; padding-bottom: 0.5rem; width: 100%; }
+  .mm-logo { display: block; width: 4.75rem; }
+  .mm-logo :global(svg) { width: 100%; height: auto; }
   .mm-close { min-height: 2.75rem; margin: -0.8125rem 0; padding: 0; border: 0; background: none; font: 400 0.9375rem/1.45 var(--font); cursor: pointer; }
-  .mm-nav { display: flex; flex-direction: column; padding-top: 2.5rem; width: 100%; }
+  .mm-nav { display: flex; flex-direction: column; padding-top: 2rem; width: 100%; }
   .mm-a { padding-block: 0.625rem; border-bottom: 1px solid var(--hairline); }
   .mm-a:first-child { border-top: 1px solid var(--ink); }
   .mm-cta { margin-top: auto; padding-bottom: 2rem; width: 100%; }

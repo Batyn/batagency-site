@@ -3,7 +3,11 @@
 const svg = document.getElementById('logo') as unknown as SVGSVGElement | null;
 const hero = document.getElementById('top');
 
-if (svg && hero) init(svg, hero);
+// при reduced-motion глаз неподвижен на всех страницах; слежение за курсором — только над первым экраном главной
+if (svg) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) svg.pauseAnimations();
+  else if (hero) init(svg, hero);
+}
 
 function init(svg: SVGSVGElement, hero: HTMLElement) {
   const $ = <T extends Element>(id: string) => document.getElementById(id) as unknown as T;
@@ -13,7 +17,6 @@ function init(svg: SVGSVGElement, hero: HTMLElement) {
   const lidAnim = $<SVGAnimationElement>('lid-anim');
   const blinkLoop = $<SVGAnimationElement>('blink-loop');
   const blinkOnce = () => $<SVGAnimationElement>('blink-once').beginElement();
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { svg.pauseAnimations(); return; }
 
   const CX = +gaze.dataset.cx!, CY = +gaze.dataset.cy!;
   const UX = +gaze.dataset.ux!, UY = +gaze.dataset.uy!, VX = -UY, VY = UX;

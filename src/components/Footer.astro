@@ -59,13 +59,14 @@ import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL, TAGLINE } from '../data/site
   .ft-year { font: 400 0.9375rem/1.45 var(--font); color: var(--grey); }
 
   @media (max-width: 760px) {
-    .ft-body { grid-template-columns: 1fr; row-gap: 2rem; padding: 2rem 0 1.5rem; }
+    /* Figma «Footer · mobile» (318:3722): «Навигация» и «Связь» в две колонки 171 + 8 */
+    .ft-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 0.5rem; padding-block: 2rem; align-items: start; }
     .ft-brand { display: none; }
     .ft-group { gap: 0; }
     .ft-h { font: 500 0.75rem/1.2 var(--font); }
     .ft-list { gap: 0; }
     .ft-a { display: flex; align-items: center; min-height: 2.75rem; font-size: 0.875rem; }
-    .ft-bottom { grid-template-columns: 1fr auto; padding: 0.75rem 0 2rem; row-gap: 0.75rem; }
+    .ft-bottom { grid-template-columns: 1fr auto; padding: 0.75rem 0 3.5rem; row-gap: 0.75rem; }
     .ft-legal { grid-column: 1 / -1; flex-direction: column; padding-bottom: 1.125rem; }
     .ft-mark--m { display: block; font-size: 0.875rem; }
     .ft-year { font-size: 0.875rem; line-height: 1.2; }
