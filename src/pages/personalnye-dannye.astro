@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import LegalPage from '../components/LegalPage.astro';
+import Footer from '../components/Footer.astro';
+import { parseLegal } from '../lib/legal';
+import md from '../legal/politika-personalnye-dannye.md?raw';
+const doc = parseLegal(md);
+---
+<Base title="Политика обработки персональных данных — Bat Agency" description="Как Bat Agency обрабатывает и защищает персональные данные: цели, сроки, права и как к нам обратиться.">
+  <Header />
+  <main><LegalPage doc={doc} /></main>
+  <Footer />
+</Base>

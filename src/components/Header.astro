@@ -1,0 +1,39 @@
+---
+// Шапка внутренних страниц: слева надпись, справа меню, текущий пункт — чёрная плашка (Figma Final, «Шапка»).
+// На телефоне — «Bat Agency» и «Меню». На главной шапка встроена в первый экран (Hero).
+import { NAV, TAGLINE, type NavKey } from '../data/site';
+import MenuButton from './MenuButton.astro';
+
+interface Props { current?: NavKey }
+const { current } = Astro.props;
+---
+<header class="hdr wrap">
+  <a class="hdr-tag t-label-md" href="/">{TAGLINE}</a>
+  <a class="hdr-mark" href="/">Bat Agency</a>
+  <nav class="nav" aria-label="Разделы">
+    {NAV.map((n) => (
+      <a class:list={['nav-a t-label-md', { 'is-current': n.key === current }]} href={n.href} aria-current={n.key === current ? 'page' : undefined}>{n.label}</a>
+    ))}
+  </nav>
+  <MenuButton />
+</header>
+
+<style>
+  .hdr {
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 4.25rem; padding-top: 2.75rem;
+  }
+  .hdr-mark { display: none; }
+  .nav { display: flex; align-items: center; gap: 1.75rem; }
+  /* текущий пункт: плашка 3/8 с радиусом 6; отступ компенсируем, чтобы меню не сдвигалось */
+  .nav-a { padding: 0.1875rem 0.5rem; margin: -0.1875rem -0.5rem; border-radius: var(--r-sm); transition: background-color 160ms ease, color 160ms ease; }
+  .nav-a.is-current { background: var(--ink); color: var(--bg); }
+  @media (hover: hover) and (pointer: fine) {
+    .nav-a:not(.is-current):hover { text-decoration: underline; text-underline-offset: 0.25rem; }
+  }
+  @media (max-width: 760px) {
+    .hdr { min-height: 2.875rem; padding-top: 1.5rem; }
+    .hdr-tag, .nav { display: none; }
+    .hdr-mark { display: inline-flex; align-items: center; min-height: 2.75rem; margin: -0.8125rem 0; font: 700 0.875rem/1.2 var(--font); }
+  }
+</style>

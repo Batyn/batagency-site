@@ -1,0 +1,22 @@
+---
+// Заголовок внутренней страницы: H1 и текст в колонках 4–12.
+interface Props { title: string }
+const { title } = Astro.props;
+---
+<div class="ptitle wrap">
+  <div class="row">
+    <div class="col-main ptitle-main">
+      <h1 class="t-h-lg">{title}</h1>
+      <slot />
+    </div>
+  </div>
+</div>
+
+<style>
+  .ptitle { padding-top: 3.5rem; }
+  .ptitle-main > :global(* + *) { margin-top: 1.75rem; }
+  @media (max-width: 760px) {
+    .ptitle { padding-top: 2rem; }
+    .ptitle-main > :global(* + *) { margin-top: 1rem; }
+  }
+</style>

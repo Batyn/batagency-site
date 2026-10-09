@@ -1,0 +1,67 @@
+---
+// Окно согласия на cookies (Figma Components, Cookie banner 347:5483). Решение Batın 2026-10-09:
+// закрыть нельзя — ни крестика, ни Esc, ни клика мимо; одна кнопка «Принять». Текст утверждён, не менять.
+// Пока не приняли — окно на каждой странице; после «Принять» — больше не показываем и грузим Метрику.
+---
+<div class="ck" id="cookie-banner" role="region" aria-label="Согласие на cookie-файлы" hidden>
+  <p class="ck-text">На нашем сайте используются cookie-файлы, в том числе сервисов веб-аналитики. Нажимая «Принять», вы даёте <a href="/personalnye-dannye/#analitika">согласие на обработку данных при помощи cookie-файлов</a>. Подробнее об обработке персональных данных вы можете узнать в <a href="/privacy/">Политике конфиденциальности</a></p>
+  <button class="ck-accept" type="button" data-cookie-accept>Принять</button>
+</div>
+
+<script>
+  import { loadMetrica, hasConsent, saveConsent } from '../scripts/metrica';
+
+  const box = document.getElementById('cookie-banner')!;
+  if (hasConsent()) loadMetrica();
+  else {
+    box.hidden = false;
+    // появление снизу: один раз за загрузку страницы, 300 мс ease-out
+    void box.offsetHeight;
+    box.classList.add('is-in');
+  }
+  box.querySelector('[data-cookie-accept]')!.addEventListener('click', () => {
+    saveConsent();
+    loadMetrica();
+    box.classList.remove('is-in');
+    box.classList.add('is-out');
+    const done = () => { box.hidden = true; };
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) done();
+    else setTimeout(done, 200);
+  });
+</script>
+
+<style>
+  .ck {
+    position: fixed; left: 1.5rem; bottom: 1.5rem; z-index: 70;
+    width: 27.5rem; max-width: calc(100vw - 3rem);
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1.25rem;
+    padding: 1.5rem;
+    background: var(--bg); border: 1px solid var(--ink); border-radius: var(--r-md);
+    opacity: 0; transform: translateY(1rem);
+    transition: opacity 300ms var(--ease-out), transform 300ms var(--ease-out);
+  }
+  .ck.is-in { opacity: 1; transform: none; }
+  .ck.is-out { opacity: 0; transform: translateY(1rem); transition-duration: 200ms; }
+  .ck-text { font: 400 0.9375rem/1.45 var(--font); }
+  .ck-text a { text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; }
+  .ck-accept {
+    min-height: 2.8125rem; padding: 0.8125rem 1.5rem;
+    background: var(--ink); color: var(--bg);
+    border: 1px solid var(--ink); border-radius: var(--r-md);
+    font: 400 1rem/1 var(--font); cursor: pointer;
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+  /* Accept hover — инверсия; Focus accept — кольцо 2 px с отступом 4 */
+  @media (hover: hover) and (pointer: fine) {
+    .ck-accept:hover { background: var(--bg); color: var(--ink); }
+  }
+  .ck-accept:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: var(--r-md); }
+  @media (max-width: 760px) {
+    .ck { left: 1.25rem; right: 1.25rem; bottom: 1.25rem; width: auto; max-width: none; gap: 1rem; padding: 1.25rem; }
+    .ck-text { font-size: 0.875rem; }
+    .ck-accept { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ck, .ck.is-out { transform: none; transition: opacity 200ms ease; }
+  }
+</style>

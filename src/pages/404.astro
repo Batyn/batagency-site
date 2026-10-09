@@ -1,0 +1,29 @@
+---
+// Страница 404 (Figma Final, секция 404: 320:3676 / 320:3741). Кнопок нет — решение Batın 2026-10-09.
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+<Base title="Такой страницы нет — Bat Agency" description="Страница не найдена." noindex>
+  <Header />
+  <main class="nf wrap">
+    <div class="row">
+      <div class="col-main nf-main">
+        <p class="t-label-sm">Ошибка 404</p>
+        <h1 class="t-h-lg">Такой страницы нет</h1>
+        <p class="t-body-lg measure">Возможно, адрес набран с ошибкой или страницу перенесли. Начните с <a class="ul" href="/">главной</a>.</p>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .nf { padding-top: 3.5rem; padding-bottom: 6rem; min-height: 26.5rem; }
+  .nf-main > * + * { margin-top: 1.75rem; }
+  .ul { text-decoration: underline; text-underline-offset: 0.25rem; text-decoration-thickness: 1px; }
+  @media (max-width: 760px) {
+    .nf { padding-top: 3rem; padding-bottom: 4.5rem; min-height: 0; }
+    .nf-main > * + * { margin-top: 1rem; }
+  }
+</style>

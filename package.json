@@ -1,0 +1,17 @@
+{
+  "name": "batagency-site",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "sync": "node tools/sync-content.mjs",
+    "dev": "node tools/sync-content.mjs && astro dev",
+    "build": "node tools/sync-content.mjs && astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "astro": "7.3.5",
+    "@astrojs/sitemap": "3.7.4"
+  }
+}

@@ -1,0 +1,98 @@
+---
+// Аккордеон страницы /uslugi/ — вариант C2 (Figma Components «Row/NN», «Row mobile/NN», State = Closed / Open):
+// можно раскрыть несколько строк; раскрытая строка — инверсия. На <details>: без JS тоже раскрывается, весь текст в HTML.
+// «Что получаете» — заглушка из макета, текст пишет Batın (задача 23).
+import { SERVICES } from '../data/services';
+import { TELEGRAM_URL } from '../data/site';
+---
+<div class="acc wrap" data-accordion>
+  {SERVICES.map((s) => (
+    <details class="acc-row" id={s.slug}>
+      <summary class="acc-sum">
+        <span class="acc-n">{s.n}</span>
+        <h2 class="acc-title">{s.title}</h2>
+        <span class="acc-sign" aria-hidden="true"></span>
+      </summary>
+      <div class="acc-body">
+        <div class="acc-inner">
+          <p class="acc-lead">{s.lead}</p>
+          <div class="acc-block">
+            <h3 class="acc-h">Шаги</h3>
+            <ol class="acc-steps">
+              {s.items.map((it, i) => <li><span class="acc-step-n">{i + 1}</span><span>{it}</span></li>)}
+            </ol>
+          </div>
+          <div class="acc-block">
+            <h3 class="acc-h">Что получаете</h3>
+            <p class="acc-todo">текст пишет Batın</p>
+          </div>
+          <a class="btn btn--lg btn--light btn--block-m acc-btn" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="consult_click">Бесплатная консультация</a>
+        </div>
+      </div>
+    </details>
+  ))}
+</div>
+
+<script>
+  import '../scripts/accordion';
+</script>
+
+<style>
+  /* колонка номера: 292 из 1278 внутри строки — одна и та же у заголовка и тела */
+  .acc-row { --acc-spacer: 22.85%; }
+  .acc { display: flex; flex-direction: column; gap: 0.5rem; padding-top: 4.5rem; }
+  .acc-row {
+    border: 1px solid var(--ink); border-radius: var(--r-md);
+    background: var(--bg); color: var(--ink);
+    overflow: hidden;
+    transition: background-color var(--t-accordion) ease, color var(--t-accordion) ease;
+  }
+  .acc-row[open], .acc-row.is-open { background: var(--ink); color: var(--bg); }
+  .acc-row.is-closing { background: var(--bg); color: var(--ink); }
+  .acc-sum {
+    display: grid; grid-template-columns: var(--acc-spacer) minmax(0, 1fr) auto; column-gap: 1.5rem; align-items: center;
+    padding: 1.25rem; cursor: pointer; list-style: none;
+  }
+  .acc-sum::-webkit-details-marker { display: none; }
+  .acc-sum:focus-visible { outline-offset: -0.25rem; }
+  .acc-n { font: 400 0.8125rem/1.2 var(--font); color: var(--grey); transition: color var(--t-accordion) ease; }
+  .acc-row[open] .acc-n { color: var(--soft); }
+  .acc-row.is-closing .acc-n { color: var(--grey); }
+  .acc-title { font: 700 2.5rem/1.04 var(--font); letter-spacing: var(--track-tight); }
+  /* «+» и «−» одним знаком: вертикальная черта сворачивается */
+  .acc-sign { position: relative; width: 1.375rem; height: 1.375rem; }
+  .acc-sign::before, .acc-sign::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 0.1875rem; margin-top: -1.5px; background: currentColor; }
+  .acc-sign::after { transform: rotate(90deg); transition: transform var(--t-accordion) var(--ease-out); }
+  .acc-row[open] .acc-sign::after { transform: rotate(0deg) scaleX(0); }
+  .acc-row.is-closing .acc-sign::after { transform: rotate(90deg); }
+
+  .acc-body { display: grid; grid-template-columns: var(--acc-spacer) minmax(0, 40.5rem) minmax(0, 1fr); column-gap: 1.5rem; padding: 0.5rem 1.25rem 2.75rem; }
+  .acc-inner { grid-column: 2; display: flex; flex-direction: column; gap: 1.75rem; align-items: flex-start; }
+  .acc-lead { font: 400 1.25rem/1.45 var(--font); }
+  .acc-block { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; }
+  .acc-h { font: 500 1.25rem/1.3 var(--font); }
+  .acc-steps { border-top: 1px solid var(--grey); }
+  .acc-steps li { display: flex; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--grey); font: 400 1.125rem/1.45 var(--font); }
+  .acc-step-n { flex: 0 0 2rem; font: 400 0.9375rem/1.7 var(--font); color: var(--soft); }
+  .acc-todo { font: 400 1rem/1.5 var(--font); color: var(--soft); }
+
+  @media (max-width: 760px) {
+    .acc { padding-top: 2rem; }
+    .acc-sum { grid-template-columns: 1.5rem minmax(0, 1fr) auto; column-gap: 0.75rem; padding: 1.125rem 1rem; }
+    .acc-n { font: 500 0.75rem/1.2 var(--font); }
+    .acc-title { font-size: 1.25rem; letter-spacing: -0.01em; }
+    .acc-sign { width: 0.875rem; height: 0.875rem; }
+    .acc-sign::before, .acc-sign::after { height: 2px; margin-top: -1px; }
+    .acc-body { display: block; padding: 2px 1rem 1.5rem; }
+    .acc-inner { gap: 1.25rem; align-items: stretch; }
+    .acc-lead { font-size: 1rem; }
+    .acc-h { font: 500 1.0625rem/1.2 var(--font); }
+    .acc-steps { border-color: var(--soft); }
+    .acc-steps li { gap: 0.75rem; padding: 0.625rem 0; border-color: var(--soft); font-size: 0.9375rem; }
+    .acc-step-n { flex-basis: 1.5rem; font: 500 0.75rem/1.8 var(--font); }
+    .acc-todo { font-size: 0.9375rem; line-height: 1.45; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .acc-row, .acc-n, .acc-sign::after { transition: none; }
+  }
+</style>

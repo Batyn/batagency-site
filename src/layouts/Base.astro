@@ -1,0 +1,42 @@
+---
+// <head> и общие части всех страниц. Пока PUBLIC_INDEXING=false — страницы закрыты от поиска.
+import '../styles/global.css';
+import MobileMenu from '../components/MobileMenu.astro';
+import CookieBanner from '../components/CookieBanner.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  noindex?: boolean;
+}
+const { title, description, noindex = false } = Astro.props;
+const indexing = import.meta.env.PUBLIC_INDEXING === 'true' && !noindex;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  {!indexing && <meta name="robots" content="noindex, nofollow" />}
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ru_RU" />
+  <meta property="og:site_name" content="Bat Agency" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta name="theme-color" content="#ffffff" />
+  <script is:inline>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+  <slot />
+  <MobileMenu />
+  <CookieBanner />
+  <script>
+    import '../scripts/goals';
+  </script>
+</body>
+</html>

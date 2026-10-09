@@ -1,0 +1,230 @@
+---
+// Блок «Услуги» на главной (Figma Final «2 · Услуги» 278:4659, телефон 278:5103; компоненты «Cell NN (главная)»,
+// «Mobile services (главная)»). Одна разметка на обе раскладки:
+// десктоп — ячейка описания 428 + мозаика 7×2 (ширины ячеек из services.ts), наведение — инверсия, три пункта и «Подробнее →»;
+// телефон — пары 171×152, 09 и 14 во всю ширину; нажатие делает ячейку чёрной и раскрывает список под её рядом.
+import { SERVICES } from '../data/services';
+---
+<section class="svc wrap" id="uslugi" aria-labelledby="uslugi-h">
+  <div class="svc-grid">
+    <div class="svc-desc">
+      <div class="svc-desc-top">
+        <h2 class="t-h-lg" id="uslugi-h">Услуги</h2>
+        <p class="t-lead">Если в агентстве нет своего маркетолога, соберём план на полгода и выполним его целиком. Если отдел маркетинга есть, возьмём отдельные задачи. Стоимость называем после консультации.</p>
+      </div>
+      <div class="svc-desc-bottom">
+        <p class="svc-hint"><span class="only-d">Наведите на услугу, чтобы увидеть, что в неё входит</span><span class="only-m">Нажмите на услугу, чтобы увидеть, что в неё входит</span></p>
+        <p class="t-footnote only-d">*Instagram принадлежит компании Meta, признанной экстремистской и запрещённой в России.</p>
+      </div>
+    </div>
+    <ul class="mosaic" data-mosaic>
+      {SERVICES.map((s) => (
+        <li class:list={['cell', { 'cell--wide': s.wide }]} id={s.slug} style={`--w:${s.width}`} data-slug={s.slug}>
+          <div class="cell-top">
+            <span class="cell-n">{s.n}</span>
+            <h3 class="cell-title">{s.title}</h3>
+          </div>
+          <div class="cell-bottom">
+            <p class="cell-caption">{s.caption}</p>
+            <div class="cell-more">
+              <p class="cell-lead">{s.lead}</p>
+              <ul class="cell-items">{s.items.map((i, k) => <li class:list={{ 'is-extra': k > 2 }}>— {i}</li>)}</ul>
+              <a class="cell-link" href={`/uslugi/#${s.slug}`} data-goal="service_more">Подробнее<span class="sr"> о услуге «{s.title}»</span>&nbsp;&nbsp;→</a>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+  <p class="t-footnote only-m svc-note">*Instagram принадлежит компании Meta, признанной экстремистской и запрещённой в России.</p>
+</section>
+
+<script>
+  import { goal } from '../scripts/goals';
+
+  // Телефон: нажатие на ячейку раскрывает её список под рядом. Открыта одна услуга (как в наборе «Mobile services»).
+  const phone = matchMedia('(max-width: 760px)');
+  const mosaic = document.querySelector<HTMLElement>('[data-mosaic]')!;
+  const cells = [...mosaic.querySelectorAll<HTMLElement>('.cell')];
+  const panel = document.createElement('li');
+  panel.className = 'cell-panel';
+  panel.innerHTML = '<div class="cell-panel-in"></div>';
+  panel.setAttribute('aria-live', 'polite');
+  let openCell: HTMLElement | null = null;
+
+  // последняя ячейка каждого ряда на телефоне: пары, а 09 и 14 — во всю ширину
+  const rowEnds = new Map<HTMLElement, HTMLElement>();
+  for (let i = 0; i < cells.length; ) {
+    const a = cells[i], b = cells[i + 1];
+    if (a.classList.contains('cell--wide') || !b || b.classList.contains('cell--wide')) { rowEnds.set(a, a); i += 1; }
+    else { rowEnds.set(a, b); rowEnds.set(b, b); i += 2; }
+  }
+  const rowEnd = (cell: HTMLElement) => rowEnds.get(cell) ?? cell;
+
+  function close() {
+    if (!openCell) return;
+    openCell.classList.remove('is-open');
+    openCell.querySelector('.cell-top')?.setAttribute('aria-expanded', 'false');
+    panel.classList.remove('is-in');
+    const p = panel;
+    setTimeout(() => { if (!p.classList.contains('is-in')) p.remove(); }, 250);
+    openCell = null;
+  }
+
+  function open(cell: HTMLElement) {
+    const more = cell.querySelector('.cell-more')!;
+    const inner = panel.firstElementChild!;
+    inner.innerHTML = more.innerHTML;
+    rowEnd(cell).after(panel);
+    cell.classList.add('is-open');
+    cell.querySelector('.cell-top')?.setAttribute('aria-expanded', 'true');
+    openCell = cell;
+    void panel.offsetHeight;   // зафиксировать закрытое состояние, чтобы переход сработал
+    panel.classList.add('is-in');
+    goal('service_open');
+  }
+
+  cells.forEach((cell) => {
+    const top = cell.querySelector<HTMLElement>('.cell-top')!;
+    const toggle = () => {
+      if (!phone.matches) return;
+      const was = openCell === cell;
+      close();
+      if (!was) open(cell);
+    };
+    cell.addEventListener('click', (e) => {
+      if (!phone.matches || (e.target as Element).closest('a')) return;
+      toggle();
+    });
+    // на телефоне ячейка — кнопка для клавиатуры и читалок
+    const sync = () => {
+      if (phone.matches) { top.setAttribute('role', 'button'); top.tabIndex = 0; top.setAttribute('aria-expanded', String(openCell === cell)); }
+      else { top.removeAttribute('role'); top.removeAttribute('tabindex'); top.removeAttribute('aria-expanded'); }
+    };
+    sync();
+    phone.addEventListener('change', () => { close(); sync(); });
+    top.addEventListener('keydown', (e) => { if (phone.matches && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(); } });
+  });
+
+  // десктоп: наведение на ячейку — цель service_open (один раз на услугу)
+  const seen = new Set<string>();
+  cells.forEach((c) => c.addEventListener('pointerenter', (e) => {
+    if (phone.matches || e.pointerType !== 'mouse' || seen.has(c.dataset.slug!)) return;
+    seen.add(c.dataset.slug!);
+    goal('service_open');
+  }));
+</script>
+
+<style>
+  .svc { padding-top: var(--section-top); padding-bottom: var(--section-bottom); }
+  .svc-grid { display: flex; gap: 0.5rem; align-items: stretch; }
+
+  /* ячейка описания: 428 из 1320 */
+  .svc-desc {
+    flex: 0 0 calc((100% - 0.5rem) * 428 / 1312);
+    display: flex; flex-direction: column; justify-content: space-between; gap: 2.5rem;
+    padding: 1.5rem; border: 1px solid var(--ink); border-radius: var(--r-md);
+  }
+  .svc-desc-top { display: flex; flex-direction: column; gap: 2rem; }
+  .svc-desc-bottom { display: flex; flex-direction: column; gap: 1rem; }
+  .svc-hint { font: 400 0.9375rem/1.45 var(--font); max-width: 18.75rem; }
+  .only-m { display: none; }
+
+  /* мозаика: пары ячеек, ширины из Figma (сумма пары 876 + зазор 8) */
+  .mosaic { flex: 1 1 0; min-width: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; align-content: start; }
+  .cell {
+    position: relative;
+    width: calc((100% - 0.5rem) * var(--w) / 876);
+    height: 20rem; padding: 1.25rem;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 0.75rem;
+    border: 1px solid var(--ink); border-radius: var(--r-md);
+    background: var(--bg); color: var(--ink);
+    overflow: hidden;
+    transition: background-color var(--t-cell) ease, color var(--t-cell) ease;
+  }
+  .cell-top { display: flex; flex-direction: column; gap: 0.625rem; }
+  .cell-n { font: 400 0.8125rem/1.2 var(--font); color: var(--grey); transition: color var(--t-cell) ease; }
+  .cell-title { font: 700 2.5rem/1.04 var(--font); letter-spacing: var(--track-tight); }
+  /* низ ячейки: подпись и «что входит» лежат друг на друге и меняются прозрачностью */
+  .cell-bottom { display: grid; grid-template-columns: minmax(0, 1fr); align-items: end; }
+  .cell-bottom > * { grid-area: 1 / 1; }
+  .cell-caption { font: 400 0.9375rem/1.3 var(--font); color: var(--grey); transition: opacity var(--t-cell) ease; }
+  .cell-more {
+    min-width: 0;
+    display: flex; flex-direction: column; gap: 0.375rem;
+    opacity: 0; transform: translateY(0.375rem);
+    transition: opacity var(--t-cell) var(--ease-out), transform var(--t-cell) var(--ease-out);
+  }
+  .cell .cell-lead { display: none; }
+  .cell-items { display: flex; flex-direction: column; gap: 0.25rem; font: 400 0.9375rem/1.45 var(--font); }
+  /* в наведённой ячейке — первые три пункта в строку, как в Figma */
+  .cell .cell-items li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cell .is-extra { display: none; }
+  .cell-link { display: inline-flex; align-items: center; min-height: 2.75rem; font: 400 1rem/1 var(--font); white-space: nowrap; align-self: flex-start; }
+  /* вся ячейка ведёт на раздел услуги */
+  .cell .cell-link::after { content: ""; position: absolute; inset: 0; }
+
+  .cell:focus-within,
+  .cell.is-open { background: var(--ink); color: var(--bg); }
+  .cell:focus-within .cell-n,
+  .cell.is-open .cell-n { color: var(--soft); }
+  .cell:focus-within .cell-caption { opacity: 0; }
+  .cell:focus-within .cell-more { opacity: 1; transform: none; }
+  @media (hover: hover) and (pointer: fine) {
+    .cell:hover { background: var(--ink); color: var(--bg); }
+    .cell:hover .cell-n { color: var(--soft); }
+    .cell:hover .cell-caption { opacity: 0; }
+    .cell:hover .cell-more { opacity: 1; transform: none; }
+  }
+  .cell-link:focus-visible { outline-color: var(--bg); }
+
+  /* ---------- телефон ---------- */
+  @media (max-width: 760px) {
+    .svc-grid { flex-direction: column; }
+    .svc-desc { flex: none; padding: 1rem 1rem 1.25rem; gap: 0.875rem; }
+    .svc-desc-top { gap: 0.875rem; }
+    .svc-hint { font: 400 0.8125rem/1.4 var(--font); color: var(--grey); max-width: none; }
+    .only-d { display: none; }
+    .only-m { display: inline; }
+    .svc-note { display: block; margin-top: 1.25rem; }
+
+    .cell { width: calc((100% - 0.5rem) / 2); height: 9.5rem; padding: 0.875rem; gap: 0.625rem; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .cell--wide { width: 100%; height: 8rem; }
+    .cell-top { gap: 0.5rem; outline-offset: 0.375rem; }
+    .cell-n { font: 500 0.75rem/1.2 var(--font); }
+    .cell-title { font-size: 1.25rem; letter-spacing: -0.01em; }
+    .cell-caption { font-size: 0.8125rem; }
+    .cell-more { display: none; }
+    .cell .cell-link::after { display: none; }
+    .cell:focus-within { background: var(--bg); color: var(--ink); }
+    .cell:focus-within .cell-n { color: var(--grey); }
+    .cell:focus-within .cell-caption { opacity: 1; }
+    .cell.is-open { background: var(--ink); color: var(--bg); }
+    .cell.is-open .cell-caption { color: var(--soft); }
+    .cell:active { transform: scale(0.98); transition: transform 120ms var(--ease-out), background-color var(--t-cell) ease, color var(--t-cell) ease; }
+
+    /* раскрытый список под рядом: высота через grid 0fr → 1fr и прозрачность, 250 мс */
+    .mosaic :global(.cell-panel) {
+      width: 100%;
+      display: grid; grid-template-rows: 0fr;
+      opacity: 0;
+      transition: grid-template-rows 250ms var(--ease-out), opacity 200ms var(--ease-out);
+    }
+    .mosaic :global(.cell-panel.is-in) { grid-template-rows: 1fr; opacity: 1; }
+    .mosaic :global(.cell-panel-in) {
+      min-height: 0; overflow: hidden;
+      background: var(--ink); color: var(--bg); border-radius: var(--r-md);
+      padding: 0 0.875rem;
+      font: 400 0.875rem/1.45 var(--font);
+    }
+    .mosaic :global(.cell-panel-in .cell-lead) { display: block; padding-top: 0.375rem; }
+    .mosaic :global(.cell-panel-in .cell-items) { font-size: 0.875rem; gap: 0; }
+    .mosaic :global(.cell-panel-in .cell-link) { font: 500 1.0625rem/1 var(--font); padding-bottom: 1.25rem; min-height: 4rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cell, .cell-n, .cell-caption, .cell-more { transition: none; }
+    .cell-more { transform: none; }
+    .mosaic :global(.cell-panel) { transition: none; }
+  }
+</style>

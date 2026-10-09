@@ -1,0 +1,85 @@
+---
+// Меню на телефоне. В Figma не нарисовано — простая версия на сверку Batın (2026-10-09):
+// белая панель на весь экран, пункты крупно, «Закрыть» текстом, внизу «Бесплатная консультация».
+import { NAV, TELEGRAM_URL } from '../data/site';
+---
+<div class="mm" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Меню" hidden>
+  <div class="mm-top wrap">
+    <a class="mm-mark" href="/">Bat Agency</a>
+    <button class="mm-close" type="button" data-menu-close>Закрыть</button>
+  </div>
+  <nav class="mm-nav wrap" aria-label="Разделы">
+    <a class="mm-a t-h-lg" href="/">Главная</a>
+    {NAV.map((n) => <a class="mm-a t-h-lg" href={n.href}>{n.label}</a>)}
+    <a class="mm-a t-h-lg" href="/#voprosy">Вопросы</a>
+  </nav>
+  <div class="mm-cta wrap">
+    <a class="btn btn--lg btn--block-m" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="consult_click">Бесплатная консультация</a>
+  </div>
+</div>
+
+<script>
+  // Панель: появление opacity + сдвиг 8 px, 200 мс ease-out; закрытие быстрее. Esc и «Закрыть» закрывают, фокус возвращается.
+  const menu = document.getElementById('mobile-menu')!;
+  const openers = document.querySelectorAll<HTMLElement>('[data-menu-open]');
+  let lastFocus: HTMLElement | null = null;
+
+  function open(e: Event) {
+    e.preventDefault();
+    lastFocus = e.currentTarget as HTMLElement;
+    menu.hidden = false;
+    document.documentElement.classList.add('is-menu-open');
+    void menu.offsetHeight;
+    menu.classList.add('is-open');
+    menu.querySelector<HTMLElement>('[data-menu-close]')?.focus();
+  }
+  function close() {
+    if (menu.hidden) return;
+    menu.classList.remove('is-open');
+    document.documentElement.classList.remove('is-menu-open');
+    const done = () => { menu.hidden = true; };
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) done();
+    else setTimeout(done, 160);
+    lastFocus?.focus();
+  }
+  openers.forEach((b) => {
+    b.setAttribute('role', 'button');
+    b.setAttribute('aria-expanded', 'false');
+    b.addEventListener('click', (e) => { open(e); b.setAttribute('aria-expanded', 'true'); });
+  });
+  menu.querySelector('[data-menu-close]')!.addEventListener('click', () => { close(); openers.forEach((b) => b.setAttribute('aria-expanded', 'false')); });
+  // переход по пункту закрывает меню (якоря на главной тоже)
+  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => close()));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  // фокус не уходит из панели
+  menu.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const f = [...menu.querySelectorAll<HTMLElement>('a, button')];
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+  matchMedia('(min-width: 761px)').addEventListener('change', (m) => { if (m.matches) close(); });
+</script>
+
+<style>
+  .mm {
+    position: fixed; inset: 0; z-index: 80;
+    display: flex; flex-direction: column;
+    background: var(--bg);
+    opacity: 0; transform: translateY(-0.5rem);
+    transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out);
+  }
+  .mm.is-open { opacity: 1; transform: none; transition-duration: 200ms; }
+  .mm-top { display: flex; align-items: center; justify-content: space-between; padding-top: 1.5rem; min-height: 2.875rem; width: 100%; }
+  .mm-mark { display: inline-flex; align-items: center; min-height: 2.75rem; margin: -0.8125rem 0; font: 700 0.875rem/1.2 var(--font); }
+  .mm-close { min-height: 2.75rem; margin: -0.8125rem 0; padding: 0; border: 0; background: none; font: 400 0.9375rem/1.45 var(--font); cursor: pointer; }
+  .mm-nav { display: flex; flex-direction: column; padding-top: 2.5rem; width: 100%; }
+  .mm-a { padding-block: 0.625rem; border-bottom: 1px solid var(--hairline); }
+  .mm-a:first-child { border-top: 1px solid var(--ink); }
+  .mm-cta { margin-top: auto; padding-bottom: 2rem; width: 100%; }
+  :global(html.is-menu-open) { overflow: hidden; }
+  @media (prefers-reduced-motion: reduce) {
+    .mm, .mm.is-open { transform: none; transition: opacity 150ms ease; }
+  }
+</style>

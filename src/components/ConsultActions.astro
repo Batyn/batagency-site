@@ -1,0 +1,37 @@
+---
+// Кнопка «Бесплатная консультация» и контакты под ней.
+import { TELEGRAM, TELEGRAM_URL, EMAIL } from '../data/site';
+interface Props { page?: boolean }
+const { page = false } = Astro.props;
+---
+<a class="btn btn--lg btn--block-m" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="consult_click">Бесплатная консультация</a>
+<dl class:list={['contacts measure', { 'contacts--page': page }]}>
+  <div class="contacts-row">
+    <dt>Telegram</dt>
+    <dd><a class="t-contact" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="tg_click">@{TELEGRAM}</a></dd>
+  </div>
+  <div class="contacts-row">
+    <dt>Почта</dt>
+    <dd><a class="t-contact" href={`mailto:${EMAIL}`} data-goal="email_click">{EMAIL}</a></dd>
+  </div>
+</dl>
+
+<style>
+  .contacts { border-bottom: 1px solid var(--ink); }
+  .contacts-row { display: flex; align-items: center; gap: 1.5rem; padding: 1.125rem 0; border-top: 1px solid var(--ink); }
+  .contacts--page, .contacts--page .contacts-row { border-color: var(--hairline); }
+  .contacts--page .contacts-row { gap: 0; padding: 1.25rem 0; }
+  .contacts--page dt { flex-basis: 14rem; }
+  dt { flex: 0 0 12.5rem; font: 400 0.9375rem/1.2 var(--font); color: var(--grey); }
+  dd { margin: 0; }
+  @media (hover: hover) and (pointer: fine) {
+    dd a:hover { text-decoration: underline; text-underline-offset: 0.3125rem; text-decoration-thickness: 1px; }
+  }
+  @media (max-width: 760px) {
+    .contacts-row, .contacts--page .contacts-row { flex-direction: column; align-items: flex-start; gap: 0.25rem; padding: 0.8125rem 0; }
+    dt, .contacts--page dt { flex: none; font-size: 0.8125rem; line-height: 1.3; }
+    /* на главной у телефона над контактами линии нет — сразу после кнопки (просьба Batın 2026-10-09) */
+    .contacts:not(.contacts--page) .contacts-row:first-child { border-top: 0; }
+    dd a { display: inline-flex; align-items: center; min-height: 2.75rem; margin: -0.625rem 0; overflow-wrap: anywhere; }
+  }
+</style>

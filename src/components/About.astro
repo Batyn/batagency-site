@@ -1,0 +1,26 @@
+---
+// «О нас» на главной (Figma Final «4 · О нас» 278:4802). Тексты — content/site-texts.md, раздел 5; Саша их перепишет (задача 22).
+import Brands from './Brands.astro';
+---
+<section class="about wrap section" id="o-nas" aria-labelledby="about-h">
+  <div class="section-rule"></div>
+  <div class="section-head">
+    <div class="row">
+      <div class="col-main about-text">
+        <h2 class="t-h-lg" id="about-h">О нас</h2>
+        <p class="t-body-lg measure">Рассказываем о <span class="nowrap">дизайн‑ и</span> digital-агентствах, их людях и проектах так, чтобы ими восхищались, а к агентству приходили новые клиенты. Ваша команда тратит время на проекты, о себе за неё рассказываем мы.</p>
+        <p class="t-body-lg measure">Мы отвечали за маркетинг и PR брендингового агентства и подавали его проекты на ключевые премии. Вели соцсети журналов, универмагов, фестивалей и театра, готовили тендеры для креативных агентств, делали спецпроекты с художниками и музыкантами. Работаем вдвоём. Если задаче нужна узкая экспертиза, подключаем подрядчика.</p>
+      </div>
+    </div>
+  </div>
+  <div class="about-brands"><Brands /></div>
+</section>
+
+<style>
+  .section-head .row > .about-text > * + * { margin-top: 1.5rem; }
+  .about-brands { margin-top: 3.5rem; }
+  @media (max-width: 760px) {
+    .section-head .row > .about-text > * + * { margin-top: 1rem; }
+    .about-brands { margin-top: 2rem; }
+  }
+</style>

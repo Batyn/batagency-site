@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import LegalPage from '../components/LegalPage.astro';
+import Footer from '../components/Footer.astro';
+import { parseLegal } from '../lib/legal';
+import md from '../legal/politika-konfidencialnosti.md?raw';
+const doc = parseLegal(md);
+---
+<Base title="Политика конфиденциальности — Bat Agency" description="Какие данные собирает сайт Bat Agency, какие cookies он использует и как от них отказаться.">
+  <Header />
+  <main><LegalPage doc={doc} /></main>
+  <Footer />
+</Base>

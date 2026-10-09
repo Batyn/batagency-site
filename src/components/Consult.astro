@@ -1,0 +1,51 @@
+---
+// «Начнём с одного созвона» (Figma Final: главная 278:4818; страницы «Услуги», «О нас» — блок «Консультация»).
+// На главной следом идут частые вопросы (Faq), на внутренних страницах — только этот блок.
+import ConsultActions from './ConsultActions.astro';
+interface Props { page?: boolean }
+const { page = false } = Astro.props;
+---
+<section class:list={['consult wrap', { 'consult--page': page }]} id="kontakty" aria-labelledby="consult-h">
+  <div class="section-rule"></div>
+  <div class="section-head">
+    <div class="row">
+      <div class="col-main consult-main">
+        <h2 class="t-display" id="consult-h">Начнём с одного созвона</h2>
+        <p class="t-body-lg measure">Пока о проекте не рассказали, о нём знают только заказчики. За 45 минут посмотрим сайт, кейсы, премии и соцсети агентства и предложим первые шаги. Ни к чему не обязывает.</p>
+        {page && <ConsultActions page />}
+      </div>
+    </div>
+  </div>
+  {!page && (
+    <div class="row consult-actions">
+      <div class="col-main consult-main"><ConsultActions /></div>
+    </div>
+  )}
+</section>
+
+<script>
+  // reach_consult: долистали до блока консультации
+  import { goal } from '../scripts/goals';
+  const el = document.getElementById('kontakty');
+  if (el && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); goal('reach_consult'); } }, { threshold: 0.4 });
+    io.observe(el);
+  }
+</script>
+
+<style>
+  /* кнопка и контакты приходят из ConsultActions, поэтому отступы между ними — через :global */
+  .consult { padding-top: 0; }
+  .consult--page { padding-top: var(--section-top); padding-bottom: 0; }
+  .consult-main > :global(* + *) { margin-top: 1.75rem; }
+  .consult-actions { margin-top: 4.5rem; }
+  .consult-actions .consult-main > :global(* + *) { margin-top: 2.5rem; }
+
+  @media (max-width: 760px) {
+    .consult-main > :global(* + *) { margin-top: 1rem; }
+    .consult-actions { margin-top: 2rem; }
+    .consult-actions .consult-main > :global(* + *) { margin-top: 2rem; }
+    .consult--page { padding-top: 4.5rem; }
+    .consult--page .consult-main > :global(* + *) { margin-top: 1.25rem; }
+  }
+</style>

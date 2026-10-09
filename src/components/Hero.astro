@@ -1,0 +1,62 @@
+---
+// Первый экран главной (Figma Final, «1 · Первый экран», 278:4646 / 278:5094).
+// Десктоп 1440×900: логотип 246×122 слева сверху, меню справа, заголовок display на две строки,
+// внизу подзаголовок слева и кнопка справа. Телефон: логотип 76×38, «Меню», заголовок 40, внизу текст и кнопка.
+import Logo from './Logo.astro';
+import MenuButton from './MenuButton.astro';
+import { NAV, TELEGRAM_URL } from '../data/site';
+
+// на главной пункты-якоря ведут к блокам этой же страницы
+const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 'kontakty' ? `#${n.key}` : n.href }));
+---
+<header class="hero wrap" id="top">
+  <div class="hero-top">
+    <a class="hero-logo" href="/" aria-label="Bat Agency — на главную"><Logo /></a>
+    <nav class="nav" aria-label="Разделы">
+      {nav.map((n) => <a class="nav-a t-label-md" href={n.href}>{n.label}</a>)}
+    </nav>
+    <MenuButton />
+  </div>
+  <h1 class="hero-title t-display">Маркетинг и PR для <span class="nowrap">дизайн‑ и</span> digital-агентств</h1>
+  <div class="hero-bottom">
+    <p class="hero-sub t-body-sm">Вы делаете проекты, мы рассказываем о них клиентам, жюри и отраслевым СМИ. Пишем кейсы и заявки на премии, ведём соцсети и рассылку, готовим спикеров и вебинары.</p>
+    <a class="btn btn--block-m" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="consult_click">Бесплатная консультация</a>
+  </div>
+</header>
+
+<script>
+  import '../scripts/eye';
+</script>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-rows: auto 1fr auto 1fr auto;
+    min-height: max(40rem, min(100svh, 56.25rem));
+    padding-top: 2.75rem; padding-bottom: 3rem;
+  }
+  .hero-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  /* в Figma логотип стоит на 7 px правее поля: оптическая компенсация круглой «b» */
+  .hero-logo { display: block; width: 15.375rem; margin-left: 0.4375rem; }
+  .hero-logo :global(svg) { width: 100%; height: auto; }
+  .nav { display: flex; gap: 1.75rem; }
+  @media (hover: hover) and (pointer: fine) {
+    .nav-a:hover { text-decoration: underline; text-underline-offset: 0.25rem; }
+  }
+  .hero-title { grid-row: 3; max-width: 68.75rem; text-wrap: balance; }
+  .hero-bottom { grid-row: 5; display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem; }
+  .hero-sub { max-width: 29.75rem; }
+
+  @media (max-width: 760px) {
+    .hero {
+      grid-template-rows: auto auto 1fr auto;
+      min-height: 100svh;
+      padding-top: 1rem; padding-bottom: clamp(3rem, 18svh, 9.5rem);
+    }
+    .hero-top { align-items: center; }
+    .hero-logo { width: 4.75rem; margin: -0.1875rem 0; padding: 0.1875rem 0; }
+    .nav { display: none; }
+    .hero-title { grid-row: 2; margin-top: 4.875rem; }
+    .hero-bottom { grid-row: 4; flex-direction: column; align-items: stretch; gap: 1rem; padding-top: 2.5rem; }
+  }
+</style>

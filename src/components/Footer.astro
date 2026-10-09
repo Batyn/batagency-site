@@ -1,0 +1,73 @@
+---
+// Подвал, вариант A «Колонки» (Figma Components: Footer · desktop 318:3677, Footer · mobile 318:3722).
+import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL, TAGLINE } from '../data/site';
+---
+<footer class="ft wrap">
+  <div class="section-rule"></div>
+  <div class="ft-body">
+    <div class="ft-brand">
+      <p class="ft-mark">Bat Agency</p>
+      <p class="t-caption ft-grey">{TAGLINE}</p>
+    </div>
+    <div class="ft-group" id="footer-nav">
+      <p class="ft-h">Навигация</p>
+      <ul class="ft-list">
+        {FOOTER_NAV.map((l) => <li><a class="ft-a" href={l.href}>{l.label}</a></li>)}
+      </ul>
+    </div>
+    <div class="ft-group">
+      <p class="ft-h">Связь</p>
+      <ul class="ft-list">
+        <li><a class="ft-a" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="tg_click">Telegram @{TELEGRAM}</a></li>
+        <li><a class="ft-a" href={`mailto:${EMAIL}`} data-goal="email_click">{EMAIL}</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ft-hair"></div>
+  <div class="ft-bottom">
+    <p class="ft-legal">
+      <a class="ft-a" href="/privacy/">Политика конфиденциальности</a>
+      <a class="ft-a" href="/personalnye-dannye/">Обработка персональных данных</a>
+    </p>
+    <p class="ft-mark ft-mark--m">Bat Agency</p>
+    <p class="ft-year">2026</p>
+  </div>
+</footer>
+
+<style>
+  .ft-body {
+    display: grid; grid-template-columns: var(--col-3) var(--col-3) minmax(0, 1fr);
+    column-gap: var(--col-gap); padding-block: 2.5rem;
+  }
+  .ft-brand { display: flex; flex-direction: column; gap: 0.5rem; }
+  .ft-mark { font: 700 0.9375rem/1.2 var(--font); }
+  .ft-grey { color: var(--grey); }
+  .ft-group { display: flex; flex-direction: column; gap: 0.75rem; }
+  .ft-h { font: 400 0.8125rem/1.2 var(--font); color: var(--grey); }
+  .ft-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .ft-a { font: 400 0.9375rem/1.45 var(--font); }
+  @media (hover: hover) and (pointer: fine) {
+    .ft-a:hover { text-decoration: underline; text-underline-offset: 0.25rem; }
+  }
+  .ft-hair { height: 1px; background: var(--hairline); }
+  .ft-bottom {
+    display: grid; grid-template-columns: var(--col-3) minmax(0, 1fr) auto;
+    column-gap: var(--col-gap); padding: 1.25rem 0 2rem;
+  }
+  .ft-legal { grid-column: 2; display: flex; flex-wrap: wrap; gap: 0 1.5rem; }
+  .ft-mark--m { display: none; }
+  .ft-year { font: 400 0.9375rem/1.45 var(--font); color: var(--grey); }
+
+  @media (max-width: 760px) {
+    .ft-body { grid-template-columns: 1fr; row-gap: 2rem; padding: 2rem 0 1.5rem; }
+    .ft-brand { display: none; }
+    .ft-group { gap: 0; }
+    .ft-h { font: 500 0.75rem/1.2 var(--font); }
+    .ft-list { gap: 0; }
+    .ft-a { display: flex; align-items: center; min-height: 2.75rem; font-size: 0.875rem; }
+    .ft-bottom { grid-template-columns: 1fr auto; padding: 0.75rem 0 2rem; row-gap: 0.75rem; }
+    .ft-legal { grid-column: 1 / -1; flex-direction: column; padding-bottom: 1.125rem; }
+    .ft-mark--m { display: block; font-size: 0.875rem; }
+    .ft-year { font-size: 0.875rem; line-height: 1.2; }
+  }
+</style>

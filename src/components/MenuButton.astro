@@ -1,0 +1,13 @@
+---
+// «Меню» на телефоне. Без JS — ссылка на навигацию в подвале; с JS открывает панель MobileMenu.
+---
+<a class="menu-btn" href="#footer-nav" data-menu-open aria-haspopup="dialog" aria-controls="mobile-menu">Меню</a>
+
+<style>
+  .menu-btn {
+    display: none;
+    align-items: center; min-height: 2.75rem; min-width: 2.75rem; justify-content: flex-end;
+    margin: -0.8125rem 0; font: 400 0.9375rem/1.45 var(--font);
+  }
+  @media (max-width: 760px) { .menu-btn { display: inline-flex; } }
+</style>
