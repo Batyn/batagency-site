@@ -1,0 +1,1 @@
+import{t as e}from"./goals.Bg3iRGA6.js";var t=document.getElementById(`kontakty`);if(t&&`IntersectionObserver`in window){let n=new IntersectionObserver(t=>{t.some(e=>e.isIntersecting)&&(n.disconnect(),e(`reach_consult`))},{threshold:.4});n.observe(t)}

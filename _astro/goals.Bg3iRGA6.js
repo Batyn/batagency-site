@@ -1,0 +1,1 @@
+function e(e){try{window.ym?.(113553806,`reachGoal`,e)}catch{}}document.addEventListener(`click`,t=>{let n=t.target?.closest(`[data-goal]`);n?.dataset.goal&&e(n.dataset.goal)});export{e as t};

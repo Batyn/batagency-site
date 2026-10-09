@@ -1,0 +1,1 @@
+import"./goals.Bg3iRGA6.js";
