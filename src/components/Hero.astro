@@ -94,9 +94,9 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
   .hero-bar { position: absolute; top: 0; left: 0; right: 0; z-index: 60; height: var(--header-h); }
   :global(.js) .hero-bar { position: fixed; }
   .hero-bar .glass { transition: none; }
-  /* ниже «Услуг» шапка уезжает целиком: выход 200 мс, возврат 250 мс, ease-out */
-  .hero-bar { transition: transform 250ms var(--ease-out); }
-  .hero-bar.is-hidden { transform: translateY(-100%); transition-duration: 200ms; }
+  /* шапка уезжает и возвращается целиком, 300 мс, кривая выезжающей панели iOS */
+  .hero-bar { transition: transform var(--t-header) var(--ease-drawer); }
+  .hero-bar.is-hidden { transform: translateY(-100%); transition-duration: var(--t-header-out); transition-timing-function: var(--ease-in-out); }
   .hero-top { position: relative; height: 100%; display: flex; justify-content: flex-end; align-items: center; }
   /* в Figma логотип стоит на 7 px правее поля: оптическая компенсация круглой «b» */
   .hero-logo {

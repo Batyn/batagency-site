@@ -58,8 +58,8 @@ const { current } = Astro.props;
 
   @media (max-width: 760px) {
     /* Figma: шапка телефона 62 — отступы 16 сверху и 8 снизу, логотип 76×38 */
-    .hdr { height: auto; padding-top: 1rem; padding-bottom: 0.5rem; transition: transform 250ms var(--ease-out); }
-    .hdr.is-hidden { transform: translateY(-100%); transition-duration: 200ms; }
+    .hdr { height: auto; padding-top: 1rem; padding-bottom: 0.5rem; transition: transform var(--t-header) var(--ease-drawer); }
+    .hdr.is-hidden { transform: translateY(-100%); transition-duration: var(--t-header-out); transition-timing-function: var(--ease-in-out); }
     .nav { display: none; }
     .hdr-logo { width: 4.75rem; }
   }

@@ -30,7 +30,9 @@ import { FAQ } from '../data/faq';
   .faq { margin-top: 4.5rem; }
   .faq-grid { display: grid; grid-template-columns: var(--col-3) minmax(0, 1fr); column-gap: var(--col-gap); }
   .faq-list { display: flex; flex-direction: column; gap: 0.5rem; }
-  .faq-row { border: 1px solid var(--ink); border-radius: var(--r-md); overflow: hidden; }
+  .faq-row { border: 1px solid var(--ink); border-radius: var(--r-md); overflow: hidden; transition: transform 120ms var(--ease-out); }
+  /* нажатие: строка чуть уменьшается, как ячейки услуг */
+  .faq-row:has(> .faq-q:active) { transform: scale(0.99); }
   .faq-q { display: flex; align-items: center; gap: 1.5rem; padding: 1.25rem; cursor: pointer; list-style: none; }
   .faq-q::-webkit-details-marker { display: none; }
   .faq-q:focus-visible { outline-offset: -0.25rem; }
@@ -55,6 +57,7 @@ import { FAQ } from '../data/faq';
     .faq-a { margin-top: -0.375rem; padding: 0 1rem 1.5rem; font-size: 1rem; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .faq-sign::after { transition: none; }
+    .faq-sign::after, .faq-row { transition: none; }
+    .faq-row:has(> .faq-q:active) { transform: none; }
   }
 </style>

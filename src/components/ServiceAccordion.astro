@@ -45,9 +45,11 @@ import { TELEGRAM_URL } from '../data/site';
     border: 1px solid var(--ink); border-radius: var(--r-md);
     background: var(--bg); color: var(--ink);
     overflow: hidden;
-    transition: background-color var(--t-accordion) ease, color var(--t-accordion) ease;
+    transition: background-color var(--t-accordion) ease, color var(--t-accordion) ease, transform 120ms var(--ease-out);
   }
   .acc-row[open], .acc-row.is-open { background: var(--ink); color: var(--bg); }
+  /* нажатие: строка чуть уменьшается, как ячейки услуг на главной */
+  .acc-row:has(> .acc-sum:active) { transform: scale(0.99); }
   .acc-row.is-closing { background: var(--bg); color: var(--ink); }
   .acc-sum {
     display: grid; grid-template-columns: var(--acc-spacer) minmax(0, 1fr) auto; column-gap: 1.5rem; align-items: center;
@@ -94,5 +96,6 @@ import { TELEGRAM_URL } from '../data/site';
   }
   @media (prefers-reduced-motion: reduce) {
     .acc-row, .acc-n, .acc-sign::after { transition: none; }
+    .acc-row:has(> .acc-sum:active) { transform: none; }
   }
 </style>
