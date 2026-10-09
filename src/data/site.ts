@@ -3,7 +3,6 @@
 export const TELEGRAM = 'batynrrr';
 export const TELEGRAM_URL = `https://t.me/${TELEGRAM}`;
 export const EMAIL = 'erbatyn@gmail.com';
-export const TAGLINE = 'Маркетинг и PR для дизайн‑ и digital-агентств';
 
 export type NavKey = 'uslugi' | 'kak-rabotaem' | 'o-nas' | 'kontakty';
 

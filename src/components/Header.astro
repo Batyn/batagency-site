@@ -1,7 +1,7 @@
 ---
 // Шапка внутренних страниц (Figma Components «Header · desktop», Type = Compact, 404:6059): слева логотип bat 81×40,
-// справа меню, текущий пункт — чёрная плашка. На десктопе шапка липкая, после начала прокрутки фон — матовое стекло.
-// На телефоне — логотип 76×38 и «Меню»: при прокрутке вниз шапка уезжает, при прокрутке вверх возвращается (Batın 2026-10-09).
+// справа меню, текущий пункт — чёрная плашка; на телефоне — логотип 76×38 и «Меню». После начала прокрутки фон — матовое стекло.
+// На десктопе и телефоне шапка при прокрутке вниз уезжает, при прокрутке вверх возвращается (Batın 2026-10-09).
 // На главной шапка встроена в первый экран (Hero).
 import { NAV, type NavKey } from '../data/site';
 import Logo from './Logo.astro';
@@ -26,15 +26,13 @@ const { current } = Astro.props;
   import { autoHide } from '../scripts/autohide';
   // стекло появляется, когда под шапкой есть текст: страница прокручена хотя бы на пиксель
   const hdr = document.querySelector<HTMLElement>('[data-hdr]')!;
-  const phone = matchMedia('(max-width: 760px)');
   const hide = autoHide(hdr, () => hdr.offsetHeight);
   const sync = () => {
     const y = Math.max(0, scrollY);
     hdr.classList.toggle('is-scrolled', y > 0);
-    if (phone.matches) hide(y); else hdr.classList.remove('is-hidden');
+    hide(y);
   };
   addEventListener('scroll', sync, { passive: true });
-  phone.addEventListener('change', sync);
   sync();
 </script>
 
@@ -55,11 +53,13 @@ const { current } = Astro.props;
     .nav-a:not(.is-current):hover { text-decoration: underline; text-underline-offset: 0.25rem; }
   }
   .hdr.is-scrolled .glass { opacity: 1; }
+  /* уходит плавно (разгон и торможение), возвращается быстро — как на главной */
+  .hdr { transition: transform var(--t-header) var(--ease-drawer); }
+  .hdr.is-hidden { transform: translateY(-100%); transition-duration: var(--t-header-out); transition-timing-function: var(--ease-in-out); }
 
   @media (max-width: 760px) {
     /* Figma: шапка телефона 62 — отступы 16 сверху и 8 снизу, логотип 76×38 */
-    .hdr { height: auto; padding-top: 1rem; padding-bottom: 0.5rem; transition: transform var(--t-header) var(--ease-drawer); }
-    .hdr.is-hidden { transform: translateY(-100%); transition-duration: var(--t-header-out); transition-timing-function: var(--ease-in-out); }
+    .hdr { height: auto; padding-top: 1rem; padding-bottom: 0.5rem; }
     .nav { display: none; }
     .hdr-logo { width: 4.75rem; }
   }

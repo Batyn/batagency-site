@@ -1,14 +1,12 @@
 ---
 // Подвал, вариант A «Колонки» (Figma Components: Footer · desktop 318:3677, Footer · mobile 318:3722).
-import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL, TAGLINE } from '../data/site';
+// Десктоп (Batın 2026-10-10): подписи под названием нет; внизу без линии — слева «© Bat Agency. Все права защищены»,
+// в колонке «Связи» политики друг над другом, справа год; снизу 72. На телефоне та же строка «© Bat Agency…» под политиками.
+import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL } from '../data/site';
 ---
 <footer class="ft wrap">
   <div class="section-rule"></div>
   <div class="ft-body">
-    <div class="ft-brand">
-      <p class="ft-mark">Bat Agency</p>
-      <p class="t-caption ft-grey">{TAGLINE}</p>
-    </div>
     <div class="ft-group" id="footer-nav">
       <p class="ft-h">Навигация</p>
       <ul class="ft-list">
@@ -25,11 +23,11 @@ import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL, TAGLINE } from '../data/site
   </div>
   <div class="ft-hair"></div>
   <div class="ft-bottom">
+    <p class="ft-copy">©&nbsp;Bat Agency. Все права защищены</p>
     <p class="ft-legal">
       <a class="ft-a" href="/privacy/">Политика конфиденциальности</a>
       <a class="ft-a" href="/personalnye-dannye/">Обработка персональных данных</a>
     </p>
-    <p class="ft-mark ft-mark--m">Bat Agency</p>
     <p class="ft-year">2026</p>
   </div>
 </footer>
@@ -39,9 +37,7 @@ import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL, TAGLINE } from '../data/site
     display: grid; grid-template-columns: var(--col-3) var(--col-3) minmax(0, 1fr);
     column-gap: var(--col-gap); padding-block: 2.5rem;
   }
-  .ft-brand { display: flex; flex-direction: column; gap: 0.5rem; }
-  .ft-mark { font: 700 0.9375rem/1.2 var(--font); }
-  .ft-grey { color: var(--grey); }
+  .ft-body > :first-child { grid-column: 2; }
   .ft-group { display: flex; flex-direction: column; gap: 0.75rem; }
   .ft-h { font: 400 0.8125rem/1.2 var(--font); color: var(--grey); }
   .ft-list { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -49,26 +45,28 @@ import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL, TAGLINE } from '../data/site
   @media (hover: hover) and (pointer: fine) {
     .ft-a:hover { text-decoration: underline; text-underline-offset: 0.25rem; }
   }
-  .ft-hair { height: 1px; background: var(--hairline); }
+  .ft-hair { display: none; height: 1px; background: var(--hairline); }
   .ft-bottom {
-    display: grid; grid-template-columns: var(--col-3) minmax(0, 1fr) auto;
-    column-gap: var(--col-gap); padding: 1.25rem 0 2rem;
+    display: grid; grid-template-columns: var(--col-3) var(--col-3) minmax(0, 1fr) auto;
+    column-gap: var(--col-gap); align-items: start; padding: 0 0 4.5rem;
   }
-  .ft-legal { grid-column: 2; display: flex; flex-wrap: wrap; gap: 0 1.5rem; }
-  .ft-mark--m { display: none; }
-  .ft-year { font: 400 0.9375rem/1.45 var(--font); color: var(--grey); }
+  .ft-copy { grid-column: 1; font: 400 0.9375rem/1.45 var(--font); color: var(--grey); }
+  /* под «Связью» (Batın 2026-10-10); шаг строк 32, как у списков над ними */
+  .ft-legal { grid-column: 3; display: flex; flex-direction: column; align-items: flex-start; gap: 0.625rem; }
+  .ft-year { grid-column: 4; font: 400 0.9375rem/1.45 var(--font); color: var(--grey); }
 
   @media (max-width: 760px) {
     /* Figma «Footer · mobile» (318:3722): «Навигация» и «Связь» в две колонки 171 + 8 */
     .ft-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 0.5rem; padding-block: 2rem; align-items: start; }
-    .ft-brand { display: none; }
+    .ft-body > :first-child { grid-column: auto; }
+    .ft-hair { display: block; }
     .ft-group { gap: 0; }
     .ft-h { font: 500 0.75rem/1.2 var(--font); }
     .ft-list { gap: 0; }
     .ft-a { display: flex; align-items: center; min-height: 2.75rem; font-size: 0.875rem; }
     .ft-bottom { grid-template-columns: 1fr auto; padding: 0.75rem 0 3.5rem; row-gap: 0.75rem; }
-    .ft-legal { grid-column: 1 / -1; flex-direction: column; padding-bottom: 1.125rem; }
-    .ft-mark--m { display: block; font-size: 0.875rem; }
-    .ft-year { font-size: 0.875rem; line-height: 1.2; }
+    .ft-legal { grid-row: 1; grid-column: 1 / -1; gap: 0; padding-bottom: 1.125rem; }
+    .ft-copy { grid-row: 2; grid-column: 1; font-size: 0.875rem; line-height: 1.2; }
+    .ft-year { grid-row: 2; grid-column: 2; font-size: 0.875rem; line-height: 1.2; }
   }
 </style>
