@@ -1,1 +1,0 @@
-import{t as e}from"./autohide.ARZIgWND.js";var t=document.querySelector(`[data-hdr]`),n=matchMedia(`(max-width: 760px)`),r=e(t,()=>t.offsetHeight),i=()=>{let e=Math.max(0,scrollY);t.classList.toggle(`is-scrolled`,e>0),n.matches?r(e):t.classList.remove(`is-hidden`)};addEventListener(`scroll`,i,{passive:!0}),n.addEventListener(`change`,i),i();
