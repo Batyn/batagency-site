@@ -1,7 +1,8 @@
 ---
 // Подвал, вариант A «Колонки» (Figma Components: Footer · desktop 318:3677, Footer · mobile 318:3722).
 // Десктоп (Batın 2026-10-10): подписи под названием нет; внизу без линии — слева «© Bat Agency. Все права защищены»,
-// в колонке «Связи» политики друг над другом, справа год; снизу 72. На телефоне та же строка «© Bat Agency…» под политиками.
+// справа год; снизу 72. Политики — в колонке «Связи» напротив «Контактов» и «Вопросов» (Batın 2026-10-10).
+// На телефоне политики, как раньше, внизу над строкой «© Bat Agency…» — поэтому ссылки в разметке дважды, видна одна пара.
 import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL } from '../data/site';
 ---
 <footer class="ft wrap">
@@ -15,9 +16,11 @@ import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL } from '../data/site';
     </div>
     <div class="ft-group">
       <p class="ft-h">Связь</p>
-      <ul class="ft-list">
+      <ul class="ft-list ft-list--contact">
         <li><a class="ft-a" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="tg_click">Telegram @{TELEGRAM}</a></li>
         <li><a class="ft-a" href={`mailto:${EMAIL}`} data-goal="email_click">{EMAIL}</a></li>
+        <li class="ft-legal-d"><a class="ft-a" href="/privacy/">Политика конфиденциальности</a></li>
+        <li class="ft-legal-d"><a class="ft-a" href="/personalnye-dannye/">Обработка персональных данных</a></li>
       </ul>
     </div>
   </div>
@@ -48,11 +51,15 @@ import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL } from '../data/site';
   .ft-hair { display: none; height: 1px; background: var(--hairline); }
   .ft-bottom {
     display: grid; grid-template-columns: var(--col-3) var(--col-3) minmax(0, 1fr) auto;
-    column-gap: var(--col-gap); align-items: start; padding: 0 0 4.5rem;
+    /* над строкой «© Bat Agency…» 72 (40 от списков + 32), снизу тоже 72 */
+    column-gap: var(--col-gap); align-items: start; padding: 2rem 0 4.5rem;
   }
+  /* «Связь» — сетка в шаг строк «Навигации» (24 + 8): политики встают в 5-ю и 6-ю строки, напротив «Контактов» и «Вопросов» */
+  .ft-list--contact { display: grid; grid-template-rows: repeat(6, 1.5rem); row-gap: 0.5rem; align-items: start; }
+  .ft-legal-d:nth-last-child(2) { grid-row: 5; }
+  .ft-legal-d:last-child { grid-row: 6; }
+  .ft-legal { display: none; }
   .ft-copy { grid-column: 1; font: 400 0.9375rem/1.45 var(--font); color: var(--grey); }
-  /* под «Связью» (Batın 2026-10-10); шаг строк 32, как у списков над ними */
-  .ft-legal { grid-column: 3; display: flex; flex-direction: column; align-items: flex-start; gap: 0.625rem; }
   .ft-year { grid-column: 4; font: 400 0.9375rem/1.45 var(--font); color: var(--grey); }
 
   @media (max-width: 760px) {
@@ -62,10 +69,11 @@ import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL } from '../data/site';
     .ft-hair { display: block; }
     .ft-group { gap: 0; }
     .ft-h { font: 500 0.75rem/1.2 var(--font); }
-    .ft-list { gap: 0; }
+    .ft-list, .ft-list--contact { display: flex; gap: 0; }
+    .ft-legal-d { display: none; }
     .ft-a { display: flex; align-items: center; min-height: 2.75rem; font-size: 0.875rem; }
     .ft-bottom { grid-template-columns: 1fr auto; padding: 0.75rem 0 3.5rem; row-gap: 0.75rem; }
-    .ft-legal { grid-row: 1; grid-column: 1 / -1; gap: 0; padding-bottom: 1.125rem; }
+    .ft-legal { grid-row: 1; grid-column: 1 / -1; display: flex; flex-direction: column; align-items: flex-start; padding-bottom: 1.125rem; }
     .ft-copy { grid-row: 2; grid-column: 1; font-size: 0.875rem; line-height: 1.2; }
     .ft-year { grid-row: 2; grid-column: 2; font-size: 0.875rem; line-height: 1.2; }
   }

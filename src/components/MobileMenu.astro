@@ -1,6 +1,6 @@
 ---
 // Меню на телефоне. В Figma не нарисовано — простая версия на сверку Batın (2026-10-09):
-// белая панель на весь экран, пункты крупно, «Закрыть» текстом, внизу «Бесплатная консультация».
+// белая панель на весь экран, пункты крупно, справа сверху крестик (Batın 2026-10-10), внизу «Бесплатная консультация».
 // Слева сверху логотип bat с глазом — на том же месте и того же размера, что в шапке телефона (Batın 2026-10-09).
 import { NAV, TELEGRAM_URL } from '../data/site';
 import Logo from './Logo.astro';
@@ -8,7 +8,7 @@ import Logo from './Logo.astro';
 <div class="mm" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Меню" hidden>
   <div class="mm-top wrap">
     <a class="mm-logo" href="/" aria-label="Bat Agency — на главную"><Logo id="menu-logo" /></a>
-    <button class="mm-close" type="button" data-menu-close>Закрыть</button>
+    <button class="mm-close" type="button" data-menu-close aria-label="Закрыть меню"><span class="mm-x" aria-hidden="true"></span></button>
   </div>
   <nav class="mm-nav wrap" aria-label="Разделы">
     <a class="mm-a t-h-lg" href="/">Главная</a>
@@ -21,7 +21,7 @@ import Logo from './Logo.astro';
 </div>
 
 <script>
-  // Панель: появление opacity + сдвиг 8 px, 200 мс ease-out; закрытие быстрее. Esc и «Закрыть» закрывают, фокус возвращается.
+  // Панель: появление opacity + сдвиг 8 px, 200 мс ease-out; закрытие быстрее. Esc и крестик закрывают, фокус возвращается.
   const menu = document.getElementById('mobile-menu')!;
   // при reduced-motion глаз в меню тоже неподвижен
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) (document.getElementById('menu-logo') as unknown as SVGSVGElement | null)?.pauseAnimations();
@@ -79,7 +79,13 @@ import Logo from './Logo.astro';
   .mm-top { display: flex; align-items: center; justify-content: space-between; padding-top: 1rem; padding-bottom: 0.5rem; width: 100%; }
   .mm-logo { display: block; width: 4.75rem; }
   .mm-logo :global(svg) { width: 100%; height: auto; }
-  .mm-close { min-height: 2.75rem; margin: -0.8125rem 0; padding: 0; border: 0; background: none; font: 400 0.9375rem/1.45 var(--font); cursor: pointer; }
+  /* крестик 18 из двух черт 2 px, как «+» / «−» в аккордеонах; зона нажатия 44×44, сам знак — вровень с полем справа */
+  .mm-close { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; margin: -0.1875rem -0.8125rem -0.1875rem 0; padding: 0; border: 0; background: none; color: var(--ink); cursor: pointer; }
+  .mm-x { position: relative; width: 1.125rem; height: 1.125rem; }
+  .mm-x::before, .mm-x::after { content: ""; position: absolute; left: -0.125rem; right: -0.125rem; top: 50%; height: 2px; margin-top: -1px; background: currentColor; border-radius: 1px; }
+  .mm-x::before { transform: rotate(45deg); }
+  .mm-x::after { transform: rotate(-45deg); }
+  .mm-close:active .mm-x { transform: scale(0.9); transition: transform 120ms var(--ease-out); }
   .mm-nav { display: flex; flex-direction: column; padding-top: 2rem; width: 100%; }
   .mm-a { padding-block: 0.625rem; border-bottom: 1px solid var(--hairline); }
   .mm-a:first-child { border-top: 1px solid var(--ink); }
