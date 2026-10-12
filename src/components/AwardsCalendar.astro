@@ -145,7 +145,9 @@ const date = dataDateText();
   /* прошедший срок: подпись не пересекает линию «сегодня» — начинается через 8 px после неё */
   .aw-tl :global(.tl-lbl.is-passed) { color: var(--grey); left: max(calc(var(--mx) + 0.8125rem), calc(var(--today) + 1px + 0.5rem)); }
   .aw-tl :global(.tl-bar) {
-    position: absolute; left: 0; right: 0; top: 50%; height: 1.875rem; transform: translateY(-50%);
+    /* по центру строки отступами, а не transform (иначе контур на доле пикселя размыт); по бокам 6 px от линий
+       первого и последнего месяца, чтобы контур с ними не сливался (Batın 2026-10-12) */
+    position: absolute; inset: 0 var(--s-2xs); height: 1.875rem; margin: auto 0;
     display: flex; align-items: center; padding: 0 0.5625rem;
     background: var(--bg); border: 1px solid var(--ink); border-radius: var(--r-sm);
     font: 400 0.8125rem/1.2 var(--font);
