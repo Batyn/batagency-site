@@ -9,6 +9,7 @@ export type Service = {
   items: string[];      // что входит; в наведённой ячейке на десктопе — первые три
   width: number;        // ширина ячейки в мозаике 884 px (десктоп)
   wide?: boolean;       // на телефоне во всю ширину
+  link?: { label: string; href: string }; // ссылка на /uslugi/ перед кнопкой консультации
 };
 
 export const SERVICES: Service[] = [
@@ -38,6 +39,7 @@ export const SERVICES: Service[] = [
       'Готовим и подаём заявки на российские и международные премии',
       'Если кейса ещё нет, сначала пишем его',
     ],
+    link: { label: 'Календарь премий', href: '/kalendar-premiy/' },
   },
   {
     n: '04', title: 'Статьи', slug: 'stati', width: 442,

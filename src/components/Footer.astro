@@ -1,7 +1,8 @@
 ---
 // Подвал, вариант A «Колонки» (Figma Components: Footer · desktop 318:3677, Footer · mobile 318:3722).
 // Десктоп (Batın 2026-10-10): подписи под названием нет; внизу без линии — слева «© Bat Agency. Все права защищены»,
-// справа год; снизу 72. Политики — в колонке «Связи» напротив «Контактов» и «Вопросов» (Batın 2026-10-10).
+// справа год; снизу 72. Политики — в колонке «Связи» напротив двух последних строк «Навигации»:
+// «Вопросов» и «Календаря премий» (Batın 2026-10-12; было напротив «Контактов» и «Вопросов», 2026-10-10).
 // На телефоне политики, как раньше, внизу над строкой «© Bat Agency…» — поэтому ссылки в разметке дважды, видна одна пара.
 import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL } from '../data/site';
 ---
@@ -54,10 +55,10 @@ import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL } from '../data/site';
     /* над строкой «© Bat Agency…» 72 (40 от списков + 32), снизу тоже 72 */
     column-gap: var(--col-gap); align-items: start; padding: 2rem 0 4.5rem;
   }
-  /* «Связь» — сетка в шаг строк «Навигации» (24 + 8): политики встают в 5-ю и 6-ю строки, напротив «Контактов» и «Вопросов» */
-  .ft-list--contact { display: grid; grid-template-rows: repeat(6, 1.5rem); row-gap: 0.5rem; align-items: start; }
-  .ft-legal-d:nth-last-child(2) { grid-row: 5; }
-  .ft-legal-d:last-child { grid-row: 6; }
+  /* «Связь» — сетка в шаг строк «Навигации» (24 + 8): политики встают в 6-ю и 7-ю строки, напротив «Вопросов» и «Календаря премий» */
+  .ft-list--contact { display: grid; grid-template-rows: repeat(7, 1.5rem); row-gap: 0.5rem; align-items: start; }
+  .ft-legal-d:nth-last-child(2) { grid-row: 6; }
+  .ft-legal-d:last-child { grid-row: 7; }
   .ft-legal { display: none; }
   .ft-copy { grid-column: 1; font: 400 0.9375rem/1.45 var(--font); color: var(--grey); }
   .ft-year { grid-column: 4; font: 400 0.9375rem/1.45 var(--font); color: var(--grey); }

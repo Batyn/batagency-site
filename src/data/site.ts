@@ -21,4 +21,5 @@ export const FOOTER_NAV = [
   { label: 'О нас', href: '/o-nas/' },
   { label: 'Контакты', href: '/#kontakty' },
   { label: 'Вопросы', href: '/#voprosy' },
+  { label: 'Календарь премий', href: '/kalendar-premiy/' },
 ];
