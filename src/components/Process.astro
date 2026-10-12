@@ -1,19 +1,23 @@
 ---
 // «Как работаем» (Figma Final «3 · Как работаем» 278:4774 / 278:5199). Тексты — content/site-texts.md, раздел 4.
-const STEPS = [
+// На «Календаре премий» тот же блок с другим заголовком и шагами («Как мы подаём заявку», раздел 7).
+interface Step { t: string; d: string }
+interface Props { title?: string; steps?: Step[]; id?: string }
+const DEFAULT_STEPS: Step[] = [
   { t: 'Консультация', d: 'Бесплатно смотрим, что у агентства уже есть: сайт, кейсы, премии, публикации, соцсети.' },
   { t: 'План', d: 'Присылаем работы, сроки и цены на одну задачу или на полгода. Начинаем после вашего «да».' },
   { t: 'Работа', d: 'Пишем тексты и заявки, ведём каналы. Каждый материал согласуем до публикации, деньги на рекламу и взносы тратим только на согласованную цель.' },
   { t: 'Отчёт', d: 'Раз в месяц рассказываем, что сделано и что изменилось в обращениях и охватах.' },
 ];
+const { title = 'Как работаем', steps = DEFAULT_STEPS, id = 'kak-rabotaem' } = Astro.props;
 ---
-<section class="proc wrap section" id="kak-rabotaem" aria-labelledby="proc-h">
+<section class="proc wrap section" id={id} aria-labelledby="proc-h">
   <div class="section-rule"></div>
   <div class="section-head">
-    <div class="row"><div class="col-main"><h2 class="t-h-lg" id="proc-h">Как работаем</h2></div></div>
+    <div class="row"><div class="col-main"><h2 class="t-h-lg" id="proc-h">{title}</h2></div></div>
   </div>
   <ol class="steps">
-    {STEPS.map((s, i) => (
+    {steps.map((s, i) => (
       <li class="step">
         <span class="step-n" aria-hidden="true">{i + 1}</span>
         <div class="step-body">

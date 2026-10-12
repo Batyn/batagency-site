@@ -2,8 +2,10 @@
 // «Начнём с одного созвона» (Figma Final: главная 278:4818; страницы «Услуги», «О нас» — блок «Консультация»).
 // На главной следом идут частые вопросы (Faq), на внутренних страницах — только этот блок.
 import ConsultActions from './ConsultActions.astro';
-interface Props { page?: boolean }
-const { page = false } = Astro.props;
+// text — свой текст под заголовком (на «Календаре премий» — про премии, content/site-texts.md, раздел 7)
+interface Props { page?: boolean; text?: string }
+const DEFAULT_TEXT = 'Пока о проекте не рассказали, о нём знают только заказчики. За 45 минут посмотрим сайт, кейсы, премии и соцсети агентства и предложим первые шаги. Ни к чему не обязывает.';
+const { page = false, text = DEFAULT_TEXT } = Astro.props;
 ---
 <section class:list={['consult wrap', { 'consult--page': page }]} id="kontakty" aria-labelledby="consult-h">
   <div class="section-rule"></div>
@@ -11,7 +13,7 @@ const { page = false } = Astro.props;
     <div class="row">
       <div class="col-main consult-main">
         <h2 class="t-display" id="consult-h">Начнём с одного созвона</h2>
-        <p class="t-body-lg measure">Пока о проекте не рассказали, о нём знают только заказчики. За 45 минут посмотрим сайт, кейсы, премии и соцсети агентства и предложим первые шаги. Ни к чему не обязывает.</p>
+        <p class="t-body-lg measure">{text}</p>
         {page && <ConsultActions page />}
       </div>
     </div>

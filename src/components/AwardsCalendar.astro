@@ -1,0 +1,263 @@
+---
+// Блок «Календарь премий» (Figma Final, секция Awards calendar 472:6612).
+// Десктоп — вариант A «Таймлайн на год» (437:6621): сводка 438:6756, фильтр и легенда 438:6769, таймлайн 438:6787.
+// Телефон — P6: «Список» (456:6902), «Месяц» (462:7111, 450:6935), «Весь год» (454:6893).
+// Отступы у отметок — образцы Batın 442:6894 и 442:6897, правило в DESIGN.md (Shapes).
+// HTML собирается на день сборки, scripts/awards.ts пересчитывает от даты посетителя. Данные — data/awards.ts.
+import { todayNum, renderSummary, renderFilter, renderTimeline, renderList, dataDateText } from '../scripts/awards-view';
+
+const built = todayNum();
+const date = dataDateText();
+---
+<section class="aw wrap" data-aw data-built={built} aria-label="Календарь премий">
+  <!-- Сводка только на десктопе: в макете телефона её нет (вопрос Batın, MEMORY.md) -->
+  <div class="aw-sum" data-sum set:html={renderSummary(built)} />
+
+  <div class="aw-d">
+    <div class="aw-bar">
+      <div class="aw-filter" role="group" aria-label="Какие премии показать" set:html={renderFilter()} />
+      <ul class="aw-legend aw-legend--d">
+        <li><i class="sw"></i>последний день подачи</li>
+        <li><i class="sw sw--passed"></i>срок прошёл</li>
+        <li><i class="sw sw--line"></i>сегодня</li>
+      </ul>
+    </div>
+    <div class="aw-tl" data-tl set:html={renderTimeline(built)} />
+    <p class="aw-note">Даты — с сайтов организаторов на {date}. Знак «~» — ориентир по прошлому сезону: организатор ещё не объявил сроки. Взнос — за один проект в одной номинации; в рублях — примерно, по курсу на ту же дату.</p>
+  </div>
+
+  <div class="aw-m">
+    <!-- Без JS переключатель и фильтр скрыты: виден весь список -->
+    <div class="aw-switch" role="group" aria-label="Вид календаря">
+      <button type="button" data-mode="list" aria-pressed="true">Список</button>
+      <button type="button" data-mode="month" aria-pressed="false">Месяц</button>
+      <button type="button" data-mode="year" aria-pressed="false">Весь год</button>
+    </div>
+    <div class="aw-view" data-view="list">
+      <div class="aw-filter aw-filter--m" role="group" aria-label="Какие премии показать" set:html={renderFilter(true)} />
+      <div data-list set:html={renderList(built)} />
+    </div>
+    <div class="aw-view" data-view="month" hidden></div>
+    <div class="aw-view" data-view="year" hidden></div>
+    <p class="aw-note aw-note--m">Даты на {date}. «~» — ориентир по прошлому сезону. Взнос — за один проект в одной номинации.</p>
+    <p class="sr" aria-live="polite" data-live></p>
+  </div>
+</section>
+
+<script>
+  import '../scripts/awards';
+</script>
+
+<style>
+  .aw { padding-top: var(--s-7xl); padding-bottom: var(--section-bottom); }
+  .aw-m { display: none; }
+
+  /* ---------- сводка: три ячейки одной высоты ---------- */
+  .aw-sum { display: flex; align-items: stretch; gap: var(--col-gap); }
+  .aw-sum :global(.aw-tile) {
+    flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--s-md);
+    padding: var(--s-2xl); border: 1px solid var(--ink); border-radius: var(--r-md);
+  }
+  .aw-sum :global(.aw-tile-l) { font: 400 0.9375rem/1.2 var(--font); color: var(--grey); }
+  .aw-sum :global(.aw-tile-b) { font: 700 2.5rem/1.04 var(--font); letter-spacing: var(--track-tight); }
+  .aw-sum :global(.aw-tile-n) { font: 400 0.9375rem/1.3 var(--font); color: var(--grey); }
+
+  /* ---------- фильтр и легенда ---------- */
+  .aw-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-lg) var(--s-2xl); margin-top: var(--s-4xl); }
+  .aw-filter { display: flex; flex-wrap: wrap; gap: var(--s-xs); }
+  html:not(.js) .aw-filter, html:not(.js) .aw-switch { display: none; }
+  .aw-filter :global(.aw-chip) {
+    padding: 0.5625rem 0.75rem; background: var(--bg); color: var(--ink);
+    border: 1px solid var(--ink); border-radius: var(--r-sm);
+    font: 400 0.875rem/1.15 var(--font); white-space: nowrap; cursor: pointer;
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+  .aw-filter :global(.aw-chip[aria-pressed="true"]) { background: var(--ink); color: var(--bg); }
+  @media (hover: hover) and (pointer: fine) {
+    .aw-filter :global(.aw-chip[aria-pressed="false"]:hover) { text-decoration: underline; text-underline-offset: 0.25rem; }
+  }
+
+  .aw :global(.aw-legend) { display: flex; flex-wrap: wrap; gap: var(--s-xs) var(--s-2xl); font: 400 0.8125rem/1.3 var(--font); }
+  .aw :global(.aw-legend li) { display: flex; align-items: center; gap: var(--s-xs); }
+  /* отметки: дедлайн — чёрный квадрат 10 со скруглением 2, сегодня — квадрат с контуром 1,5, срок прошёл — круг с контуром 1,5 */
+  .aw :global(.sw) { flex: none; width: 0.625rem; height: 0.625rem; background: var(--ink); border-radius: 2px; }
+  .aw :global(.sw--today) { background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--ink); }
+  .aw :global(.sw--passed) { background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--ink); border-radius: 50%; }
+  .aw :global(.sw--line) { width: 1px; height: 1rem; border-radius: 0; }
+
+  /* ---------- таймлайн ----------
+     Колонки как в сетке: название — колонки 1–3 и межколонник (336 из 1320), шкала 840, взнос 144 */
+  .aw-tl { margin-top: var(--s-4xl); }
+  .aw-tl :global(.tl) {
+    --tl-name: calc(var(--col-3) + var(--col-gap));
+    --tl-fee: 9rem;
+    position: relative; padding-bottom: 2.625rem;
+  }
+  .aw-tl :global(.tl-top), .aw-tl :global(.tl-row) {
+    display: grid; grid-template-columns: var(--tl-name) minmax(0, 1fr) var(--tl-fee);
+  }
+  .aw-tl :global(.tl-top) {
+    position: relative; height: 3.5rem; padding-top: 1.75rem; border-bottom: 1px solid var(--ink);
+    font: 400 0.8125rem/1.2 var(--font); color: var(--grey);
+  }
+  .aw-tl :global(.tl-months) { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); color: var(--ink); }
+  .aw-tl :global(.tl-m) { position: relative; padding-left: var(--s-xs); white-space: nowrap; }
+  .aw-tl :global(.tl-y) { position: absolute; left: var(--s-xs); top: -1.75rem; color: var(--grey); }
+  .aw-tl :global(.tl-fee-h) { text-align: right; }
+
+  /* линии месяцев (Hairline) от подписи года до конца строк и линия «сегодня» (Ink) */
+  .aw-tl :global(.tl-lines) {
+    position: absolute; top: 1.25rem; bottom: 2.5rem; left: var(--tl-name); right: var(--tl-fee);
+    display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); pointer-events: none;
+  }
+  .aw-tl :global(.tl-lines span) { border-left: 1px solid var(--hairline); }
+  .aw-tl :global(.tl-lines span:last-child) { border-right: 1px solid var(--hairline); }
+  .aw-tl :global(.tl-now) {
+    position: absolute; top: 3.5rem; bottom: 1.25rem; width: 1px; background: var(--ink); pointer-events: none;
+    left: calc(var(--tl-name) + (100% - var(--tl-name) - var(--tl-fee)) * var(--today-f, 0));
+  }
+  .aw-tl :global(.tl-now-l) {
+    position: absolute; bottom: 1.25rem; font: 400 0.8125rem/1.2 var(--font);
+    left: calc(var(--tl-name) + (100% - var(--tl-name) - var(--tl-fee)) * var(--today-f, 0) + 0.5rem);
+  }
+
+  .aw-tl :global(.tl-row) { position: relative; min-height: 3.5rem; align-items: center; border-bottom: 1px solid var(--hairline); }
+  .aw-tl :global(.tl-name) { display: flex; flex-direction: column; padding: 0.5rem var(--s-lg) 0.5rem 0; }
+  .aw-tl :global(.tl-n) { font: 400 0.9375rem/1.2 var(--font); }
+  .aw-tl :global(.tl-c), .aw-tl :global(.tl-cur) { font: 400 0.8125rem/1.45 var(--font); color: var(--grey); }
+  .aw-tl :global(.tl-fee) { display: flex; flex-direction: column; align-items: flex-end; font: 400 0.9375rem/1.2 var(--font); white-space: nowrap; }
+  .aw-tl :global(.tl-row.is-passed) { color: var(--grey); }
+
+  /* --x — место дня на шкале; отметка не выходит за края шкалы */
+  .aw-tl :global(.tl-track) { --mx: clamp(5px, var(--x, 0%), calc(100% - 5px)); position: relative; align-self: stretch; }
+  .aw-tl :global(.tl-mark) {
+    position: absolute; top: 50%; left: var(--mx);
+    width: 0.625rem; height: 0.625rem; margin: -0.3125rem 0 0 -0.3125rem;
+    background: var(--ink); border-radius: 2px;
+  }
+  .aw-tl :global(.tl-mark.is-passed) { background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--ink); border-radius: 50%; }
+  /* подпись через 8 px от отметки, на 1 px выше центра (образец Batın 442:6894) */
+  .aw-tl :global(.tl-lbl) {
+    position: absolute; top: 50%; left: calc(var(--mx) + 0.8125rem); transform: translateY(calc(-50% - 1px));
+    font: 400 0.8125rem/1.2 var(--font); white-space: nowrap;
+  }
+  .aw-tl :global(.tl-lbl.is-flip) { left: auto; right: calc(100% - var(--mx) + 0.8125rem); }
+  /* прошедший срок: подпись не пересекает линию «сегодня» — начинается через 8 px после неё */
+  .aw-tl :global(.tl-lbl.is-passed) { color: var(--grey); left: max(calc(var(--mx) + 0.8125rem), calc(var(--today) + 1px + 0.5rem)); }
+  .aw-tl :global(.tl-bar) {
+    position: absolute; left: 0; right: 0; top: 50%; height: 1.875rem; transform: translateY(-50%);
+    display: flex; align-items: center; padding: 0 0.5625rem;
+    background: var(--bg); border: 1px solid var(--ink); border-radius: var(--r-sm);
+    font: 400 0.8125rem/1.2 var(--font);
+  }
+
+  .aw-note { max-width: 40.5rem; margin-top: var(--s-4xl); font: 400 0.9375rem/1.3 var(--font); color: var(--grey); }
+
+  /* между 761 и 1279 макета нет: крупные числа сводки уменьшаются, чтобы «30 октября» помещалось в ячейку */
+  @media (min-width: 761px) and (max-width: 1279px) {
+    .aw-sum :global(.aw-tile-b) { font-size: clamp(1.625rem, 3.1vw, 2.5rem); }
+    .aw-sum :global(.aw-tile) { padding: var(--s-xl); }
+  }
+
+  /* ---------- телефон: P6 ---------- */
+  @media (max-width: 760px) {
+    .aw { padding-top: var(--s-2xl); }
+    .aw-sum, .aw-d { display: none; }
+    .aw-m { display: flex; flex-direction: column; gap: var(--s-lg); }
+    .aw-view { display: flex; flex-direction: column; gap: var(--s-lg); }
+    .aw-view[hidden] { display: none; }
+
+    .aw-switch { display: flex; border: 1px solid var(--ink); border-radius: var(--r-sm); overflow: hidden; }
+    .aw-switch button {
+      flex: 1 1 0; min-height: 2.75rem; padding: 0; background: var(--bg); color: var(--ink); border: 0;
+      font: 400 0.9375rem/1.45 var(--font); cursor: pointer; transition: background-color 160ms ease, color 160ms ease;
+    }
+    .aw-switch button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+    .aw-switch button:focus-visible { outline-offset: -4px; }
+
+    .aw-filter--m { gap: var(--s-2xs); }
+    .aw-filter--m :global(.aw-chip) { min-height: 2.75rem; padding: 0 var(--s-sm); }
+
+    /* список */
+    .aw-m :global(.ls-head) {
+      display: flex; justify-content: space-between; padding-bottom: var(--s-xs); border-bottom: 1px solid var(--ink);
+      font: 400 0.8125rem/1.3 var(--font); color: var(--grey);
+    }
+    .aw-m :global(.ls-row) { display: flex; gap: var(--s-md); padding: var(--s-md) 0; border-bottom: 1px solid var(--hairline); }
+    .aw-m :global(.ls-name) { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .aw-m :global(.ls-n) { font: 400 1rem/1.45 var(--font); }
+    .aw-m :global(.ls-c), .aw-m :global(.ls-f) { font: 400 0.8125rem/1.3 var(--font); }
+    .aw-m :global(.ls-c) { color: var(--grey); }
+    .aw-m :global(.ls-meta) { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; white-space: nowrap; }
+    .aw-m :global(.ls-d) { font: 500 0.9375rem/1.2 var(--font); }
+    .aw-m :global(.ls-row.is-passed) { color: var(--grey); }
+
+    /* месяц */
+    .aw-m :global(.mo-head) { display: flex; align-items: center; justify-content: space-between; }
+    .aw-m :global(.mo-arrow) {
+      width: 2.75rem; height: 2.75rem; padding: 0; background: none; border: 0; border-radius: var(--r-sm);
+      font: 400 1rem/1.45 var(--font); color: var(--ink); cursor: pointer;
+    }
+    .aw-m :global(.mo-arrow:disabled) { color: var(--soft); cursor: default; }
+    .aw-m :global(.mo-title) { font: 700 1.25rem/1.04 var(--font); letter-spacing: -0.01em; }
+    .aw-m :global(.mo-title:focus) { outline: none; }
+    /* 7 колонок одинаковой ширины, зазор 4: border-spacing с компенсацией по краям */
+    .aw-m :global(.mo-grid) { width: calc(100% + 8px); margin: -4px; border-collapse: separate; border-spacing: 4px; table-layout: fixed; }
+    .aw-m :global(.mo-grid th) { font: 400 0.8125rem/1.3 var(--font); color: var(--grey); text-align: center; padding: 0; }
+    .aw-m :global(.mo-grid td) { height: 2.75rem; padding: 0; }
+    .aw-m :global(.mo-grid .d) {
+      display: flex; align-items: center; justify-content: center; height: 2.75rem;
+      border-radius: 4px; font: 400 0.9375rem/1.45 var(--font);
+    }
+    .aw-m :global(.mo-grid .is-dim) { color: var(--grey); }
+    .aw-m :global(.mo-grid .is-today) { box-shadow: inset 0 0 0 1.5px var(--ink); font-weight: 500; color: var(--ink); }
+    .aw-m :global(.mo-grid .is-deadline) { background: var(--ink); color: var(--bg); }
+    /* срок прошёл — круг 36 с контуром 1,5 и серым числом */
+    .aw-m :global(.mo-grid .is-passed) { width: 2.25rem; height: 2.25rem; margin: 0 auto; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--ink); color: var(--grey); }
+
+    .aw-m :global(.aw-legend--m) { gap: var(--s-xs) var(--s-lg); }
+    .aw-m :global(.aw-legend--m .sw) { width: 0.875rem; height: 0.875rem; border-radius: 4px; }
+    .aw-m :global(.aw-legend--m .sw--passed) { border-radius: 50%; }
+
+    .aw-m :global(.mo-row) { display: flex; align-items: flex-start; gap: 0.875rem; padding: var(--s-md) 0; border-bottom: 1px solid var(--hairline); }
+    /* отметка по центру строки с датой: сверху 4, до даты 14 (образец Batın 442:6897) */
+    .aw-m :global(.mo-mk) { flex: none; width: 0.625rem; height: 0.625rem; margin-top: 0.25rem; background: var(--ink); border-radius: 2px; }
+    .aw-m :global(.mo-mk.is-passed) { background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--ink); border-radius: 50%; }
+    .aw-m :global(.mo-d) { flex: none; width: 3.25rem; font: 500 0.9375rem/1.2 var(--font); }
+    .aw-m :global(.mo-t) { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .aw-m :global(.mo-n) { font: 400 1rem/1.45 var(--font); }
+    .aw-m :global(.mo-c) { font: 400 0.8125rem/1.3 var(--font); color: var(--grey); }
+    .aw-m :global(.mo-row.is-passed) { color: var(--grey); }
+    .aw-m :global(.mo-now) { padding: var(--s-sm) 0; }
+    .aw-m :global(.mo-now span) { display: inline-block; padding: 0.25rem var(--s-xs); background: var(--ink); color: var(--bg); border-radius: var(--r-sm); font: 500 0.75rem/1.2 var(--font); }
+    .aw-m :global(.mo-empty) { font: 400 1rem/1.45 var(--font); color: var(--grey); }
+
+    /* весь год: 12 мини-месяцев 3×4, сетка всегда 6×7 */
+    .aw-m :global(.yr) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-xs); }
+    .aw-m :global(.yr-m) {
+      display: flex; flex-direction: column; gap: var(--s-2xs); width: 100%; padding: var(--s-xs) var(--s-xs) var(--s-sm);
+      background: var(--bg); color: var(--ink); border: 1px solid var(--ink); border-radius: var(--r-md); cursor: pointer; text-align: left;
+    }
+    .aw-m :global(.yr-m.is-empty) { border-color: var(--hairline); color: var(--grey); }
+    .aw-m :global(.yr-m:active) { transform: scale(0.98); transition: transform 120ms var(--ease-out); }
+    .aw-m :global(.yr-h) { display: flex; justify-content: space-between; align-items: baseline; font: 400 0.8125rem/1.3 var(--font); }
+    /* сетка дней тянется на всю ширину месяца (до 760 px месяцы бывают и 101, и 215 px): зазор и скругление —
+       в тех же пропорциях, что в макете 390 (квадрат 11, зазор 2, скругление 2) */
+    .aw-m :global(.yr-m) { container-type: inline-size; }
+    .aw-m :global(.yr-g) { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: max(2px, 2.15cqi); width: 100%; }
+    .aw-m :global(.yr-g i) { aspect-ratio: 1; border-radius: 18%; }
+    .aw-m :global(.yr-g .is-day) { background: var(--cell-empty); }
+    .aw-m :global(.yr-g .is-deadline) { background: var(--ink); }
+    .aw-m :global(.yr-g .is-today) { box-shadow: inset 0 0 0 1.5px var(--ink); }
+    .aw-m :global(.yr-g .is-passed) { box-shadow: inset 0 0 0 1.5px var(--ink); border-radius: 50%; }
+    .aw-m :global(.aw-legend--y .sw) { width: 0.6875rem; height: 0.6875rem; }
+    .aw-m :global(.yr-hint) { font: 400 0.8125rem/1.3 var(--font); color: var(--grey); }
+
+    .aw-note--m { margin-top: 0; font-size: 0.8125rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aw-filter :global(.aw-chip), .aw-switch button { transition: none; }
+    .aw-m :global(.yr-m:active) { transform: none; }
+  }
+</style>

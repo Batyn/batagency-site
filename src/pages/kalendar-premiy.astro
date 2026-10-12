@@ -1,0 +1,37 @@
+---
+// Страница «Календарь премий» (Figma Final, секция Awards calendar 472:6612; задача 64). Тексты — content/site-texts.md, раздел 7.
+// Адрес /kalendar-premiy/ — решение Batın 2026-10-12. Откуда на неё ссылаться (меню, «Услуги» → «Премии», главная, подвал),
+// Batın решит позже: пока ссылок нет, страница доступна по адресу и в карте сайта.
+// Телефон: остальные блоки (шапка, крошки, H1, шаги, консультация, подвал) — те же компоненты, что на «Услугах» и главной.
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import PageTitle from '../components/PageTitle.astro';
+import AwardsCalendar from '../components/AwardsCalendar.astro';
+import Process from '../components/Process.astro';
+import Consult from '../components/Consult.astro';
+import Footer from '../components/Footer.astro';
+
+const STEPS = [
+  { t: 'Выбор', d: 'Смотрим ваши проекты и подбираем премии и номинации под задачу, бюджет и сроки.' },
+  { t: 'Кейс', d: 'Пишем заявку по требованиям премии, собираем иллюстрации и видео. Если кейса ещё нет, сначала пишем его.' },
+  { t: 'Подача', d: 'Следим за дедлайнами и форматами, заполняем форму на сайте премии и проверяем заявку перед отправкой.' },
+  { t: 'После', d: 'Шорт-лист и награды используем в PR, а сам кейс остаётся у вас для сайта и рассылки.' },
+];
+---
+<Base
+  title="Календарь премий для дизайн- и digital-агентств — Bat Agency"
+  description="Российские и международные премии для дизайн- и digital-агентств на год вперёд: сроки подачи, взносы и страны. Подберём премию и подготовим заявку."
+>
+  <Header />
+  <main>
+    <Breadcrumbs current="Календарь премий" />
+    <PageTitle title="Календарь премий">
+      <p class="t-body-lg measure">Российские и международные премии для <span class="nowrap">дизайн‑ и</span> digital-агентств: когда подавать, сколько стоит участие и где проходят. Подберём премию под ваш проект и подготовим заявку.</p>
+    </PageTitle>
+    <AwardsCalendar />
+    <Process title="Как мы подаём заявку" steps={STEPS} id="kak-podaem" />
+    <Consult page text="За 45 минут посмотрим ваши проекты и скажем, на какие премии их стоит подать и что нужно для заявки. Ни к чему не обязывает." />
+  </main>
+  <Footer />
+</Base>
