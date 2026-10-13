@@ -1,9 +1,10 @@
 // Липкая «Оставить заявку»: на всех страницах видна сразу, с первого экрана (Batın 2026-10-13).
-// Прячется, когда бриф дошёл до верхней четверти экрана: на коротких страницах (404, «О нас») бриф виден
-// краем уже при загрузке, и правило «бриф на экране» прятало кнопку совсем (баг 39).
+// Правило (Batın 2026-10-14): липкая и кнопка отправки брифа на экране одновременно не бывают. Кнопка прячется чуть раньше,
+// чем низ брифа (кнопка отправки, плашка сбоя или «Спасибо») показывается снизу, — на высоту самой липкой с отступом,
+// чтобы за 200 мс исчезновения они не стояли рядом. Если бриф с кнопкой виден уже при загрузке (короткие страницы), липкой нет.
 // На телефоне окно cookies во всю ширину — кнопка ждёт «Принять» (событие cookie-accepted из CookieBanner).
 const cta = document.querySelector<HTMLElement>('[data-cta]');
-const brief = document.getElementById('zayavka');
+const ends = [...document.querySelectorAll<HTMLElement>('#zayavka .bf-actions, #zayavka .bf-done')];
 
 if (cta && 'IntersectionObserver' in window) {
   const phone = matchMedia('(max-width: 760px)');
@@ -15,11 +16,19 @@ if (cta && 'IntersectionObserver' in window) {
     cta.classList.toggle('is-in', !briefReached && !cookieOpen);
   };
 
-  // нижние три четверти экрана не считаются (404 на телефоне: бриф с 40 % высоты): бриф там — ещё не повод прятать кнопку
-  if (brief) new IntersectionObserver(([e]) => {
-    briefReached = e.isIntersecting || e.boundingClientRect.top < 0;
-    sync();
-  }, { rootMargin: '0px 0px -75% 0px' }).observe(brief);
+  // у скрытого элемента (форма после «Спасибо») прямоугольник нулевой — его не считаем
+  const seen = new Map<Element, boolean>();
+  if (ends.length) {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        const shown = e.boundingClientRect.height > 0;
+        seen.set(e.target, shown && (e.isIntersecting || e.boundingClientRect.bottom < 0));
+      }
+      briefReached = [...seen.values()].some(Boolean);
+      sync();
+    }, { rootMargin: `0px 0px ${cta.offsetHeight + 32}px 0px` });
+    ends.forEach((el) => io.observe(el));
+  }
 
   document.addEventListener('cookie-accepted', sync);
   phone.addEventListener('change', sync);
