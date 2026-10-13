@@ -80,9 +80,35 @@ if (box) {
     box.querySelector<HTMLElement>(form.hidden ? '.bf-done .bf-h' : '#bf-h')?.focus({ preventScroll: true });
   };
   addEventListener('hashchange', focusTitle);
+
+  // Плавная прокрутка считает цель один раз, а по дороге страница может вырасти (на главной календарь «Плана»
+  // дорисовывается, когда до него доезжают, +~500 px) — и прокрутка останавливается выше брифа.
+  // Поэтому прокручиваем сами и, пока едем, пересчитываем цель при каждом изменении высоты страницы.
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  function scrollToBrief() {
+    const go = () => box!.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'start' });
+    go();
+    if (!('ResizeObserver' in window)) return;
+    let h = document.documentElement.scrollHeight;
+    const ro = new ResizeObserver(() => {
+      const nh = document.documentElement.scrollHeight;
+      if (nh !== h) { h = nh; go(); }
+    });
+    ro.observe(document.body);
+    const stop = () => { ro.disconnect(); removeEventListener('wheel', stop); removeEventListener('touchstart', stop); };
+    // посетитель сам взялся за прокрутку — не мешаем; иначе следим не дольше 2,5 с
+    addEventListener('wheel', stop, { passive: true, once: true });
+    addEventListener('touchstart', stop, { passive: true, once: true });
+    setTimeout(stop, 2500);
+  }
+
   document.addEventListener('click', (e) => {
     const a = (e.target as Element | null)?.closest<HTMLAnchorElement>('a[href$="#zayavka"]');
-    if (a && a.pathname === location.pathname) setTimeout(focusTitle, 0);
+    if (!a || a.pathname !== location.pathname || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    if (location.hash !== '#zayavka') history.pushState(null, '', '#zayavka');
+    scrollToBrief();
+    focusTitle();
   });
   focusTitle();
 }
