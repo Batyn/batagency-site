@@ -37,7 +37,7 @@ const formOn = import.meta.env.PUBLIC_FORM === 'true';
     <div class="bf-actions">
       <button class="bf-btn" type="submit" data-label="Отправить заявку">Отправить заявку</button>
       <div class="bf-fail" role="alert" hidden>
-        <p class="bf-fail-t">Не получилось отправить. Напишите нам в Telegram</p>
+        <p class="bf-fail-t">Не получилось отправить.</p>
         <a class="bf-fail-btn" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="tg_click">Написать в Telegram</a>
       </div>
       <!-- без JS форму не отправить (адреса для неё ещё нет), поэтому сразу запасной путь -->
@@ -121,15 +121,15 @@ const formOn = import.meta.env.PUBLIC_FORM === 'true';
   .bf-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
   .bf-btn[aria-disabled="true"] { cursor: default; background: var(--ink); color: var(--bg); }
 
-  /* сбой: плашка ложится поверх кнопки отправки, карточка не растёт (Batın 2026-10-13) */
+  /* сбой: плашка целиком перекрывает кнопку отправки — от её верхнего края, во всю ширину формы; карточка не растёт (Batın 2026-10-13) */
   .bf-fail {
-    position: absolute; left: 0; right: 0; top: 1.25rem;
+    position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
     min-height: 3.8125rem; padding: 0.5rem 0.5rem 0.5rem 1rem;
     border: 1px solid var(--ink); border-radius: var(--r-md); background: var(--bg);
   }
   .bf-fail[hidden] { display: none; }
-  .bf-fail-t { font: 400 0.875rem/1.3 var(--font); max-width: 14rem; }
+  .bf-fail-t { font: 400 0.875rem/1.3 var(--font); }
   .bf-fail-btn {
     flex: none; display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1.25rem;
     border: 1px solid var(--ink); border-radius: var(--r-sm);
@@ -159,9 +159,9 @@ const formOn = import.meta.env.PUBLIC_FORM === 'true';
     .bf-area { height: 7.5rem; }
     .bf-consent { min-height: 2.75rem; }
     .bf-btn { width: 100%; }
-    /* на телефоне плашке не хватает ширины для текста и кнопки в строку: она встаёт на место кнопки отправки */
-    .bf-fail { position: static; flex-direction: column; align-items: stretch; padding: 0.75rem; }
-    .bf-fail-t { max-width: none; }
+    /* на телефоне текст и кнопка в строку не помещаются (на 360 остаётся ~60 px под текст): плашка встаёт на место
+       кнопки отправки и целиком её заменяет, текст над кнопкой — карточка выше на ~35 px */
+    .bf-fail { position: static; flex-direction: column; align-items: stretch; padding: 0.75rem; width: 100%; }
     .bf-fail-btn { justify-content: center; }
     .bf.is-failed .bf-btn { display: none; }
     .bf-done-t { font-size: 1rem; }

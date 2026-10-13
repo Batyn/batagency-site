@@ -34,10 +34,11 @@ if (box) {
     if (on) btn.setAttribute('aria-disabled', 'true'); else btn.removeAttribute('aria-disabled');
   }
 
-  function showFail() {
+  // фокус переходит на «Написать в Telegram»: кольцо видно, только если отправляли с клавиатуры
+  function showFail(keyboard: boolean) {
     box!.classList.add('is-failed');
     fail.hidden = false;
-    fail.querySelector<HTMLElement>('a')?.focus();
+    fail.querySelector<HTMLElement>('a')?.focus({ focusVisible: keyboard } as FocusOptions);
   }
 
   function showDone() {
@@ -49,9 +50,10 @@ if (box) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (sending) return;
+    const keyboard = btn.matches(':focus-visible');
     const bad = required.filter((el) => !check(el));
     if (bad.length) { bad[0].focus(); return; }
-    if (!formOn) { showFail(); return; }
+    if (!formOn) { showFail(keyboard); return; }
 
     // задача 46: api/send.php принимает поля формы и отвечает 2xx, если заявка записана
     setSending(true);
@@ -61,7 +63,7 @@ if (box) {
       showDone();
     } catch {
       setSending(false);
-      showFail();
+      showFail(keyboard);
     }
   });
 
