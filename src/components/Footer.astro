@@ -69,13 +69,17 @@ const nav = FOOTER_NAV.map((l) => (l.label === 'Контакты' ? { ...l, href
   .ft-copy { grid-column: 1 / 4; }
   .ft-year { grid-column: 4 / 7; }
 
-  /* 761–1279: на пять колонок брифу тесно — бриф 1–7; политики в узкой «Связи» переносятся, поэтому идут столбиком после почты */
+  /* 761–1279: бриф остаётся в колонках 1–5, как на 1440 (на 1–7 карточка была шире половины экрана, Batın 2026-10-13);
+     узкую карточку перестраивает сам бриф. Политики в узкой «Связи» переносятся, поэтому идут столбиком после почты */
   @media (max-width: 1279px) and (min-width: 761px) {
-    .ft-brief { grid-column: 1 / 8; }
     .ft-list--contact { display: flex; }
     .ft-legal-d:nth-last-child(2) { margin-top: 1rem; }
     .ft-copy { grid-column: 1 / 6; }
     .ft-year { grid-column: 6 / 8; }
+  }
+  /* 761–899: в пяти колонках карточка уже 330 px — даём шестую */
+  @media (max-width: 899px) and (min-width: 761px) {
+    .ft-brief { grid-column: 1 / 7; }
   }
 
   @media (max-width: 760px) {

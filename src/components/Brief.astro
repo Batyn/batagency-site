@@ -61,6 +61,8 @@ const formOn = import.meta.env.PUBLIC_FORM === 'true';
     background: var(--bg); color: var(--ink);
     /* прокрутка к #zayavka: карточка не прячется под шапкой */
     scroll-margin-top: calc(var(--header-h) + 1.5rem);
+    /* раскладка зависит от ширины карточки, а не экрана: в подвале 761–1279 она узкая при десктопной шапке */
+    container-type: inline-size;
   }
   .bf-form { display: flex; flex-direction: column; gap: 1.5rem; }
   .bf-h { font: 700 2.5rem/1.04 var(--font); letter-spacing: var(--track-tight); }
@@ -165,6 +167,16 @@ const formOn = import.meta.env.PUBLIC_FORM === 'true';
     .bf-fail-btn { justify-content: center; }
     .bf.is-failed .bf-btn { display: none; }
     .bf-done-t { font-size: 1rem; }
+  }
+  /* узкая карточка на десктопе (меньше ~440 px): поля друг под другом, плашка сбоя вместо кнопки — как на телефоне */
+  @container (max-width: 24.5rem) {
+    .bf-h { font-size: 2.125rem; letter-spacing: -0.02em; }
+    .bf-row { flex-direction: column; gap: 1.25rem; }
+    .bf-field--name, .bf-field--contact { flex: none; width: 100%; }
+    .bf-btn { width: 100%; }
+    .bf-fail { position: static; flex-direction: column; align-items: stretch; padding: 0.75rem; width: 100%; }
+    .bf-fail-btn { justify-content: center; }
+    .bf.is-failed .bf-btn { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .bf-btn, .bf-fail-btn { transition: none; }

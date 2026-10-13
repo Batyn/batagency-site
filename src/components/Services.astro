@@ -131,6 +131,13 @@ import { SERVICES } from '../data/services';
     display: flex; flex-direction: column; gap: 1.5rem;
     padding: 1.5rem; border: 1px solid var(--ink); border-radius: var(--r-md);
   }
+  /* текст ячейки описания уменьшается вместе с ней, как названия в мозаике: на 1440 — 56 и 26 (ширина текста 380),
+     на узком десктопе лид не крупнее названий услуг и не мельче 16 */
+  @media (min-width: 761px) {
+    .svc-desc { container-type: inline-size; }
+    .svc-desc .t-h-lg { font-size: min(3.5rem, 14.9cqi); }
+    .svc-desc .t-lead { font-size: max(1rem, min(1.625rem, 6.9cqi)); }
+  }
   /* дорожка занимает всю ячейку над сноской: липкий блок не заезжает на сноску */
   .svc-desc-track { flex: 1 1 auto; }
   /* прилипает, когда до верха экрана у ячейки остаётся 8 px (+ её отступ 24); шапка к этому времени уже уехала (Batın 2026-10-09) */
@@ -141,7 +148,7 @@ import { SERVICES } from '../data/services';
   .only-m { display: none; }
 
   /* мозаика: пары ячеек, ширины из Figma (сумма пары 876 + зазор 8) */
-  .mosaic { flex: 1 1 0; min-width: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; align-content: start; }
+  .mosaic { flex: 1 1 0; min-width: 0; container-type: inline-size; display: flex; flex-wrap: wrap; gap: 0.5rem; align-content: start; }
   .cell {
     position: relative;
     width: calc((100% - 0.5rem) * var(--w) / 876);
@@ -154,7 +161,9 @@ import { SERVICES } from '../data/services';
   }
   .cell-top { display: flex; flex-direction: column; gap: 0.625rem; }
   .cell-n { font: 400 0.8125rem/1.2 var(--font); color: var(--grey); transition: color var(--t-cell) ease; }
-  .cell-title { font: 700 2.5rem/1.04 var(--font); letter-spacing: var(--track-tight); }
+  /* на узком десктопе слово целиком не влезало в ячейку («Выступления», «Спецпроекты»): кегль общий для всех ячеек
+     и уменьшается вместе с мозаикой; 5.6cqi − 8 px — запас под самое длинное слово в самой узкой ячейке (324 из 876), до 40 */
+  .cell-title { font: 700 min(2.5rem, 5.6cqi - 0.5rem)/1.04 var(--font); letter-spacing: var(--track-tight); }
   /* низ ячейки: подпись и «что входит» лежат друг на друге и меняются прозрачностью */
   .cell-bottom { display: grid; grid-template-columns: minmax(0, 1fr); align-items: end; }
   .cell-bottom > * { grid-area: 1 / 1; }
