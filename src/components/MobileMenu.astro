@@ -1,7 +1,8 @@
 ---
 // Меню на телефоне. В Figma не нарисовано — простая версия на сверку Batın (2026-10-09):
 // белая панель на весь экран, пункты крупно, справа сверху крестик (Batın 2026-10-10), внизу «Бесплатная консультация» —
-// только на главной (RULES.md §5, Batın 2026-10-13).
+// только на главной (RULES.md §5, Batın 2026-10-13). Панель выезжает слева, бургер шапки на том же месте
+// сходится и поворачивается в крестик (Batın 2026-10-14, как на ony.ru).
 // Слева сверху логотип bat с глазом — на том же месте и того же размера, что в шапке телефона (Batın 2026-10-09).
 import { NAV, TELEGRAM_URL, contactsHref } from '../data/site';
 const isHome = Astro.url.pathname === '/';
@@ -10,23 +11,26 @@ import Logo from './Logo.astro';
 <div class="mm" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Меню" hidden>
   <div class="mm-top wrap">
     <a class="mm-logo" href="/" aria-label="Bat Agency — на главную"><Logo id="menu-logo" /></a>
-    <button class="mm-close" type="button" data-menu-close aria-label="Закрыть меню"><span class="mm-x" aria-hidden="true"></span></button>
+    <button class="mm-close" type="button" data-menu-close aria-label="Закрыть меню"><span class="mm-x" aria-hidden="true"><i></i><i></i></span></button>
   </div>
-  <nav class="mm-nav wrap" aria-label="Разделы">
-    <a class="mm-a t-h-lg" href="/">Главная</a>
-    {NAV.map((n) => <a class="mm-a t-h-lg" href={n.key === 'kontakty' ? contactsHref(isHome) : n.href}>{n.label}</a>)}
-    <a class="mm-a t-h-lg" href="/#voprosy">Вопросы</a>
-  </nav>
-  {isHome && (
-    <div class="mm-cta wrap">
-      <a class="btn btn--lg btn--block-m" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="consult_click">Бесплатная консультация</a>
-    </div>
-  )}
+  <div class="mm-panel">
+    <nav class="mm-nav wrap" aria-label="Разделы">
+      <a class="mm-a t-h-lg" href="/">Главная</a>
+      {NAV.map((n) => <a class="mm-a t-h-lg" href={n.key === 'kontakty' ? contactsHref(isHome) : n.href}>{n.label}</a>)}
+      <a class="mm-a t-h-lg" href="/#voprosy">Вопросы</a>
+    </nav>
+    {isHome && (
+      <div class="mm-cta wrap">
+        <a class="btn btn--lg btn--block-m" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="consult_click">Бесплатная консультация</a>
+      </div>
+    )}
+  </div>
 </div>
 
 <script>
-  // Панель: появление opacity + сдвиг 8 px, 200 мс ease-out; закрытие быстрее. Esc и крестик закрывают, фокус возвращается.
+  // Панель выезжает слева, бургер превращается в крестик — всё в CSS по классу is-open. Esc и крестик закрывают, фокус возвращается.
   const menu = document.getElementById('mobile-menu')!;
+  let closing = 0;
   // при reduced-motion глаз в меню тоже неподвижен
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) (document.getElementById('menu-logo') as unknown as SVGSVGElement | null)?.pauseAnimations();
   const openers = document.querySelectorAll<HTMLElement>('[data-menu-open]');
@@ -35,6 +39,7 @@ import Logo from './Logo.astro';
   function open(e: Event) {
     e.preventDefault();
     lastFocus = e.currentTarget as HTMLElement;
+    clearTimeout(closing);
     menu.hidden = false;
     document.documentElement.classList.add('is-menu-open');
     void menu.offsetHeight;
@@ -42,13 +47,12 @@ import Logo from './Logo.astro';
     menu.querySelector<HTMLElement>('[data-menu-close]')?.focus();
   }
   function close() {
-    if (menu.hidden) return;
+    if (menu.hidden || !menu.classList.contains('is-open')) return;
     menu.classList.remove('is-open');
-    document.documentElement.classList.remove('is-menu-open');
-    const done = () => { menu.hidden = true; };
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) done();
-    else setTimeout(done, 160);
-    lastFocus?.focus();
+    // прячем, когда крестик снова стал бургером (2 × 300 мс); бургер шапки возвращается на месте его полос
+    const done = () => { menu.hidden = true; document.documentElement.classList.remove('is-menu-open'); };
+    closing = window.setTimeout(done, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 620);
+    lastFocus?.focus({ preventScroll: true });
   }
   openers.forEach((b) => {
     b.setAttribute('role', 'button');
@@ -71,31 +75,46 @@ import Logo from './Logo.astro';
 </script>
 
 <style>
-  .mm {
-    position: fixed; inset: 0; z-index: 80;
+  /* слой меню прозрачный: панель выезжает под строку с логотипом и крестиком, а та стоит на месте шапки */
+  .mm { position: fixed; inset: 0; z-index: 80; --t-burger: 300ms; }
+  .mm-panel {
+    position: absolute; inset: 0; overflow-y: auto;
     display: flex; flex-direction: column;
-    background: var(--bg);
-    opacity: 0; transform: translateY(-0.5rem);
-    transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out);
+    padding-top: 3.875rem; background: var(--bg);
+    transform: translateX(-100%);
+    transition: transform 300ms var(--ease-in-out);
   }
-  .mm.is-open { opacity: 1; transform: none; transition-duration: 200ms; }
+  .mm.is-open .mm-panel { transform: none; transition: transform 420ms var(--ease-drawer); }
   /* как шапка телефона: 62 — отступы 16 и 8, логотип 76×38 */
-  .mm-top { display: flex; align-items: center; justify-content: space-between; padding-top: 1rem; padding-bottom: 0.5rem; width: 100%; }
+  .mm-top { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding-top: 1rem; padding-bottom: 0.5rem; width: 100%; }
   .mm-logo { display: block; width: 4.75rem; }
   .mm-logo :global(svg) { width: 100%; height: auto; }
+  /* бургер шапки прячется сразу: на его месте те же полосы крестика */
+  :global(html.is-menu-open .menu-btn) { opacity: 0; }
   /* крестик 18 из двух черт 2 px, как «+» / «−» в аккордеонах; зона нажатия 44×44, сам знак — вровень с полем справа */
   .mm-close { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; margin: -0.1875rem -0.8125rem -0.1875rem 0; padding: 0; border: 0; background: none; color: var(--ink); cursor: pointer; }
   .mm-x { position: relative; width: 1.125rem; height: 1.125rem; }
-  .mm-x::before, .mm-x::after { content: ""; position: absolute; left: -0.125rem; right: -0.125rem; top: 50%; height: 2px; margin-top: -1px; background: currentColor; border-radius: 1px; }
-  .mm-x::before { transform: rotate(45deg); }
-  .mm-x::after { transform: rotate(-45deg); }
+  /* закрыто — полосы бургера (геометрия как в MenuButton). Открытие: сходятся к центру, потом поворот;
+     закрытие — наоборот. Этапы по очереди, по 300 мс, мягкая кривая — чтобы было видно оба (Batın 2026-10-14, как на ony.ru).
+     Сдвиг и поворот на разных элементах, чтобы у каждого этапа была своя задержка */
+  .mm-x i { position: absolute; left: -0.125rem; right: -0.125rem; top: 50%; height: 2px; margin-top: -1px; transition: transform var(--t-burger) ease var(--t-burger); }
+  .mm-x i::before { content: ""; position: absolute; inset: 0; background: currentColor; border-radius: 1px; transition: transform var(--t-burger) ease; }
+  .mm-x i:first-child { transform: translateY(-4px); }
+  .mm-x i:last-child { transform: translateY(4px); }
+  .mm.is-open .mm-x i { transform: none; transition: transform var(--t-burger) ease; }
+  .mm.is-open .mm-x i::before { transition: transform var(--t-burger) ease var(--t-burger); }
+  .mm.is-open .mm-x i:first-child::before { transform: rotate(45deg); }
+  .mm.is-open .mm-x i:last-child::before { transform: rotate(-45deg); }
   .mm-close:active .mm-x { transform: scale(0.9); transition: transform 120ms var(--ease-out); }
   .mm-nav { display: flex; flex-direction: column; padding-top: 2rem; width: 100%; }
   .mm-a { padding-block: 0.625rem; border-bottom: 1px solid var(--hairline); }
   .mm-a:first-child { border-top: 1px solid var(--ink); }
-  .mm-cta { margin-top: auto; padding-bottom: 2rem; width: 100%; }
+  .mm-cta { margin-top: auto; padding-top: 2rem; padding-bottom: 2rem; width: 100%; }
   :global(html.is-menu-open) { overflow: hidden; }
+  /* без движения: панель проявляется, крестик сразу на месте */
   @media (prefers-reduced-motion: reduce) {
-    .mm, .mm.is-open { transform: none; transition: opacity 150ms ease; }
+    .mm-panel, .mm.is-open .mm-panel { transform: none; opacity: 0; transition: opacity 150ms ease; }
+    .mm.is-open .mm-panel { opacity: 1; }
+    .mm-x i, .mm-x i::before, .mm.is-open .mm-x i, .mm.is-open .mm-x i::before { transition: none; }
   }
 </style>

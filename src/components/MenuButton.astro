@@ -1,13 +1,20 @@
 ---
-// «Меню» на телефоне. Без JS — ссылка на навигацию в подвале; с JS открывает панель MobileMenu.
+// Бургер на телефоне: две полосы (Batın 2026-10-14, как на ony.ru). Без JS — ссылка на навигацию в подвале;
+// с JS открывает панель MobileMenu, где те же полосы на том же месте превращаются в крестик.
 ---
-<a class="menu-btn" href="#footer-nav" data-menu-open aria-haspopup="dialog" aria-controls="mobile-menu">Меню</a>
+<a class="menu-btn" href="#footer-nav" data-menu-open aria-haspopup="dialog" aria-controls="mobile-menu" aria-label="Меню"><span class="burger" aria-hidden="true"><i></i><i></i></span></a>
 
 <style>
+  /* зона нажатия 44×44, сами полосы вровень с полем справа — как крестик в меню */
   .menu-btn {
     display: none;
-    align-items: center; min-height: 2.75rem; min-width: 2.75rem; justify-content: flex-end;
-    margin: -0.8125rem 0; font: 400 0.9375rem/1.45 var(--font);
+    place-items: center; width: 2.75rem; height: 2.75rem;
+    margin: -0.1875rem -0.8125rem -0.1875rem 0;
   }
-  @media (max-width: 760px) { .menu-btn { display: inline-flex; } }
+  @media (max-width: 760px) { .menu-btn { display: grid; } }
+  /* 22×2, шаг 8: геометрия общая с .mm-x в MobileMenu */
+  .burger { position: relative; width: 1.125rem; height: 1.125rem; }
+  .burger i { position: absolute; left: -0.125rem; right: -0.125rem; top: 50%; height: 2px; margin-top: -1px; background: currentColor; border-radius: 1px; }
+  .burger i:first-child { transform: translateY(-4px); }
+  .burger i:last-child { transform: translateY(4px); }
 </style>
