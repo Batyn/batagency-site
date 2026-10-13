@@ -1,14 +1,15 @@
-// Липкая «Оставить заявку»: видна, когда первый экран пройден и бриф ещё впереди.
+// Липкая «Оставить заявку»: видна, когда первый экран пройден (на главной — сразу) и бриф ещё впереди.
 // На телефоне окно cookies во всю ширину — кнопка ждёт «Принять» (событие cookie-accepted из CookieBanner).
 const cta = document.querySelector<HTMLElement>('[data-cta]');
 const brief = document.getElementById('zayavka');
 
 if (cta && 'IntersectionObserver' in window) {
-  // на главной граница — кнопка «Бесплатная консультация» первого экрана, на остальных — высота экрана
-  const start = document.querySelector('[data-cta-hero]') || document.querySelector('[data-cta-start]');
+  // на главной кнопка видна сразу, на остальных страницах — после первого экрана
+  const now = cta.dataset.ctaNow === '1';
+  const start = now ? null : document.querySelector('[data-cta-start]');
   const phone = matchMedia('(max-width: 760px)');
   const cookie = document.getElementById('cookie-banner');
-  let pastStart = false;
+  let pastStart = now;
   let briefReached = false;
 
   const sync = () => {
