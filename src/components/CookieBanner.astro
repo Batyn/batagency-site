@@ -24,7 +24,8 @@
     loadMetrica();
     box.classList.remove('is-in');
     box.classList.add('is-out');
-    const done = () => { box.hidden = true; };
+    // липкая «Оставить заявку» на телефоне ждёт «Принять»
+    const done = () => { box.hidden = true; document.dispatchEvent(new Event('cookie-accepted')); };
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) done();
     else setTimeout(done, 200);
   });

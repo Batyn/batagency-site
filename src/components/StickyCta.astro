@@ -1,0 +1,51 @@
+---
+// Липкая кнопка «Оставить заявку» (Figma Components «Sticky CTA» 513:10212, вариант A; решение Batın 2026-10-13).
+// Единственное исключение из «одного главного действия»: ведёт к брифу в подвале, других кнопок «Оставить заявку» нет.
+// Без JS — обычная ссылка, видна всегда. С JS: появляется после первого экрана (на главной — когда уходит из вида
+// «Бесплатная консультация» первого экрана), прячется, когда бриф на экране или уже выше; на телефоне её нет, пока не нажата «Принять».
+// Цель Метрики lead_click — только предложение в ТЗ 9.3, без согласия Batın не включаем (data-goal не ставим).
+import { BRIEF_HASH } from '../data/site';
+---
+<span class="scta-start" aria-hidden="true" data-cta-start></span>
+<a class="scta" href={BRIEF_HASH} data-cta>Оставить заявку</a>
+
+<script>
+  import '../scripts/sticky-cta';
+</script>
+
+<style>
+  /* запасная граница «первого экрана», если на странице нет кнопки первого экрана */
+  .scta-start { position: absolute; top: 0; left: 0; width: 1px; height: 100vh; pointer-events: none; }
+  .scta {
+    position: fixed; right: var(--gutter); bottom: 1.5rem; z-index: 65;
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 3.8125rem; padding: 1.25rem 1.75rem;
+    border: 1px solid var(--ink); border-radius: var(--r-md);
+    /* белая обводка 1 px снаружи — чтобы не сливалась с чёрной раскрытой строкой услуги */
+    box-shadow: 0 0 0 1px var(--bg);
+    background: var(--ink); color: var(--bg);
+    font: 400 1.0625rem/1.2 var(--font); white-space: nowrap;
+    transition: background-color 160ms ease, color 160ms ease, opacity 200ms var(--ease-out), transform 200ms var(--ease-out), visibility 0s;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .scta:hover { background: var(--bg); color: var(--ink); }
+  }
+  .scta:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: var(--r-md); }
+  :global(html.js) .scta:not(.is-in) {
+    opacity: 0; transform: translateY(1rem); visibility: hidden; pointer-events: none;
+    transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out), visibility 0s 200ms;
+  }
+  :global(html.is-menu-open) .scta { visibility: hidden; }
+
+  @media (max-width: 760px) {
+    .scta { left: var(--gutter); right: var(--gutter); bottom: calc(1rem + env(safe-area-inset-bottom)); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scta, :global(html.js) .scta:not(.is-in) { transform: none; }
+  }
+  /* без JS кнопка видна всегда: снизу запас на её высоту, чтобы не закрывала последний текст */
+  :global(html:not(.js) .ft) { padding-bottom: calc(3.8125rem + 1.5rem); }
+  @media (max-width: 760px) {
+    :global(html:not(.js) .ft) { padding-bottom: calc(3.8125rem + 1rem + env(safe-area-inset-bottom)); }
+  }
+</style>

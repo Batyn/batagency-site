@@ -1,0 +1,172 @@
+---
+// Бриф в подвале, #zayavka (Figma Components «Brief card · desktop» Inline S / «Brief card · mobile», состояния —
+// страница «Футер», секция «Footer A» 485:6740). Тексты — content/site-texts.md, раздел 6, «Бриф в подвале».
+// Пока PUBLIC_FORM=false (до задачи 46), бриф виден, проверка полей работает, а отправка сразу показывает
+// «Не получилось отправить… Telegram» — вариант (в), Batın 2026-10-13. Никуда ничего не уходит.
+import { TELEGRAM_URL, PERSONAL_DATA_PATH } from '../data/site';
+const formOn = import.meta.env.PUBLIC_FORM === 'true';
+---
+<div class="bf" id="zayavka" data-brief data-form-on={formOn ? '1' : undefined}>
+  <form class="bf-form" method="post" action={formOn ? '/api/send.php' : undefined} novalidate aria-labelledby="bf-h">
+    <h2 class="bf-h" id="bf-h" tabindex="-1">Расскажите о задаче</h2>
+    <div class="bf-fields">
+      <div class="bf-row">
+        <div class="bf-field bf-field--name">
+          <label class="bf-label" for="bf-name">Имя</label>
+          <input class="bf-input" id="bf-name" name="name" type="text" autocomplete="name" required aria-describedby="bf-name-err" />
+          <p class="bf-err" id="bf-name-err" aria-live="polite" data-msg="Заполните поле"></p>
+        </div>
+        <div class="bf-field bf-field--contact">
+          <label class="bf-label" for="bf-contact">Как с вами связаться</label>
+          <input class="bf-input" id="bf-contact" name="contact" type="text" placeholder="Телефон, email или Telegram" required aria-describedby="bf-contact-err" />
+          <p class="bf-err" id="bf-contact-err" aria-live="polite" data-msg="Укажите, как с вами связаться"></p>
+        </div>
+      </div>
+      <div class="bf-field">
+        <label class="bf-label" for="bf-task">Опишите задачу (необязательно)</label>
+        <textarea class="bf-input bf-area" id="bf-task" name="task"></textarea>
+      </div>
+      <div class="bf-field">
+        <div class="bf-consent">
+          <input class="bf-check" id="bf-consent" name="consent" type="checkbox" value="1" required aria-describedby="bf-consent-err" />
+          <label class="bf-consent-t" for="bf-consent">Я даю согласие на <a href={PERSONAL_DATA_PATH} target="_blank" rel="noopener">обработку персональных данных.</a></label>
+        </div>
+        <p class="bf-err" id="bf-consent-err" aria-live="polite" data-msg="Поставьте отметку, чтобы мы могли обработать обращение"></p>
+      </div>
+    </div>
+    <div class="bf-actions">
+      <button class="bf-btn" type="submit" data-label="Отправить заявку">Отправить заявку</button>
+      <div class="bf-fail" role="alert" hidden>
+        <p class="bf-fail-t">Не получилось отправить. Напишите нам в Telegram</p>
+        <a class="bf-fail-btn" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="tg_click">Написать в Telegram</a>
+      </div>
+      <!-- без JS форму не отправить (адреса для неё ещё нет), поэтому сразу запасной путь -->
+      <p class="bf-nojs">Напишите нам в Telegram — <a href={TELEGRAM_URL} target="_blank" rel="noopener">@batynrrr</a></p>
+    </div>
+  </form>
+  <div class="bf-done" role="status" hidden>
+    <h2 class="bf-h" tabindex="-1">Спасибо, мы получили заявку</h2>
+    <p class="bf-done-t">Свяжемся с вами в ближайшее время.</p>
+  </div>
+</div>
+
+<script>
+  import '../scripts/brief';
+</script>
+
+<style>
+  .bf {
+    display: flex; flex-direction: column;
+    padding: 1.5rem; border-radius: var(--r-md);
+    background: var(--bg); color: var(--ink);
+    /* прокрутка к #zayavka: карточка не прячется под шапкой */
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+  .bf-form { display: flex; flex-direction: column; gap: 1.5rem; }
+  .bf-h { font: 700 2.5rem/1.04 var(--font); letter-spacing: var(--track-tight); }
+  .bf-h:focus { outline: none; }
+  .bf-h:focus-visible { outline: 2px solid var(--ink); outline-offset: 0.25rem; }
+  .bf-fields { display: flex; flex-direction: column; gap: 1.25rem; }
+  .bf-row { display: flex; gap: 0.75rem; align-items: flex-start; }
+  .bf-field { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
+  .bf-field--name { flex: 0 0 11.25rem; }
+  .bf-field--contact { flex: 1 1 0; }
+  .bf-label { font: 400 0.9375rem/1.2 var(--font); }
+
+  /* поле: рамка 1 px; фокус и ошибка — 2 px (второй пиксель — внутренняя линия, чтобы текст не сдвигался) */
+  .bf-input {
+    width: 100%; height: 3.5rem; padding: 0 1rem;
+    border: 1px solid var(--ink); border-radius: var(--r-md);
+    background: var(--bg); color: var(--ink);
+    font: 400 1rem/1.5 var(--font);
+    appearance: none;
+  }
+  .bf-input::placeholder { color: var(--grey); opacity: 1; }
+  .bf-area { height: 7.5rem; padding: 1rem; resize: vertical; min-height: 7.5rem; display: block; }
+  .bf-input:focus { outline: none; box-shadow: inset 0 0 0 1px var(--ink); }
+  .bf-input[aria-invalid="true"] { box-shadow: inset 0 0 0 1px var(--ink); }
+  .bf-input:focus-visible { outline: none; }
+
+  .bf-err { font: 500 0.8125rem/1.4 var(--font); }
+  .bf-err:empty { display: none; }
+
+  .bf-consent { display: flex; gap: 0.75rem; align-items: flex-start; }
+  .bf-check {
+    flex: none; width: 1.5rem; height: 1.5rem; margin: 0;
+    border: 1px solid var(--ink); border-radius: var(--r-sm);
+    background: var(--bg) center / 0.875rem no-repeat;
+    appearance: none; cursor: pointer;
+  }
+  .bf-check:checked {
+    background-color: var(--ink);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M2 7.5l3.2 3L12 3.5' fill='none' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E");
+  }
+  .bf-check[aria-invalid="true"] { box-shadow: inset 0 0 0 1px var(--ink); }
+  .bf-check:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .bf-consent-t { font: 400 0.9375rem/1.45 var(--font); cursor: pointer; }
+  .bf-consent-t a { text-decoration: underline; text-underline-offset: 0.1875rem; text-decoration-thickness: 1px; }
+
+  .bf-actions { position: relative; align-self: stretch; display: flex; }
+  /* кнопка: 20/28, радиус 8, без стрелки; наведение — инверсия */
+  .bf-btn {
+    min-height: 3.8125rem; padding: 1.25rem 1.75rem;
+    border: 1px solid var(--ink); border-radius: var(--r-md);
+    background: var(--ink); color: var(--bg);
+    font: 400 1.0625rem/1.2 var(--font); white-space: nowrap; cursor: pointer;
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .bf-btn:hover { background: var(--bg); color: var(--ink); }
+  }
+  .bf-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .bf-btn[aria-disabled="true"] { cursor: default; background: var(--ink); color: var(--bg); }
+
+  /* сбой: плашка ложится поверх кнопки отправки, карточка не растёт (Batın 2026-10-13) */
+  .bf-fail {
+    position: absolute; left: 0; right: 0; top: 1.25rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+    min-height: 3.8125rem; padding: 0.5rem 0.5rem 0.5rem 1rem;
+    border: 1px solid var(--ink); border-radius: var(--r-md); background: var(--bg);
+  }
+  .bf-fail[hidden] { display: none; }
+  .bf-fail-t { font: 400 0.875rem/1.3 var(--font); max-width: 14rem; }
+  .bf-fail-btn {
+    flex: none; display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1.25rem;
+    border: 1px solid var(--ink); border-radius: var(--r-sm);
+    background: var(--ink); color: var(--bg); font: 400 1rem/1 var(--font); white-space: nowrap;
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .bf-fail-btn:hover { background: var(--bg); color: var(--ink); }
+  }
+
+  .bf-nojs { display: none; font: 400 0.9375rem/1.45 var(--font); }
+  .bf-nojs a { text-decoration: underline; text-underline-offset: 0.1875rem; }
+  :global(html:not(.js)) .bf:not([data-form-on]) .bf-btn { display: none; }
+  :global(html:not(.js)) .bf:not([data-form-on]) .bf-nojs { display: block; }
+
+  .bf-done { display: flex; flex-direction: column; gap: 1.75rem; }
+  .bf-done[hidden] { display: none; }
+  .bf-done-t { font: 400 1.25rem/1.45 var(--font); }
+
+  @media (max-width: 760px) {
+    .bf { padding: 1.25rem; scroll-margin-top: 1rem; }
+    .bf-h { font-size: 2.125rem; letter-spacing: -0.02em; }
+    .bf-row { flex-direction: column; gap: 1.25rem; }
+    .bf-field--name, .bf-field--contact { flex: none; width: 100%; }
+    .bf-label { line-height: 1.45; }
+    .bf-input { height: 3.25rem; }
+    .bf-area { height: 7.5rem; }
+    .bf-consent { min-height: 2.75rem; }
+    .bf-btn { width: 100%; }
+    /* на телефоне плашке не хватает ширины для текста и кнопки в строку: она встаёт на место кнопки отправки */
+    .bf-fail { position: static; flex-direction: column; align-items: stretch; padding: 0.75rem; }
+    .bf-fail-t { max-width: none; }
+    .bf-fail-btn { justify-content: center; }
+    .bf.is-failed .bf-btn { display: none; }
+    .bf-done-t { font-size: 1rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bf-btn, .bf-fail-btn { transition: none; }
+  }
+</style>

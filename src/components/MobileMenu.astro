@@ -1,8 +1,10 @@
 ---
 // Меню на телефоне. В Figma не нарисовано — простая версия на сверку Batın (2026-10-09):
-// белая панель на весь экран, пункты крупно, справа сверху крестик (Batın 2026-10-10), внизу «Бесплатная консультация».
+// белая панель на весь экран, пункты крупно, справа сверху крестик (Batın 2026-10-10), внизу «Бесплатная консультация» —
+// только на главной (RULES.md §5, Batın 2026-10-13).
 // Слева сверху логотип bat с глазом — на том же месте и того же размера, что в шапке телефона (Batın 2026-10-09).
-import { NAV, TELEGRAM_URL } from '../data/site';
+import { NAV, TELEGRAM_URL, contactsHref } from '../data/site';
+const isHome = Astro.url.pathname === '/';
 import Logo from './Logo.astro';
 ---
 <div class="mm" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Меню" hidden>
@@ -12,12 +14,14 @@ import Logo from './Logo.astro';
   </div>
   <nav class="mm-nav wrap" aria-label="Разделы">
     <a class="mm-a t-h-lg" href="/">Главная</a>
-    {NAV.map((n) => <a class="mm-a t-h-lg" href={n.href}>{n.label}</a>)}
+    {NAV.map((n) => <a class="mm-a t-h-lg" href={n.key === 'kontakty' ? contactsHref(isHome) : n.href}>{n.label}</a>)}
     <a class="mm-a t-h-lg" href="/#voprosy">Вопросы</a>
   </nav>
-  <div class="mm-cta wrap">
-    <a class="btn btn--lg btn--block-m" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="consult_click">Бесплатная консультация</a>
-  </div>
+  {isHome && (
+    <div class="mm-cta wrap">
+      <a class="btn btn--lg btn--block-m" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="consult_click">Бесплатная консультация</a>
+    </div>
+  )}
 </div>
 
 <script>
