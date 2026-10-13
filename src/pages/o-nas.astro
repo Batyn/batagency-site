@@ -6,7 +6,6 @@ import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Brands from '../components/Brands.astro';
-import Consult from '../components/Consult.astro';
 import Footer from '../components/Footer.astro';
 ---
 <Base title="О нас — Bat Agency" description="Кто мы: команда с опытом в маркетинге и PR брендинговых агентств, медиа и моды. С кем мы работали.">
@@ -30,7 +29,6 @@ import Footer from '../components/Footer.astro';
     </div>
     <div class="wrap"><div class="section-rule"></div></div>
     <div class="ab-brands wrap"><Brands page /></div>
-    <Consult page />
   </main>
   <Footer />
 </Base>
@@ -62,6 +60,7 @@ import Footer from '../components/Footer.astro';
     :global(html.about-photo) .ab-photo { grid-column: 1; grid-row: 2; height: 16.25rem; }
     :global(html.about-photo) .ab-p2 { grid-row: 3; }
     :global(html.about-photo) .ab-note { grid-row: 4; }
-    .ab-brands { padding-top: 2rem; padding-bottom: 0; }
+    /* до подвала 72 (Figma Final 320:3918: блок консультации скрыт, отступ даёт этот блок) */
+    .ab-brands { padding-top: 2rem; padding-bottom: var(--section-bottom); }
   }
 </style>

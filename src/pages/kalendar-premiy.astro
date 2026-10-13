@@ -2,14 +2,13 @@
 // Страница «Календарь премий» (Figma Final, секция Awards calendar 472:6612; задача 64). Тексты — content/site-texts.md, раздел 7.
 // Адрес /kalendar-premiy/ — решение Batın 2026-10-12.
 // Ссылки (Batın 2026-10-12): «Услуги» → «03 Премии» (поле link в data/services.ts) и подвал после «Вопросов» (FOOTER_NAV).
-// Телефон: остальные блоки (шапка, крошки, H1, шаги, консультация, подвал) — те же компоненты, что на «Услугах» и главной.
+// Телефон: остальные блоки (шапка, крошки, H1, шаги, подвал) — те же компоненты, что на «Услугах» и главной.
 import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import PageTitle from '../components/PageTitle.astro';
 import AwardsCalendar from '../components/AwardsCalendar.astro';
 import Process from '../components/Process.astro';
-import Consult from '../components/Consult.astro';
 import Footer from '../components/Footer.astro';
 
 const STEPS = [
@@ -31,7 +30,6 @@ const STEPS = [
     </PageTitle>
     <AwardsCalendar />
     <Process title="Как мы подаём заявку" steps={STEPS} id="kak-podaem" />
-    <Consult page text="За 45 минут посмотрим ваши проекты и скажем, на какие премии их стоит подать и что нужно для заявки. Ни к чему не обязывает." />
   </main>
   <Footer />
 </Base>

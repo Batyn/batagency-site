@@ -1,9 +1,9 @@
 ---
 // Аккордеон страницы /uslugi/ — вариант C2 (Figma Components «Row/NN», «Row mobile/NN», State = Closed / Open):
 // можно раскрыть несколько строк; раскрытая строка — инверсия. На <details>: без JS тоже раскрывается, весь текст в HTML.
+// Кнопки консультации в раскрытой строке нет (Batın 2026-10-13): консультация только на главной.
 // «Что получаете» — заглушка из макета, текст пишет Batın (задача 23).
 import { SERVICES } from '../data/services';
-import { TELEGRAM_URL } from '../data/site';
 ---
 <div class="acc wrap" data-accordion="service_open">
   {SERVICES.map((s) => (
@@ -27,7 +27,6 @@ import { TELEGRAM_URL } from '../data/site';
             <p class="acc-todo">текст пишет Batın</p>
           </div>
           {s.link && <a class="acc-link" href={s.link.href}>{s.link.label}&nbsp;<span aria-hidden="true">→</span></a>}
-          <a class="btn btn--lg btn--light btn--block-m acc-btn" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="consult_click">Бесплатная консультация</a>
         </div>
       </div>
     </details>
@@ -41,7 +40,8 @@ import { TELEGRAM_URL } from '../data/site';
 <style>
   /* колонка номера: 292 из 1278 внутри строки — одна и та же у заголовка и тела */
   .acc-row { --acc-spacer: 22.85%; }
-  .acc { display: flex; flex-direction: column; gap: 0.5rem; padding-top: 4.5rem; }
+  /* снизу 96 / 48 до подвала (Figma Final «Услуги» 282:4985 / 282:5045: блока консультации больше нет) */
+  .acc { display: flex; flex-direction: column; gap: 0.5rem; padding-top: 4.5rem; padding-bottom: var(--section-top); }
   .acc-row {
     border: 1px solid var(--ink); border-radius: var(--r-md);
     background: var(--bg); color: var(--ink);
@@ -78,7 +78,7 @@ import { TELEGRAM_URL } from '../data/site';
   .acc-steps li { display: flex; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--grey); font: 400 1.125rem/1.45 var(--font); }
   .acc-step-n { flex: 0 0 2rem; font: 400 0.9375rem/1.7 var(--font); color: var(--soft); }
   .acc-todo { font: 400 1rem/1.5 var(--font); color: var(--soft); }
-  /* второстепенная ссылка (у «Премий» — на календарь): текстом, чтобы главным действием оставалась кнопка */
+  /* второстепенная ссылка (у «Премий» — на календарь): текстом, как в макете */
   .acc-link { font: 400 1.125rem/1.45 var(--font); text-decoration: underline; text-underline-offset: 0.25rem; text-decoration-thickness: 1px; }
   @media (hover: hover) and (pointer: fine) {
     .acc-link:hover { text-decoration-thickness: 2px; }

@@ -1,28 +1,21 @@
 ---
-// «Начнём с одного созвона» (Figma Final: главная 278:4818; страницы «Услуги», «О нас» — блок «Консультация»).
-// На главной следом идут частые вопросы (Faq), на внутренних страницах — только этот блок.
+// «Начнём с одного созвона» (Figma Final: главная 278:4818 / 278:5245, секция «5 · Консультация и ответы»).
+// Только на главной, перед частыми вопросами (Batın 2026-10-13); на остальных страницах блока нет — там бриф в подвале.
 import ConsultActions from './ConsultActions.astro';
-// text — свой текст под заголовком (на «Календаре премий» — про премии, content/site-texts.md, раздел 7)
-interface Props { page?: boolean; text?: string }
-const DEFAULT_TEXT = 'Пока о проекте не рассказали, о нём знают только заказчики. За 45 минут посмотрим сайт, кейсы, премии и соцсети агентства и предложим первые шаги. Ни к чему не обязывает.';
-const { page = false, text = DEFAULT_TEXT } = Astro.props;
 ---
-<section class:list={['consult wrap', { 'consult--page': page }]} id="kontakty" aria-labelledby="consult-h">
+<section class="consult wrap" id="kontakty" aria-labelledby="consult-h">
   <div class="section-rule"></div>
   <div class="section-head">
     <div class="row">
       <div class="col-main consult-main">
         <h2 class="t-display" id="consult-h">Начнём с одного созвона</h2>
-        <p class="t-body-lg measure">{text}</p>
-        {page && <ConsultActions page />}
+        <p class="t-body-lg measure">Пока о проекте не рассказали, о нём знают только заказчики. За 45 минут посмотрим сайт, кейсы, премии и соцсети агентства и предложим первые шаги. Ни к чему не обязывает.</p>
       </div>
     </div>
   </div>
-  {!page && (
-    <div class="row consult-actions">
-      <div class="col-main consult-main"><ConsultActions /></div>
-    </div>
-  )}
+  <div class="row consult-actions">
+    <div class="col-main consult-main"><ConsultActions /></div>
+  </div>
 </section>
 
 <script>
@@ -38,7 +31,6 @@ const { page = false, text = DEFAULT_TEXT } = Astro.props;
 <style>
   /* кнопка и контакты приходят из ConsultActions, поэтому отступы между ними — через :global */
   .consult { padding-top: 0; }
-  .consult--page { padding-top: var(--section-top); padding-bottom: 0; }
   .consult-main > :global(* + *) { margin-top: 1.75rem; }
   .consult-actions { margin-top: 4.5rem; }
   .consult-actions .consult-main > :global(* + *) { margin-top: 2.5rem; }
@@ -47,7 +39,5 @@ const { page = false, text = DEFAULT_TEXT } = Astro.props;
     .consult-main > :global(* + *) { margin-top: 1rem; }
     .consult-actions { margin-top: 2rem; }
     .consult-actions .consult-main > :global(* + *) { margin-top: 2rem; }
-    .consult--page { padding-top: 4.5rem; }
-    .consult--page .consult-main > :global(* + *) { margin-top: 1.25rem; }
   }
 </style>
