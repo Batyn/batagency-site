@@ -1,10 +1,10 @@
 ---
 // Меню на телефоне. В Figma не нарисовано — простая версия на сверку Batın (2026-10-09):
-// белая панель на весь экран, пункты крупно, справа сверху крестик (Batın 2026-10-10), внизу «Бесплатная консультация» —
-// только на главной (RULES.md §5, Batın 2026-10-13). Панель выезжает слева, бургер шапки на том же месте
+// белая панель на весь экран, пункты крупно, справа сверху крестик (Batın 2026-10-10). Кнопки «Бесплатная консультация»
+// в меню нет (Batın 2026-10-14). Панель выезжает слева, бургер шапки на том же месте
 // сходится и поворачивается в крестик (Batın 2026-10-14, как на ony.ru).
 // Слева сверху логотип bat с глазом — на том же месте и того же размера, что в шапке телефона (Batın 2026-10-09).
-import { NAV, TELEGRAM_URL, contactsHref } from '../data/site';
+import { NAV, contactsHref } from '../data/site';
 const isHome = Astro.url.pathname === '/';
 import Logo from './Logo.astro';
 ---
@@ -19,11 +19,6 @@ import Logo from './Logo.astro';
       {NAV.map((n) => <a class="mm-a t-h-lg" href={n.key === 'kontakty' ? contactsHref(isHome) : n.href}>{n.label}</a>)}
       <a class="mm-a t-h-lg" href="/#voprosy">Вопросы</a>
     </nav>
-    {isHome && (
-      <div class="mm-cta wrap">
-        <a class="btn btn--lg btn--block-m" href={TELEGRAM_URL} target="_blank" rel="noopener" data-goal="consult_click">Бесплатная консультация</a>
-      </div>
-    )}
   </div>
 </div>
 
@@ -106,10 +101,9 @@ import Logo from './Logo.astro';
   .mm.is-open .mm-x i:first-child::before { transform: rotate(45deg); }
   .mm.is-open .mm-x i:last-child::before { transform: rotate(-45deg); }
   .mm-close:active .mm-x { transform: scale(0.9); transition: transform 120ms var(--ease-out); }
-  .mm-nav { display: flex; flex-direction: column; padding-top: 2rem; width: 100%; }
+  .mm-nav { display: flex; flex-direction: column; padding-top: 2rem; padding-bottom: 2rem; width: 100%; }
   .mm-a { padding-block: 0.625rem; border-bottom: 1px solid var(--hairline); }
   .mm-a:first-child { border-top: 1px solid var(--ink); }
-  .mm-cta { margin-top: auto; padding-top: 2rem; padding-bottom: 2rem; width: 100%; }
   :global(html.is-menu-open) { overflow: hidden; }
   /* без движения: панель проявляется, крестик сразу на месте */
   @media (prefers-reduced-motion: reduce) {
