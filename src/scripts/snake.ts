@@ -2,6 +2,8 @@
 // заголовок уезжает вверх, справа поле без рамки. Стенки сквозные — границу видно, когда змея проходит насквозь.
 // Пока посетитель не нажал стрелку или не провёл пальцем, змейка ползёт сама (автопилот). Каждая третья еда — на 5 %
 // быстрее. Шаг дискретный, без сглаживания. Стоит, когда поле вне экрана или вкладка скрыта.
+import { crawl } from './snake-crawl';
+
 type P = [number, number];
 const DIRS: Record<string, P> = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 const KEYS: Record<string, string> = {
@@ -222,29 +224,13 @@ export function init(root: HTMLElement) {
     text(); last = 0; acc = 0; loop();
   }
 
-  // по нажатию змея перестаёт крутиться и, пока кнопка едет в угол поля (500 мс), доворачивает против часовой
-  // до целого оборота — в игре всегда головой вверх (решение Batın 2026-10-14). После закрытия крутится снова
-  const circle = btn.querySelector<HTMLElement>('.snake-circle')!;
-  let snap: Animation | null = null;
-  function stopSpin() {
-    const spin = circle.getAnimations().find(a => a instanceof CSSAnimation && a.animationName === 'snake-spin');
-    if (!spin) return;
-    const deg = parseFloat(getComputedStyle(circle).rotate) || 0;
-    spin.cancel();
-    snap = circle.animate([{ rotate: `${deg}deg` }, { rotate: `${Math.floor(deg / 360) * 360}deg` }],
-      { duration: 500, easing: 'cubic-bezier(0.2, 0.6, 0.3, 1)', fill: 'forwards' });
-  }
-  function startSpin() {
-    snap?.cancel(); snap = null;
-    // перезапуск CSS-анимации с нуля: змея и так стоит головой вверх, рывка нет
-    circle.style.animation = 'none';
-    void circle.offsetWidth;
-    circle.style.animation = '';
-  }
+  // кнопка: змея ползёт по кольцу; по нажатию, пока кнопка едет в угол поля (500 мс), доползает головой вверх и
+  // стоит — в игре всегда головой вверх (решение Batın 2026-10-14). После закрытия ползёт снова
+  const ring = crawl([...btn.querySelectorAll<SVGSVGElement>('.snake-art')], () => !reduced.matches && visible && !document.hidden);
   function open() {
     if (mode !== 'closed' || small) return;
     root.classList.add('is-open', 'was-opened');
-    stopSpin();
+    ring.park(500);
     hero!.classList.add('is-game');
     btn.setAttribute('aria-expanded', 'true');
     btn.setAttribute('aria-label', 'Закрыть игру');
@@ -262,7 +248,7 @@ export function init(root: HTMLElement) {
     btn.setAttribute('aria-expanded', 'false');
     btn.setAttribute('aria-label', btn.dataset.label || '');
     if (refocus) btn.focus({ preventScroll: true });
-    startSpin();
+    ring.resume();
     draw();
   }
 
@@ -312,9 +298,9 @@ export function init(root: HTMLElement) {
   field.addEventListener('pointerup', end);
   field.addEventListener('pointercancel', end);
 
-  new IntersectionObserver(([e]) => { visible = e.isIntersecting; last = 0; loop(); }).observe(root);
-  document.addEventListener('visibilitychange', () => { last = 0; loop(); });
-  reduced.addEventListener('change', () => { if (mode === 'auto' || mode === 'wait') toAuto(); });
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; last = 0; loop(); ring.update(); }).observe(root);
+  document.addEventListener('visibilitychange', () => { last = 0; loop(); ring.update(); });
+  reduced.addEventListener('change', () => { if (mode === 'auto' || mode === 'wait') toAuto(); ring.update(); });
   coarse.addEventListener('change', text);
 
   function fit() {
