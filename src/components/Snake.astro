@@ -14,6 +14,7 @@
       aria-label="Игра «Змейка». Стрелки — управление, Esc — закрыть">
       <canvas data-snake-canvas aria-hidden="true"></canvas>
     </div>
+    <div class="snake-swipe" aria-hidden="true"></div>
   </div>
   <button class="snake-btn" type="button" data-snake-btn aria-expanded="false" aria-controls="snake-field"
     aria-label="Сыграть в змейку" data-label="Сыграть в змейку">
@@ -72,6 +73,7 @@
   /* проигрыш — инверсия: поле на миг чёрное, змейка белая */
   .snake.is-over .snake-field { background: var(--ink); }
   .snake-field canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .snake-swipe { display: none; }
 
   /* кнопка всегда стоит в правом верхнем углу; в закрытом виде её сдвигают в центр свободного места
      (--snake-bx/--snake-by), в открытом — уменьшают до угловой. Переезд — только transform */
@@ -125,6 +127,14 @@
     .snake {
       grid-row: 3; grid-column: 1; width: auto; justify-self: stretch;
       margin: calc(var(--s-4xl) - var(--snake-shift, 0px)) 0 0;
+    }
+    /* свайп ловим шире поля — на всю ширину, от заголовка до низа первого экрана: палец чуть мимо поля
+       прокручивал страницу (Batın 2026-10-14). Кнопка-змея, липкая кнопка и меню лежат выше слоя */
+    .snake-swipe {
+      display: block; position: absolute;
+      top: calc(-1 * var(--s-4xl)); bottom: calc(-1 * var(--snake-below, 0px));
+      left: calc(-1 * var(--gutter)); right: calc(-1 * var(--gutter));
+      touch-action: none;
     }
   }
   @media (prefers-reduced-motion: reduce) {

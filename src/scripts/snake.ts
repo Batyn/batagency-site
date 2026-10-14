@@ -18,6 +18,7 @@ export function init(root: HTMLElement) {
   const hero = root.closest<HTMLElement>('.hero');
   const title = hero?.querySelector<HTMLElement>('.hero-title');
   const btn = root.querySelector<HTMLButtonElement>('[data-snake-btn]')!;
+  const play = root.querySelector<HTMLElement>('[data-snake-play]')!;
   const field = root.querySelector<HTMLElement>('[data-snake-field]')!;
   const canvas = root.querySelector<HTMLCanvasElement>('[data-snake-canvas]')!;
   const hint = root.querySelector<HTMLElement>('[data-snake-hint]')!;
@@ -71,6 +72,9 @@ export function init(root: HTMLElement) {
       root.style.setProperty('--snake-bx', `${Math.round(-(W - b) / 2)}px`);
       root.style.setProperty('--snake-by', `${Math.round(s + (H - s - b) / 2)}px`);
     }
+    // слой свайпа на телефоне тянется до низа первого экрана (Snake.astro, .snake-swipe)
+    const below = desk.matches ? 0 : hero!.getBoundingClientRect().bottom - root.getBoundingClientRect().bottom;
+    root.style.setProperty('--snake-below', `${Math.max(0, Math.round(below))}px`);
     // мало места (телефон 360×640, ширины 761–~1100) — ни кнопки, ни игры
     small = W < MIN_W || H - HINT_H < MIN_H || H - s < b + 16;
     root.classList.toggle('is-small', small);
@@ -281,15 +285,16 @@ export function init(root: HTMLElement) {
     turn(name);
   });
 
-  // свайп: направление решаем, как только палец прошёл 24 px; можно вести змейку, не отрывая пальца
+  // свайп: направление решаем, как только палец прошёл 24 px; можно вести змейку, не отрывая пальца.
+  // Слушаем всю игру, а не только поле: на телефоне касания ловит слой шире поля (.snake-swipe)
   let sx = 0, sy = 0, swiping = false;
-  field.addEventListener('pointerdown', (e) => {
+  play.addEventListener('pointerdown', (e) => {
     if (mode === 'closed') return;
     if (e.pointerType === 'mouse') { field.focus({ preventScroll: true }); return; }
     sx = e.clientX; sy = e.clientY; swiping = true;
-    field.setPointerCapture(e.pointerId);
+    play.setPointerCapture(e.pointerId);
   });
-  field.addEventListener('pointermove', (e) => {
+  play.addEventListener('pointermove', (e) => {
     if (!swiping) return;
     const dx = e.clientX - sx, dy = e.clientY - sy;
     if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE) return;
@@ -297,8 +302,8 @@ export function init(root: HTMLElement) {
     sx = e.clientX; sy = e.clientY;
   });
   const end = () => { swiping = false; };
-  field.addEventListener('pointerup', end);
-  field.addEventListener('pointercancel', end);
+  play.addEventListener('pointerup', end);
+  play.addEventListener('pointercancel', end);
 
   new IntersectionObserver(([e]) => { visible = e.isIntersecting; last = 0; loop(); ring.update(); }).observe(root);
   document.addEventListener('visibilitychange', () => { last = 0; loop(); ring.update(); });
@@ -311,7 +316,8 @@ export function init(root: HTMLElement) {
     draw(); loop();
   }
   const ro = new ResizeObserver(fit);
-  ro.observe(root); ro.observe(field);
+  // первый экран — ради высоты слоя свайпа: низ экрана может уехать, когда размер змейки тот же
+  ro.observe(root); ro.observe(field); ro.observe(hero);
 
   root.hidden = false;
   text();
