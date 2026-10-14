@@ -269,7 +269,9 @@ export function init(root: HTMLElement) {
     queue.push(d);
   }
 
-  btn.addEventListener('click', () => (mode === 'closed' ? open() : close()));
+  // фокус на кнопку возвращаем только при закрытии с клавиатуры (detail 0): после касания Safari рисовал
+  // обводку :focus-visible, пока не нажмёшь в другое место (Batın 2026-10-14)
+  btn.addEventListener('click', (e) => (mode === 'closed' ? open() : close(e.detail === 0)));
   root.addEventListener('keydown', (e) => {
     if (mode === 'closed') return;
     if (e.key === 'Escape') { e.preventDefault(); close(); return; }
