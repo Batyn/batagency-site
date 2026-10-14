@@ -10,7 +10,7 @@ const KEYS: Record<string, string> = {
 };
 // автопилот медленнее игры: он в боковом зрении, пока читают заголовок
 const AUTO_STEP = 170, PLAY_STEP = 140, MIN_STEP = 50, SPEED_UP = 1.05, EVERY = 3;
-const IDLE = 4000, OVER = 600, SWIPE = 24, HINT_H = 44, MIN_W = 256, MIN_H = 112;
+const IDLE = 4000, OVER = 600, SWIPE = 24, HINT_H = 45, MIN_W = 256, MIN_H = 112;
 
 export function init(root: HTMLElement) {
   const hero = root.closest<HTMLElement>('.hero');
