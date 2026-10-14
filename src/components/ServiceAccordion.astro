@@ -2,11 +2,11 @@
 // Аккордеон страницы /uslugi/ — вариант C2 (Figma Components «Row/NN», «Row mobile/NN», State = Closed / Open):
 // можно раскрыть несколько строк; раскрытая строка — инверсия. На <details>: без JS тоже раскрывается, весь текст в HTML.
 // Кнопки консультации в раскрытой строке нет (Batın 2026-10-13): консультация только на главной.
-// «Что получаете» — заглушка из макета, текст пишет Batın (задача 23).
-import { SERVICES } from '../data/services';
+// Тексты — content/site-texts.md, раздел 2 (задача 23): «Что это», шаги, «Что получаете».
+import { SERVICES, DETAILS } from '../data/services';
 ---
 <div class="acc wrap" data-accordion="service_open">
-  {SERVICES.map((s) => (
+  {SERVICES.map((s) => { const d = DETAILS[s.slug]; return (
     <details class="acc-row" id={s.slug}>
       <summary class="acc-sum">
         <span class="acc-n">{s.n}</span>
@@ -15,22 +15,28 @@ import { SERVICES } from '../data/services';
       </summary>
       <div class="acc-body">
         <div class="acc-inner">
-          <p class="acc-lead">{s.lead}</p>
+          <p class="acc-lead">{d.about}</p>
           <div class="acc-block">
             <h3 class="acc-h">Шаги</h3>
             <ol class="acc-steps">
-              {s.items.map((it, i) => <li><span class="acc-step-n">{i + 1}</span><span>{it}</span></li>)}
+              {d.items.map((it, i) => <li><span class="acc-step-n">{i + 1}</span><span>{it}</span></li>)}
             </ol>
+            {d.note && <p class="acc-note">{d.note}</p>}
           </div>
           <div class="acc-block">
             <h3 class="acc-h">Что получаете</h3>
-            <p class="acc-todo">текст пишет Batın</p>
+            <ul class="acc-list">{d.benefits.map((b) => <li>{b}</li>)}</ul>
           </div>
-          {s.link && <a class="acc-link" href={s.link.href}>{s.link.label}&nbsp;<span aria-hidden="true">→</span></a>}
+          {d.link && (
+            <div class="acc-block">
+              <p class="acc-text">{d.link.text}</p>
+              <a class="acc-link" href={d.link.href}>{d.link.label}&nbsp;<span aria-hidden="true">→</span></a>
+            </div>
+          )}
         </div>
       </div>
     </details>
-  ))}
+  ); })}
 </div>
 
 <script>
@@ -77,7 +83,10 @@ import { SERVICES } from '../data/services';
   .acc-steps { border-top: 1px solid var(--grey); }
   .acc-steps li { display: flex; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--grey); font: 400 1.125rem/1.45 var(--font); }
   .acc-step-n { flex: 0 0 2rem; font: 400 0.9375rem/1.7 var(--font); color: var(--soft); }
-  .acc-todo { font: 400 1rem/1.5 var(--font); color: var(--soft); }
+  .acc-note, .acc-text { font: 400 1.125rem/1.45 var(--font); }
+  .acc-note { margin-top: 0.75rem; }
+  .acc-list { border-top: 1px solid var(--grey); }
+  .acc-list li { padding: 0.75rem 0; border-bottom: 1px solid var(--grey); font: 400 1.125rem/1.45 var(--font); }
   /* второстепенная ссылка (у «Премий» — на календарь): текстом, как в макете */
   .acc-link { font: 400 1.125rem/1.45 var(--font); text-decoration: underline; text-underline-offset: 0.25rem; text-decoration-thickness: 1px; }
   @media (hover: hover) and (pointer: fine) {
@@ -98,7 +107,9 @@ import { SERVICES } from '../data/services';
     .acc-steps { border-color: var(--soft); }
     .acc-steps li { gap: 0.75rem; padding: 0.625rem 0; border-color: var(--soft); font-size: 0.9375rem; }
     .acc-step-n { flex-basis: 1.5rem; font: 500 0.75rem/1.8 var(--font); }
-    .acc-todo { font-size: 0.9375rem; line-height: 1.45; }
+    .acc-note, .acc-text { font-size: 0.9375rem; }
+    .acc-list { border-color: var(--soft); }
+    .acc-list li { padding: 0.625rem 0; border-color: var(--soft); font-size: 0.9375rem; }
     .acc-link { display: flex; align-items: center; align-self: flex-start; min-height: 2.75rem; margin-block: -0.625rem; font-size: 1rem; }
   }
   @media (prefers-reduced-motion: reduce) {
