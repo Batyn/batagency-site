@@ -18,14 +18,14 @@
   <button class="snake-btn" type="button" data-snake-btn aria-expanded="false" aria-controls="snake-field"
     aria-label="Сыграть в змейку" data-label="Сыграть в змейку">
     <span class="snake-circle" aria-hidden="true">
-      <!-- пиксельный рисунок отдельно под 74, 72 и 44 по целым пикселям: масштаб одного мылит клетки -->
-      <svg class="snake-art snake-art-xl" viewBox="0 0 74 74" width="74" height="74">
-        <path d="M26 4h11v11h-11v-2h4v-6h-4zM32 7h2v5h-2zM34 7h5v5h-5zM39 7h2v5h-2zM41 7h5v5h-5zM46 7h2v5h-2zM48 7h5v5h-5zM48 12h5v2h-5zM48 14h5v5h-5zM53 14h2v5h-2zM55 14h5v5h-5zM55 19h5v2h-5zM55 21h5v5h-5zM60 21h2v5h-2zM62 21h5v5h-5zM62 26h5v2h-5zM62 28h5v5h-5zM62 33h5v2h-5zM62 35h5v5h-5zM62 40h5v2h-5zM62 42h5v5h-5zM62 47h5v2h-5zM62 49h5v5h-5zM60 49h2v5h-2zM55 49h5v5h-5zM55 54h5v2h-5zM55 56h5v5h-5zM53 56h2v5h-2zM48 56h5v5h-5zM48 61h5v2h-5zM48 63h5v5h-5zM46 63h2v5h-2zM41 63h5v5h-5zM39 63h2v5h-2zM34 63h5v5h-5zM32 63h2v5h-2zM27 63h5v5h-5zM25 63h2v5h-2zM20 63h5v5h-5zM20 61h5v2h-5zM20 56h5v5h-5zM18 56h2v5h-2zM13 56h5v5h-5zM13 54h5v2h-5zM13 49h5v5h-5zM11 49h2v5h-2zM6 49h5v5h-5zM6 47h5v2h-5zM6 42h5v5h-5zM6 40h5v2h-5zM6 35h5v5h-5zM6 33h5v2h-5zM6 28h5v5h-5zM6 26h5v2h-5zM6 21h5v5h-5zM11 21h2v5h-2zM13 21h5v5h-5zM13 19h5v2h-5zM13 14h5v5h-5zM18 14h2v5h-2zM20 14h5v5h-5zM20 12h5v2h-5zM20 7h5v5h-5zM25 9h4v2h-4z" />
-        <path class="snake-eye" d="M32 5h3v3h-3z" />
+      <!-- пиксельный рисунок отдельно под 75, 72 и 44 (75 — образец Batın) по целым пикселям: масштаб одного мылит клетки -->
+      <svg class="snake-art snake-art-xl" viewBox="0 0 75 75" width="75" height="75">
+        <path d="M27 4h11v11h-11v-2h4v-6h-4zM33 7h2v5h-2zM35 7h5v5h-5zM40 7h2v5h-2zM42 7h5v5h-5zM47 7h2v5h-2zM49 7h5v5h-5zM49 12h5v2h-5zM49 14h5v5h-5zM54 14h2v5h-2zM56 14h5v5h-5zM56 19h5v2h-5zM56 21h5v5h-5zM61 21h2v5h-2zM63 21h5v5h-5zM63 26h5v2h-5zM63 28h5v5h-5zM63 33h5v2h-5zM63 35h5v5h-5zM63 40h5v2h-5zM63 42h5v5h-5zM63 47h5v2h-5zM63 49h5v5h-5zM61 49h2v5h-2zM56 49h5v5h-5zM56 54h5v2h-5zM56 56h5v5h-5zM54 56h2v5h-2zM49 56h5v5h-5zM49 61h5v2h-5zM49 63h5v5h-5zM47 63h2v5h-2zM42 63h5v5h-5zM40 63h2v5h-2zM35 63h5v5h-5zM33 63h2v5h-2zM28 63h5v5h-5zM26 63h2v5h-2zM21 63h5v5h-5zM21 61h5v2h-5zM21 56h5v5h-5zM19 56h2v5h-2zM14 56h5v5h-5zM14 54h5v2h-5zM14 49h5v5h-5zM12 49h2v5h-2zM7 49h5v5h-5zM7 47h5v2h-5zM7 42h5v5h-5zM7 40h5v2h-5zM7 35h5v5h-5zM7 33h5v2h-5zM7 28h5v5h-5zM7 26h5v2h-5zM7 21h5v5h-5zM12 21h2v5h-2zM14 21h5v5h-5zM14 19h5v2h-5zM14 14h5v5h-5zM19 14h2v5h-2zM21 14h5v5h-5zM21 12h5v2h-5zM21 7h5v5h-5zM26 9h4v2h-4z" />
+        <path class="snake-eye" d="M33 5h3v3h-3z" />
       </svg>
       <svg class="snake-art snake-art-l" viewBox="0 0 72 72" width="72" height="72">
-        <path d="M25.5 3h10v10h-10v-1.5h4v-6h-4zM31.5 5.5h2v5h-2zM33.5 5.5h5v5h-5zM38.5 5.5h2v5h-2zM40.5 5.5h5v5h-5zM45.5 5.5h2v5h-2zM47.5 5.5h5v5h-5zM47.5 10.5h5v2h-5zM47.5 12.5h5v5h-5zM52.5 12.5h2v5h-2zM54.5 12.5h5v5h-5zM54.5 17.5h5v2h-5zM54.5 19.5h5v5h-5zM59.5 19.5h2v5h-2zM61.5 19.5h5v5h-5zM61.5 24.5h5v2h-5zM61.5 26.5h5v5h-5zM61.5 31.5h5v2h-5zM61.5 33.5h5v5h-5zM61.5 38.5h5v2h-5zM61.5 40.5h5v5h-5zM61.5 45.5h5v2h-5zM61.5 47.5h5v5h-5zM59.5 47.5h2v5h-2zM54.5 47.5h5v5h-5zM54.5 52.5h5v2h-5zM54.5 54.5h5v5h-5zM52.5 54.5h2v5h-2zM47.5 54.5h5v5h-5zM47.5 59.5h5v2h-5zM47.5 61.5h5v5h-5zM45.5 61.5h2v5h-2zM40.5 61.5h5v5h-5zM38.5 61.5h2v5h-2zM33.5 61.5h5v5h-5zM31.5 61.5h2v5h-2zM26.5 61.5h5v5h-5zM24.5 61.5h2v5h-2zM19.5 61.5h5v5h-5zM19.5 59.5h5v2h-5zM19.5 54.5h5v5h-5zM17.5 54.5h2v5h-2zM12.5 54.5h5v5h-5zM12.5 52.5h5v2h-5zM12.5 47.5h5v5h-5zM10.5 47.5h2v5h-2zM5.5 47.5h5v5h-5zM5.5 45.5h5v2h-5zM5.5 40.5h5v5h-5zM5.5 38.5h5v2h-5zM5.5 33.5h5v5h-5zM5.5 31.5h5v2h-5zM5.5 26.5h5v5h-5zM5.5 24.5h5v2h-5zM5.5 19.5h5v5h-5zM10.5 19.5h2v5h-2zM12.5 19.5h5v5h-5zM12.5 17.5h5v2h-5zM12.5 12.5h5v5h-5zM17.5 12.5h2v5h-2zM19.5 12.5h5v5h-5zM19.5 10.5h5v2h-5zM19.5 5.5h5v5h-5zM24.5 7.5h4v2h-4z" />
-        <path class="snake-eye" d="M31.5 4.5h2.5v2.5h-2.5z" />
+        <path d="M25 3h11v11h-11v-2h4v-6h-4zM31 6h2v5h-2zM33 6h5v5h-5zM38 6h2v5h-2zM40 6h5v5h-5zM45 6h2v5h-2zM47 6h5v5h-5zM47 11h5v2h-5zM47 13h5v5h-5zM52 13h2v5h-2zM54 13h5v5h-5zM54 18h5v2h-5zM54 20h5v5h-5zM59 20h2v5h-2zM61 20h5v5h-5zM61 25h5v2h-5zM61 27h5v5h-5zM61 32h5v2h-5zM61 34h5v5h-5zM61 39h5v2h-5zM61 41h5v5h-5zM61 46h5v2h-5zM61 48h5v5h-5zM59 48h2v5h-2zM54 48h5v5h-5zM54 53h5v2h-5zM54 55h5v5h-5zM52 55h2v5h-2zM47 55h5v5h-5zM47 60h5v2h-5zM47 62h5v5h-5zM45 62h2v5h-2zM40 62h5v5h-5zM38 62h2v5h-2zM33 62h5v5h-5zM31 62h2v5h-2zM26 62h5v5h-5zM24 62h2v5h-2zM19 62h5v5h-5zM19 60h5v2h-5zM19 55h5v5h-5zM17 55h2v5h-2zM12 55h5v5h-5zM12 53h5v2h-5zM12 48h5v5h-5zM10 48h2v5h-2zM5 48h5v5h-5zM5 46h5v2h-5zM5 41h5v5h-5zM5 39h5v2h-5zM5 34h5v5h-5zM5 32h5v2h-5zM5 27h5v5h-5zM5 25h5v2h-5zM5 20h5v5h-5zM10 20h2v5h-2zM12 20h5v5h-5zM12 18h5v2h-5zM12 13h5v5h-5zM17 13h2v5h-2zM19 13h5v5h-5zM19 11h5v2h-5zM19 6h5v5h-5zM24 8h4v2h-4z" />
+        <path class="snake-eye" d="M31 4h3v3h-3z" />
       </svg>
       <svg class="snake-art snake-art-s" viewBox="0 0 44 44" width="44" height="44">
         <path d="M17 3h7v7h-7v-2h3v-3h-3zM20 5h1v3h-1zM21 5h3v3h-3zM24 5h1v3h-1zM25 5h3v3h-3zM28 5h1v3h-1zM29 5h3v3h-3zM29 8h3v1h-3zM29 9h3v3h-3zM32 9h1v3h-1zM33 9h3v3h-3zM33 12h3v1h-3zM33 13h3v3h-3zM36 13h1v3h-1zM37 13h3v3h-3zM37 16h3v1h-3zM37 17h3v3h-3zM37 20h3v1h-3zM37 21h3v3h-3zM37 24h3v1h-3zM37 25h3v3h-3zM37 28h3v1h-3zM37 29h3v3h-3zM36 29h1v3h-1zM33 29h3v3h-3zM33 32h3v1h-3zM33 33h3v3h-3zM32 33h1v3h-1zM29 33h3v3h-3zM29 36h3v1h-3zM29 37h3v3h-3zM28 37h1v3h-1zM25 37h3v3h-3zM24 37h1v3h-1zM21 37h3v3h-3zM20 37h1v3h-1zM17 37h3v3h-3zM16 37h1v3h-1zM13 37h3v3h-3zM13 36h3v1h-3zM13 33h3v3h-3zM12 33h1v3h-1zM9 33h3v3h-3zM9 32h3v1h-3zM9 29h3v3h-3zM8 29h1v3h-1zM5 29h3v3h-3zM5 28h3v1h-3zM5 25h3v3h-3zM5 24h3v1h-3zM5 21h3v3h-3zM5 20h3v1h-3zM5 17h3v3h-3zM5 16h3v1h-3zM5 13h3v3h-3zM8 13h1v3h-1zM9 13h3v3h-3zM9 12h3v1h-3zM9 9h3v3h-3zM12 9h1v3h-1zM13 9h3v3h-3zM13 8h3v1h-3zM13 5h3v3h-3zM16 6h3v1h-3z" />
@@ -111,11 +111,11 @@
   .snake.is-open .snake-art-l { display: none; }
   .snake.is-open .snake-art-s { display: block; }
 
-  /* десктоп: кнопка 74 под меню у правого поля (Batın 2026-10-14); в открытой игре уменьшается до 44 в углу
+  /* десктоп: кнопка 75 под меню у правого поля (Batın 2026-10-14); в открытой игре уменьшается до 44 в углу
      поля — там рисунок 44, чтобы клетки не мылились, а строка подсказки рассчитана на 44 */
   @media (min-width: 761px) {
-    .snake-btn { width: 4.625rem; height: 4.625rem; }
-    .snake.is-open .snake-btn { transform: scale(calc(44 / 74)); }
+    .snake-btn { width: 4.6875rem; height: 4.6875rem; }
+    .snake.is-open .snake-btn { transform: scale(calc(44 / 75)); }
     .snake-art-l { display: none; }
     .snake-art-xl { display: block; }
     .snake.is-open .snake-art-xl { display: none; }
