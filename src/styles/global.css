@@ -34,6 +34,11 @@ a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; }
 img, svg { display: block; max-width: 100%; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 0.1875rem; border-radius: 2px; }
+/* на телефоне обводка фокуса только мешает: появляется после касаний и программного фокуса (Batın 2026-10-15).
+   !important — иначе её возвращают стили компонентов */
+@media (max-width: 760px) {
+  :focus-visible { outline: none !important; }
+}
 [id] { scroll-margin-top: 1.5rem; }
 /* на десктопе шапка липкая: якоря останавливаются под ней */
 @media (min-width: 761px) {
