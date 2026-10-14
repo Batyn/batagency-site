@@ -1,0 +1,136 @@
+---
+// Змейка на первом экране главной (задача 74, решения Batın 2026-10-14). На экране только кнопка — пиксельная
+// змея-уроборос (Figma, страница «Змея», набор «Змея / Пиксели»), без подписи, медленно поворачивается против
+// часовой; по нажатию встаёт головой вверх и останавливается, заголовок уезжает вверх, справа открывается поле без рамки, кнопка
+// переезжает в его угол и закрывает игру. Без JS ничего этого нет; код игры — отдельный чанк (scripts/snake.ts).
+// Контейнер собственного размера не имеет и всегда занимает место открытой игры — сетка не сдвигается (CLS).
+---
+<div class="snake" data-snake hidden>
+  <div class="snake-play" data-snake-play>
+    <p class="snake-hint t-hint" data-snake-hint
+      data-fine="Стрелки — управление, Esc — закрыть"
+      data-coarse="Свайпай для управления!">Стрелки — управление, Esc — закрыть</p>
+    <div class="snake-field" id="snake-field" data-snake-field tabindex="-1" role="application"
+      aria-label="Игра «Змейка». Стрелки — управление, Esc — закрыть">
+      <canvas data-snake-canvas aria-hidden="true"></canvas>
+    </div>
+  </div>
+  <button class="snake-btn" type="button" data-snake-btn aria-expanded="false" aria-controls="snake-field"
+    aria-label="Сыграть в змейку" data-label="Сыграть в змейку">
+    <span class="snake-circle" aria-hidden="true">
+      <!-- пиксельный рисунок отдельно под 74, 72 и 44 по целым пикселям: масштаб одного мылит клетки -->
+      <svg class="snake-art snake-art-xl" viewBox="0 0 74 74" width="74" height="74">
+        <path d="M26 4h11v11h-11v-2h4v-6h-4zM32 7h2v5h-2zM34 7h5v5h-5zM39 7h2v5h-2zM41 7h5v5h-5zM46 7h2v5h-2zM48 7h5v5h-5zM48 12h5v2h-5zM48 14h5v5h-5zM53 14h2v5h-2zM55 14h5v5h-5zM55 19h5v2h-5zM55 21h5v5h-5zM60 21h2v5h-2zM62 21h5v5h-5zM62 26h5v2h-5zM62 28h5v5h-5zM62 33h5v2h-5zM62 35h5v5h-5zM62 40h5v2h-5zM62 42h5v5h-5zM62 47h5v2h-5zM62 49h5v5h-5zM60 49h2v5h-2zM55 49h5v5h-5zM55 54h5v2h-5zM55 56h5v5h-5zM53 56h2v5h-2zM48 56h5v5h-5zM48 61h5v2h-5zM48 63h5v5h-5zM46 63h2v5h-2zM41 63h5v5h-5zM39 63h2v5h-2zM34 63h5v5h-5zM32 63h2v5h-2zM27 63h5v5h-5zM25 63h2v5h-2zM20 63h5v5h-5zM20 61h5v2h-5zM20 56h5v5h-5zM18 56h2v5h-2zM13 56h5v5h-5zM13 54h5v2h-5zM13 49h5v5h-5zM11 49h2v5h-2zM6 49h5v5h-5zM6 47h5v2h-5zM6 42h5v5h-5zM6 40h5v2h-5zM6 35h5v5h-5zM6 33h5v2h-5zM6 28h5v5h-5zM6 26h5v2h-5zM6 21h5v5h-5zM11 21h2v5h-2zM13 21h5v5h-5zM13 19h5v2h-5zM13 14h5v5h-5zM18 14h2v5h-2zM20 14h5v5h-5zM20 12h5v2h-5zM20 7h5v5h-5zM25 9h4v2h-4z" />
+        <path class="snake-eye" d="M32 5h3v3h-3z" />
+      </svg>
+      <svg class="snake-art snake-art-l" viewBox="0 0 72 72" width="72" height="72">
+        <path d="M25.5 3h10v10h-10v-1.5h4v-6h-4zM31.5 5.5h2v5h-2zM33.5 5.5h5v5h-5zM38.5 5.5h2v5h-2zM40.5 5.5h5v5h-5zM45.5 5.5h2v5h-2zM47.5 5.5h5v5h-5zM47.5 10.5h5v2h-5zM47.5 12.5h5v5h-5zM52.5 12.5h2v5h-2zM54.5 12.5h5v5h-5zM54.5 17.5h5v2h-5zM54.5 19.5h5v5h-5zM59.5 19.5h2v5h-2zM61.5 19.5h5v5h-5zM61.5 24.5h5v2h-5zM61.5 26.5h5v5h-5zM61.5 31.5h5v2h-5zM61.5 33.5h5v5h-5zM61.5 38.5h5v2h-5zM61.5 40.5h5v5h-5zM61.5 45.5h5v2h-5zM61.5 47.5h5v5h-5zM59.5 47.5h2v5h-2zM54.5 47.5h5v5h-5zM54.5 52.5h5v2h-5zM54.5 54.5h5v5h-5zM52.5 54.5h2v5h-2zM47.5 54.5h5v5h-5zM47.5 59.5h5v2h-5zM47.5 61.5h5v5h-5zM45.5 61.5h2v5h-2zM40.5 61.5h5v5h-5zM38.5 61.5h2v5h-2zM33.5 61.5h5v5h-5zM31.5 61.5h2v5h-2zM26.5 61.5h5v5h-5zM24.5 61.5h2v5h-2zM19.5 61.5h5v5h-5zM19.5 59.5h5v2h-5zM19.5 54.5h5v5h-5zM17.5 54.5h2v5h-2zM12.5 54.5h5v5h-5zM12.5 52.5h5v2h-5zM12.5 47.5h5v5h-5zM10.5 47.5h2v5h-2zM5.5 47.5h5v5h-5zM5.5 45.5h5v2h-5zM5.5 40.5h5v5h-5zM5.5 38.5h5v2h-5zM5.5 33.5h5v5h-5zM5.5 31.5h5v2h-5zM5.5 26.5h5v5h-5zM5.5 24.5h5v2h-5zM5.5 19.5h5v5h-5zM10.5 19.5h2v5h-2zM12.5 19.5h5v5h-5zM12.5 17.5h5v2h-5zM12.5 12.5h5v5h-5zM17.5 12.5h2v5h-2zM19.5 12.5h5v5h-5zM19.5 10.5h5v2h-5zM19.5 5.5h5v5h-5zM24.5 7.5h4v2h-4z" />
+        <path class="snake-eye" d="M31.5 4.5h2.5v2.5h-2.5z" />
+      </svg>
+      <svg class="snake-art snake-art-s" viewBox="0 0 44 44" width="44" height="44">
+        <path d="M17 3h7v7h-7v-2h3v-3h-3zM20 5h1v3h-1zM21 5h3v3h-3zM24 5h1v3h-1zM25 5h3v3h-3zM28 5h1v3h-1zM29 5h3v3h-3zM29 8h3v1h-3zM29 9h3v3h-3zM32 9h1v3h-1zM33 9h3v3h-3zM33 12h3v1h-3zM33 13h3v3h-3zM36 13h1v3h-1zM37 13h3v3h-3zM37 16h3v1h-3zM37 17h3v3h-3zM37 20h3v1h-3zM37 21h3v3h-3zM37 24h3v1h-3zM37 25h3v3h-3zM37 28h3v1h-3zM37 29h3v3h-3zM36 29h1v3h-1zM33 29h3v3h-3zM33 32h3v1h-3zM33 33h3v3h-3zM32 33h1v3h-1zM29 33h3v3h-3zM29 36h3v1h-3zM29 37h3v3h-3zM28 37h1v3h-1zM25 37h3v3h-3zM24 37h1v3h-1zM21 37h3v3h-3zM20 37h1v3h-1zM17 37h3v3h-3zM16 37h1v3h-1zM13 37h3v3h-3zM13 36h3v1h-3zM13 33h3v3h-3zM12 33h1v3h-1zM9 33h3v3h-3zM9 32h3v1h-3zM9 29h3v3h-3zM8 29h1v3h-1zM5 29h3v3h-3zM5 28h3v1h-3zM5 25h3v3h-3zM5 24h3v1h-3zM5 21h3v3h-3zM5 20h3v1h-3zM5 17h3v3h-3zM5 16h3v1h-3zM5 13h3v3h-3zM8 13h1v3h-1zM9 13h3v3h-3zM9 12h3v1h-3zM9 9h3v3h-3zM12 9h1v3h-1zM13 9h3v3h-3zM13 8h3v1h-3zM13 5h3v3h-3zM16 6h3v1h-3z" />
+        <path class="snake-eye" d="M21 4h2v2h-2z" />
+      </svg>
+    </span>
+  </button>
+  <p class="sr" aria-live="polite" data-snake-live></p>
+</div>
+
+<style>
+  .snake {
+    position: relative; z-index: 1;
+    /* под заголовком справа, рядом с подзаголовком (29,75rem + зазор); вверх — на место, которое освобождает
+       уехавший заголовок (--snake-shift ставит scripts/snake.ts) */
+    grid-row: 4 / 6; grid-column: 1;
+    justify-self: end; align-self: stretch;
+    width: min(36rem, 100% - 32rem);
+    min-height: 0;
+    /* снизу — место под липкую «Оставить заявку» и 32 px воздуха до неё */
+    margin: calc(var(--s-2xl) - var(--snake-shift, 0px)) 0 4.25rem;
+    pointer-events: none;
+    opacity: 0; transition: opacity 400ms var(--ease-out);
+  }
+  .snake.is-ready { opacity: 1; }
+  .snake.is-small { visibility: hidden; }
+
+  .snake-play {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    opacity: 0; visibility: hidden; transform: scale(0.96); transform-origin: 100% 0;
+    transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out), visibility 0s 200ms;
+  }
+  .snake.is-open .snake-play {
+    opacity: 1; visibility: visible; transform: none; pointer-events: auto;
+    /* поле проявляется, когда заголовок уже почти уехал */
+    transition: opacity 300ms var(--ease-out) 200ms, transform 300ms var(--ease-out) 200ms, visibility 0s;
+  }
+  /* строка подсказки по высоте уменьшенного круга: круг стоит в ней справа */
+  .snake-hint { display: flex; align-items: center; min-height: 2.75rem; padding-right: 3.5rem; }
+  .snake-field { position: relative; flex: 1; min-height: 0; border-radius: var(--r-md); outline: none; }
+  .snake.is-open .snake-field { touch-action: none; }
+  /* проигрыш — инверсия: поле на миг чёрное, змейка белая */
+  .snake.is-over .snake-field { background: var(--ink); }
+  .snake-field canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* кнопка всегда стоит в правом верхнем углу; в закрытом виде её сдвигают в центр свободного места
+     (--snake-bx/--snake-by), в открытом — уменьшают до угловой. Переезд — только transform */
+  .snake-btn {
+    position: absolute; top: 0; right: 0;
+    width: 4.5rem; height: 4.5rem; padding: 0;
+    border: 0; border-radius: 50%; background: none; color: var(--ink);
+    cursor: pointer; pointer-events: auto;
+    transform: translate(var(--snake-bx, 0px), var(--snake-by, 0px));
+    transform-origin: 100% 0;
+    transition: transform 500ms var(--ease-in-out);
+  }
+  .snake.is-open .snake-btn { transform: scale(0.6); }
+  /* до первой раскладки круг встаёт на место без переезда */
+  .snake:not(.is-ready) .snake-btn { transition: none; }
+  .snake-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  /* фона нет: кнопка — сама змея; наведение и открытая игра — инверсия (чёрный круг, белая змея) */
+  .snake-circle {
+    display: block; width: 100%; height: 100%; border-radius: 50%;
+    color: var(--ink);
+    transition: background-color 160ms ease, color 160ms ease, scale 160ms var(--ease-out);
+    animation: snake-spin 16s linear infinite;
+  }
+  .snake-art { display: block; width: 100%; height: 100%; fill: currentColor; }
+  /* глаз — красный, как радужка в логотипе (решение Batın 2026-10-14), во всех состояниях */
+  .snake-eye { fill: var(--eye); }
+  .snake-art-s, .snake-art-xl { display: none; }
+  .snake.is-open .snake-circle { background: var(--ink); color: var(--bg); }
+  @media (hover: hover) and (pointer: fine) {
+    .snake-btn:hover .snake-circle { background: var(--ink); color: var(--bg); }
+  }
+  .snake-btn:active .snake-circle { scale: 0.96; }
+  /* крутится против часовой; по нажатию scripts/snake.ts доворачивает её до целого оборота (в игре — головой
+     вверх) и останавливает, после закрытия игры запускает снова */
+  @keyframes snake-spin { to { rotate: -360deg; } }
+
+  /* телефон, открытая игра: круг 72 уменьшен до 0,6 (43 px) — рисунок 44, чтобы клетки не мылились */
+  .snake.is-open .snake-art-l { display: none; }
+  .snake.is-open .snake-art-s { display: block; }
+
+  /* десктоп: кнопка 74 под меню у правого поля (Batın 2026-10-14); в открытой игре уменьшается до 44 в углу
+     поля — там рисунок 44, чтобы клетки не мылились, а строка подсказки рассчитана на 44 */
+  @media (min-width: 761px) {
+    .snake-btn { width: 4.625rem; height: 4.625rem; }
+    .snake.is-open .snake-btn { transform: scale(calc(44 / 74)); }
+    .snake-art-l { display: none; }
+    .snake-art-xl { display: block; }
+    .snake.is-open .snake-art-xl { display: none; }
+  }
+
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  @media (max-width: 760px) {
+    .snake {
+      grid-row: 3; grid-column: 1; width: auto; justify-self: stretch;
+      margin: calc(var(--s-4xl) - var(--snake-shift, 0px)) 0 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .snake-circle { animation: none; }
+    .snake-btn, .snake-play, .snake.is-open .snake-play { transition: opacity 200ms ease, visibility 0s; }
+  }
+</style>

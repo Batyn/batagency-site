@@ -7,6 +7,7 @@
 // Телефон: логотип 76×38, «Меню», заголовок 40, внизу текст; шапка не липкая.
 import Logo from './Logo.astro';
 import MenuButton from './MenuButton.astro';
+import Snake from './Snake.astro';
 import { NAV } from '../data/site';
 
 // на главной пункты-якоря ведут к блокам этой же страницы
@@ -25,6 +26,7 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
   </div>
   <div class="hero-space" aria-hidden="true"></div>
   <h1 class="hero-title t-display">Маркетинг и PR для <span class="nowrap">дизайн‑ и</span> digital-агентств</h1>
+  <Snake />
   <div class="hero-bottom">
     <p class="hero-sub t-body-sm">Вы делаете проекты, мы рассказываем о них клиентам, жюри и отраслевым СМИ. Пишем кейсы и заявки на премии, ведём соцсети и рассылку, готовим спикеров и вебинары.</p>
   </div>
@@ -32,6 +34,14 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
 
 <script>
   import '../scripts/eye';
+
+  // Змейка (кнопка и игра) — отдельный чанк после загрузки страницы: в бюджет JS первого экрана не входит
+  const snake = document.querySelector<HTMLElement>('[data-snake]');
+  if (snake) {
+    const start = () => import('../scripts/snake').then((m) => m.init(snake));
+    const idle = () => ('requestIdleCallback' in window ? requestIdleCallback(start, { timeout: 2000 }) : setTimeout(start, 200));
+    if (document.readyState === 'complete') idle(); else addEventListener('load', idle, { once: true });
+  }
 
   // Шапка на десктопе: первые 120 px прокрутки логотип плавно уменьшается из 246×122 в 81×40 и встаёт в шапку 68,
   // меню поднимается к середине шапки, проступает стекло. Ход привязан к прокрутке 1:1 — только transform и opacity.
@@ -110,8 +120,10 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
   @media (hover: hover) and (pointer: fine) {
     .nav-a:hover { text-decoration: underline; text-underline-offset: 0.25rem; }
   }
-  .hero-title { grid-row: 3; max-width: 68.75rem; text-wrap: balance; }
-  .hero-bottom { grid-row: 5; display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem; }
+  .hero-title { grid-row: 3; grid-column: 1; max-width: 68.75rem; text-wrap: balance; transition: transform 500ms var(--ease-in-out); }
+  /* открыта змейка: заголовок уезжает вверх и освобождает место под игру (--snake-shift — scripts/snake.ts) */
+  .hero.is-game .hero-title { transform: translateY(calc(-1 * var(--snake-shift, 0px))); }
+  .hero-bottom { grid-row: 5; grid-column: 1; display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem; }
   .hero-sub { max-width: 29.75rem; }
 
   @media (max-width: 760px) {
@@ -130,6 +142,6 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
     .hero-bottom { grid-row: 4; flex-direction: column; align-items: stretch; gap: 1rem; padding-top: 2.5rem; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .hero-bar { transition: none; }
+    .hero-bar, .hero-title { transition: none; }
   }
 </style>
