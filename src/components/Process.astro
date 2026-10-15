@@ -31,9 +31,9 @@ const { title = 'Как работаем', steps = DEFAULT_STEPS, id = 'kak-rabo
 
 <style>
   .steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: var(--col-gap); margin-top: 4.5rem; }
-  .step { display: flex; flex-direction: column; gap: 0.875rem; border-top: 1px solid var(--ink); padding-top: 0.875rem; }
+  .step { display: flex; flex-direction: column; gap: var(--s-lg); border-top: 1px solid var(--ink); padding-top: var(--s-lg); }
   .step-n { font: 700 4rem/1 var(--font); letter-spacing: -0.03em; }
-  .step-body { display: flex; flex-direction: column; gap: 0.875rem; }
+  .step-body { display: flex; flex-direction: column; gap: var(--s-lg); }
   .step-t { font: 700 1.375rem/1.2 var(--font); }
   .step-d { font: 400 1rem/1.5 var(--font); color: var(--grey); }
 

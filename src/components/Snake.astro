@@ -47,8 +47,8 @@
     justify-self: end; align-self: stretch;
     width: min(36rem, 100% - 32rem);
     min-height: 0;
-    /* снизу — место под липкую «Оставить заявку» и 32 px воздуха до неё */
-    margin: calc(var(--s-2xl) - var(--snake-shift, 0px)) 0 4.25rem;
+    /* снизу — место под липкую «Оставить заявку» и 32 px воздуха до неё: 24 + 61 + 32 − поле первого экрана 24 */
+    margin: calc(var(--s-2xl) - var(--snake-shift, 0px)) 0 5.8125rem;
     pointer-events: none;
     opacity: 0; transition: opacity 400ms var(--ease-out);
   }

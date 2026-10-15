@@ -75,8 +75,8 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
     hide(y);
     if (!desk.matches) { logo.style.transform = nav.style.transform = ''; glass.style.opacity = y > 0 ? '1' : '0'; return; }
     const p = reduced.matches ? (y > 0 ? 1 : 0) : Math.min(1, y / DIST);
-    // из точки (7, 44) от поля в (0, 14): оптическая компенсация «b» нужна только крупному логотипу
-    logo.style.transform = `translate(${(-0.4375 * rem * p).toFixed(2)}px, ${(-1.875 * rem * p).toFixed(2)}px) scale(${(1 - (1 - SCALE) * p).toFixed(4)})`;
+    // из точки (0, 44) от поля в (0, 14): логотип на поле и в большом виде (выравнивание отступов, Batın 2026-10-15)
+    logo.style.transform = `translateY(${(-1.875 * rem * p).toFixed(2)}px) scale(${(1 - (1 - SCALE) * p).toFixed(4)})`;
     nav.style.transform = `translateY(${(navLift * (1 - p)).toFixed(2)}px)`;
     glass.style.opacity = String(p);
   }
@@ -95,7 +95,8 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
     display: grid;
     grid-template-rows: auto 1fr auto 1fr auto;
     min-height: max(40rem, min(100svh, 56.25rem));
-    padding-top: 2.75rem; padding-bottom: 3rem;
+    /* низ подзаголовка в 24 от низа экрана, вровень с липкой «Оставить заявку» (Batın 2026-10-15) */
+    padding-top: 2.75rem; padding-bottom: var(--s-2xl);
   }
   /* место большого логотипа в сетке: сама шапка вынесена из потока */
   .hero-space { height: 7.625rem; }
@@ -108,9 +109,9 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
   .hero-bar { transition: transform var(--t-header) var(--ease-drawer); }
   .hero-bar.is-hidden { transform: translateY(-100%); transition-duration: var(--t-header-out); transition-timing-function: var(--ease-in-out); }
   .hero-top { position: relative; height: 100%; display: flex; justify-content: flex-end; align-items: center; }
-  /* в Figma логотип стоит на 7 px правее поля: оптическая компенсация круглой «b» */
+  /* логотип на поле 60, как заголовок (Batın 2026-10-15; до этого стоял на 7 px правее — компенсация круглой «b») */
   .hero-logo {
-    position: absolute; left: calc(var(--gutter) + 0.4375rem); top: 2.75rem;
+    position: absolute; left: var(--gutter); top: 2.75rem;
     display: block; width: 15.375rem;
     transform-origin: 0 0;
   }
