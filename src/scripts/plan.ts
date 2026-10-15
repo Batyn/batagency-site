@@ -87,7 +87,7 @@ export function initPlan() {
   }).join('');
 
   chipsBox.innerHTML = SERVICES.map((s) => `<button type="button" class="pl-chip" data-s="${esc(s)}" aria-pressed="false">${GRIP}${esc(s)}</button>`).join('');
-  if (!canHover.matches) $('pl-hint').textContent = 'Нажмите на услугу, потом на месяц. Чтобы перетащить услугу или плашку, удерживайте её.';
+  if (!canHover.matches) $('pl-hint').textContent = 'Нажмите на услугу, потом на месяц или на услугу ещё раз — она встанет в первый свободный месяц. Чтобы перетащить услугу или плашку, удерживайте её.';
 
   /* ---------- отрисовка ---------- */
   function slots(r: { bars: Bar[] }) {
@@ -175,8 +175,17 @@ export function initPlan() {
     rowsBox.querySelectorAll('.pl-row[data-s]').forEach((el) => el.classList.add('is-gone'));
     setTimeout(done, 240);
   }
+  // второе нажатие на выбранную услугу ставит её в первый свободный месяц
   function toggleArm(s: string) {
-    armed = armed === s ? null : s;
+    if (armed === s) {
+      const r = rowOf(s) || { bars: [] };
+      const m = Array.from({ length: MONTHS }, (_, i) => i).find((i) => free(r, i, 1));
+      armed = null;
+      if (m == null) { render(); say(`${s}: свободных месяцев нет`); return; }
+      addBar(s, m);
+      return;
+    }
+    armed = s;
     selectedId = null;
     if (armed) expanded = true;
     render();
