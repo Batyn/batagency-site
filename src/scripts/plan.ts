@@ -1,6 +1,6 @@
 // Календарь «План на полгода». Перенесён из prototypes/plan-timeline.html: 14 услуг из services.ts, шрифт и радиусы — Final.
 // Решения Batın: открывается с примером; «Очистить» очищает полностью и пример не возвращает; на плашке — название услуги
-// (у примера — подписи из макета); плашки примера покачиваются при наведении до первого действия; на телефоне — вариант C1.
+// (у примера тоже); плашки примера покачиваются при наведении до первого действия; на телефоне — вариант C1.
 import { SERVICES as ALL } from '../data/services';
 import { EMAIL, TELEGRAM } from '../data/site';
 import { goal } from './goals';
@@ -15,16 +15,16 @@ type Drag = {
 };
 
 const SERVICES = ALL.map((s) => s.title);
-// Пример с макета: [месяц начала 0–5, длина в месяцах, подпись]
-const EXAMPLE: [string, [number, number, string][]][] = [
-  ['Кейсы', [[0, 6, 'кейс каждый месяц']]],
-  ['Сайт', [[0, 1, 'страница услуги'], [1, 1, 'новая страница']]],
-  ['Премии', [[0, 1, '2 заявки'], [2, 1, '2 заявки'], [3, 1, '4 заявки'], [4, 1, '2 заявки']]],
-  ['Статьи', [[1, 1, 'статья'], [3, 1, 'статья'], [5, 1, 'статья']]],
-  ['SMM', [[0, 1, 'стратегия'], [1, 2, 'посты'], [3, 3, 'посты + реклама']]],
-  ['Аудит пути клиента', [[1, 1, 'аудит']]],
-  ['Рейтинги и каталоги', [[1, 1, 'Clutch'], [2, 4, 'Рейтинг Рунета']]],
-  ['Выступления', [[4, 1, 'подготовка'], [5, 1, 'выступление']]],
+// Пример: [месяц начала 0–5, длина в месяцах]; подпись плашки — название услуги
+const EXAMPLE: [string, [number, number][]][] = [
+  ['Кейсы', [[0, 6]]],
+  ['Сайт', [[0, 2]]],
+  ['Премии', [[0, 1], [2, 3]]],
+  ['Статьи', [[1, 1], [3, 1], [5, 1]]],
+  ['SMM', [[0, 6]]],
+  ['Аудит пути клиента', [[1, 1]]],
+  ['Рейтинги и каталоги', [[1, 5]]],
+  ['Выступления', [[4, 2]]],
 ];
 const MONTHS = 6;
 const FOLD = 5;
@@ -56,9 +56,9 @@ export function initPlan() {
   const fresh = new Set<string | number>();
 
   const key = (list: [string, (number | string)[][]][]) => JSON.stringify(list.map(([s, bars]) => [s, bars.map((b) => b.slice(0, 3)).sort((a, c) => (a[0] as number) - (c[0] as number))]));
-  const EXAMPLE_KEY = key(EXAMPLE);
+  const EXAMPLE_KEY = key(EXAMPLE.map(([s, bars]) => [s, bars.map(([start, len]) => [start, len, s])]));
   const snapshot = () => key(rows.map((r) => [r.s, r.bars.map((b) => [b.start, b.len, b.label])]));
-  const fromExample = (): Row[] => EXAMPLE.map(([s, bars]) => ({ s, bars: bars.map(([start, len, label]) => ({ id: ++uid, start, len, label })) }));
+  const fromExample = (): Row[] => EXAMPLE.map(([s, bars]) => ({ s, bars: bars.map(([start, len]) => ({ id: ++uid, start, len, label: s })) }));
   const rowOf = (s: string) => rows.find((r) => r.s === s);
   const rowEl = (s: string) => grid.querySelector<HTMLElement>(`.pl-row[data-s="${CSS.escape(s)}"]`);
   const findBar = (id: number) => { for (const r of rows) { const b = r.bars.find((x) => x.id === id); if (b) return { r, b }; } return null; };
