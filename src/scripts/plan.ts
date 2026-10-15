@@ -29,6 +29,8 @@ const EXAMPLE: [string, [number, number][]][] = [
 const MONTHS = 6;
 const FOLD = 5;
 const HOLD = 280;
+const PDF_NAME = 'bat-agency-plan.pdf';
+const SHARE_TEXT = 'План на полгода от Bat Agency. Обсудим его на бесплатной консультации.';
 const DROP_LABEL = 'Перетащите услугу';
 const GRIP = '<svg viewBox="0 0 6.6 12.6" aria-hidden="true"><circle cx="1.3" cy="1.3" r="1.3"/><circle cx="5.3" cy="1.3" r="1.3"/><circle cx="1.3" cy="6.3" r="1.3"/><circle cx="5.3" cy="6.3" r="1.3"/><circle cx="1.3" cy="11.3" r="1.3"/><circle cx="5.3" cy="11.3" r="1.3"/></svg>';
 
@@ -54,6 +56,8 @@ export function initPlan() {
   let expanded = false;
   let firstAdd = true;
   const fresh = new Set<string | number>();
+  // PDF для «Поделиться» готовим заранее: Safari принимает share() только прямо в обработчике нажатия
+  let pdfFile: File | null = null, pdfFor = '', pdfTimer = 0;
 
   const key = (list: [string, (number | string)[][]][]) => JSON.stringify(list.map(([s, bars]) => [s, bars.map((b) => b.slice(0, 3)).sort((a, c) => (a[0] as number) - (c[0] as number))]));
   const EXAMPLE_KEY = key(EXAMPLE.map(([s, bars]) => [s, bars.map(([start, len]) => [start, len, s])]));
@@ -132,7 +136,7 @@ export function initPlan() {
     more.hidden = extra <= 0;
     more.setAttribute('aria-expanded', String(expanded));
     more.firstElementChild!.textContent = expanded ? 'Свернуть' : `Показать ещё ${extra} ${plural(extra, 'услугу', 'услуги', 'услуг')}`;
-    ($('pl-mail') as HTMLAnchorElement).href = `mailto:${EMAIL}?subject=${encodeURIComponent('План на полгода')}&body=${encodeURIComponent(planText())}`;
+    schedulePdf();
   }
 
   /* ---------- изменения плана ---------- */
@@ -520,17 +524,58 @@ export function initPlan() {
     const ok = copyNow(planText());
     setTimeout(() => toast(ok ? 'План скопирован. Вставьте его в сообщение в Telegram.' : 'Не получилось скопировать план. Скачайте PDF и отправьте его в Telegram.'), 50);
   });
-  $('pl-mail').addEventListener('click', (e) => { if (!empty(e)) goal('plan_email'); });
+  function savePdf(blob: Blob) {
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), { href: url, download: PDF_NAME });
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+  function schedulePdf() {
+    clearTimeout(pdfTimer);
+    if (!rows.length || typeof navigator.canShare !== 'function') { pdfFile = null; return; }
+    const want = snapshot();
+    if (pdfFor === want) return;
+    pdfTimer = window.setTimeout(async () => {
+      try {
+        const blob = await buildPdf();
+        if (snapshot() !== want) return;   // план успел измениться — новая сборка уже запланирована
+        pdfFile = new File([blob], PDF_NAME, { type: 'application/pdf' }); pdfFor = want;
+      } catch { pdfFile = null; }
+    }, 300);
+  }
+  $('pl-mail').addEventListener('click', async (e) => {
+    e.preventDefault();
+    if (empty(e)) return;
+    const btn = e.currentTarget as HTMLElement;
+    if (btn.getAttribute('aria-busy')) return;
+    const file = pdfFile && pdfFor === snapshot() ? pdfFile : null;
+    if (file && navigator.canShare?.({ files: [file] })) {   // share() вызываем сразу, без await перед ним
+      try {
+        await navigator.share({ files: [file], title: 'План на полгода', text: SHARE_TEXT });
+        goal('plan_email');
+        return;
+      } catch (err) {
+        if ((err as DOMException).name === 'AbortError') return;   // человек закрыл окно
+      }
+    }
+    btn.setAttribute('aria-busy', 'true');
+    try {
+      savePdf(file || await buildPdf());
+      goal('plan_email');
+      toast('PDF скачан. Прикрепите его к письму.');
+      location.href = `mailto:${EMAIL}?subject=${encodeURIComponent('План на полгода')}&body=${encodeURIComponent(`План во вложении — прикрепите скачанный файл ${PDF_NAME}\n\n${planText()}`)}`;
+    } catch (err) {
+      console.error(err);
+      toast('Не получилось собрать PDF. Попробуйте ещё раз.');
+    } finally { btn.removeAttribute('aria-busy'); }
+  });
   $('pl-pdf').addEventListener('click', async (e) => {
     if (empty(e)) return;
     const btn = e.currentTarget as HTMLElement;
     if (btn.getAttribute('aria-busy')) return;
     btn.setAttribute('aria-busy', 'true');
     try {
-      const url = URL.createObjectURL(await buildPdf());
-      const a = Object.assign(document.createElement('a'), { href: url, download: 'bat-agency-plan.pdf' });
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      savePdf(await buildPdf());
       goal('plan_pdf');
     } catch (err) {
       console.error(err);
@@ -613,4 +658,5 @@ export function initPlan() {
 
   rows = fromExample();
   render();
+  document.fonts.ready.then(schedulePdf);
 }
