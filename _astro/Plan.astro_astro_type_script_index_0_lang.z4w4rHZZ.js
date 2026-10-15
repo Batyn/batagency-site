@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["_astro/plan.Dwmcmbq3.js","_astro/goals.Bg3iRGA6.js"])))=>i.map(i=>d[i]);
+import{t as e}from"./preload-helper.DHhhL8Zf.js";var t=document.getElementById(`plan`),n=()=>e(()=>import(`./plan.Dwmcmbq3.js`).then(e=>e.initPlan()),__vite__mapDeps([0,1]));if(`IntersectionObserver`in window){let e=new IntersectionObserver(t=>{t.some(e=>e.isIntersecting)&&(e.disconnect(),n())},{rootMargin:`100% 0px`});e.observe(t)}else n();
