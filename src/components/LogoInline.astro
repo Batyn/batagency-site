@@ -19,5 +19,6 @@ const { uid } = Astro.props;
 </svg>
 
 <style>
-  .logo-inline { display: inline-block; height: 0.76em; width: auto; aspect-ratio: 427 / 211; vertical-align: baseline; }
+  /* зазор до логотипа 0,28 кегля, как в Figma; на базовой линии логотип оптически висит выше букв — опущен на ~1 px при 15 px (Batın 2026-10-20) */
+  .logo-inline { display: inline-block; height: 0.76em; width: auto; aspect-ratio: 427 / 211; vertical-align: -0.07em; margin-left: 0.28em; }
 </style>

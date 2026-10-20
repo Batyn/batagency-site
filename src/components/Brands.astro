@@ -17,8 +17,6 @@ const { page = false } = Astro.props;
   .brands { display: grid; grid-template-columns: var(--col-3) minmax(0, 1fr); column-gap: var(--col-gap); }
   .brands-content { display: flex; flex-direction: column; gap: 1rem; }
   .brands-rule { height: 1px; background: var(--ink); }
-  /* зазор до логотипа — 0,28 кегля, как в Figma */
-  .brands-label :global(.logo-inline) { margin-left: 0.28em; }
 
   @media (max-width: 760px) {
     .brands { grid-template-columns: 1fr; row-gap: 0.75rem; }
