@@ -46,7 +46,8 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
   // Шапка на десктопе: первые 120 px прокрутки логотип плавно уменьшается из 246×122 в 81×40 и встаёт в шапку 68,
   // меню поднимается к середине шапки, проступает стекло. Ход привязан к прокрутке 1:1 — только transform и opacity.
   // При reduced-motion без промежуточных кадров: вверху — большой логотип, после первого пикселя — сразу компактная шапка.
-  // Ниже начала блока «Услуги» шапка уезжает вверх при прокрутке вниз и возвращается при прокрутке вверх (Batın 2026-10-09).
+  // Ниже начала первого блока после первого экрана шапка уезжает вверх при прокрутке вниз и возвращается при прокрутке вверх
+  // (Batın 2026-10-09; с 2026-10-20 первый блок — описание, а не «Услуги»).
   // Телефон: шапка «bat + Меню» прячется, как только её прокрутили, и появляется при прокрутке вверх.
   import { autoHide } from '../scripts/autohide';
   const DIST = 120;
@@ -57,10 +58,10 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
   const nav = document.querySelector<HTMLElement>('[data-bar-nav]')!;
   const glass = document.querySelector<HTMLElement>('[data-bar-glass]')!;
   const bar = document.querySelector<HTMLElement>('[data-bar]')!;
-  const services = document.getElementById('uslugi');
+  const firstBlock = document.querySelector<HTMLElement>('main > :first-child');
   let rem = 16, navLift = 0, queued = false;
   const hide = autoHide(bar, () => desk.matches
-    ? (services ? services.getBoundingClientRect().top + scrollY - bar.offsetHeight : Infinity)
+    ? (firstBlock ? firstBlock.getBoundingClientRect().top + scrollY - bar.offsetHeight : Infinity)
     : bar.offsetHeight);
 
   function measure() {
