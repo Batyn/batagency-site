@@ -1,0 +1,73 @@
+---
+// Описание агентства — сразу после первого экрана (Figma Final, «1а · Описание» 589:9730 / 589:9740; тексты — content/site-texts.md, раздел 1а).
+// Десктоп: заголовок в колонках 1–10, ниже зигзаг — текст 1–5 и мышь 7–12, змея 1–6 и текст 8–12. Телефон: всё столбиком, рисунки по центру.
+// Рисунки Batın обрезаны по контуру, как в Figma (иначе вокруг них много пустого поля); alt пустой — они декоративные.
+import { Picture } from 'astro:assets';
+import Brands from './Brands.astro';
+import bat from '../assets/illustrations/letuchaya-mysh.png';
+import snake from '../assets/illustrations/zmeya.png';
+
+const pic = { formats: ['avif', 'webp'] as const, widths: [520, 1080], sizes: '(max-width: 760px) 260px, 45vw', loading: 'lazy' as const, decoding: 'async' as const, alt: '' };
+---
+<section class="intro wrap" id="agentstvo" aria-labelledby="intro-h">
+  <div class="intro-grid">
+    <h2 class="intro-title" id="intro-h">bat — независимое адаптивное агентство маркетинга и коммуникаций.</h2>
+    <p class="t-lead intro-text intro-text--1">Мы небольшая команда с большим профессиональным опытом и возможностью масштабироваться под задачи проекта. За нашими плечами — годы работы в медиа, моде, брендинге, недвижимости и культурных проектах, а также внутри креативных и <span class="nowrap">digital-агентств</span>.</p>
+    <div class="intro-pic intro-pic--bat"><Picture src={bat} {...pic} /></div>
+    <div class="intro-pic intro-pic--snake"><Picture src={snake} {...pic} /></div>
+    <p class="t-lead intro-text intro-text--2">Выстраиваем коммуникации системно: от исследования и стратегии до производства контента, публикаций и продюсирования ивентов. Можем взять на себя отдельную задачу или полностью заниматься маркетингом агентства, сохраняя единый подход ко всем каналам коммуникации.</p>
+  </div>
+  <div class="intro-brands"><Brands /></div>
+</section>
+
+<style>
+  .intro { padding-top: var(--section-top); }
+  .intro-grid {
+    display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--col-gap);
+    align-items: center;
+  }
+  .intro-title {
+    grid-column: 1 / 11; grid-row: 1; margin-bottom: var(--s-7xl);
+    font: 700 4rem/1 var(--font); letter-spacing: -0.03em; text-wrap: balance;
+  }
+  .intro-text--1 { grid-column: 1 / 6; grid-row: 2; }
+  .intro-pic--bat { grid-column: 7 / 13; grid-row: 2; }
+  .intro-pic--snake { grid-column: 1 / 7; grid-row: 3; }
+  .intro-text--2 { grid-column: 8 / 13; grid-row: 3; }
+
+  /* ячейка сетки — своя обёртка: <picture> рисует Astro, scoped-стили до него не доходят */
+  /* картинка лежит поверх рамки с пропорцией из Figma и обрезается по ней (иначе рамку растягивает высота файла) */
+  .intro-pic { position: relative; width: 100%; }
+  .intro-pic :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  /* пропорции рамок из Figma: мышь 648×480, змея 648×631 */
+  .intro-pic--bat { aspect-ratio: 648 / 480; }
+  .intro-pic--snake { aspect-ratio: 648 / 631; }
+
+  /* от змеи до брендов 72 + 24 + 72, как в Figma */
+  .intro-brands { margin-top: 10.5rem; }
+
+  @media (min-width: 761px) and (max-width: 1279px) {
+    .intro-title { font-size: clamp(2.5rem, 5vw, 4rem); }
+  }
+  /* планшет (макета нет): в пяти колонках лиду тесно — тексту по шесть колонок, рисункам по шесть */
+  @media (min-width: 761px) and (max-width: 1099px) {
+    .intro-text--1 { grid-column: 1 / 7; }
+    .intro-text--2 { grid-column: 7 / 13; }
+    .intro-text { font-size: 1.25rem; }
+  }
+
+  @media (max-width: 760px) {
+    .intro-grid { grid-template-columns: minmax(0, 1fr); row-gap: var(--s-4xl); }
+    .intro-title, .intro-text--1, .intro-text--2, .intro-pic { grid-column: 1; grid-row: auto; }
+    .intro-title { margin-bottom: 0; font-size: 2.125rem; line-height: 1.04; letter-spacing: -0.02em; }
+    .intro-pic { justify-self: center; width: 16.25rem; }
+    .intro-pic--bat { aspect-ratio: 260 / 192; }
+    /* на телефоне змея обрезана несимметрично: сверху 4,2 %, снизу 2,3 % (Figma 589:9747) */
+    .intro-pic--snake { aspect-ratio: 260 / 243; }
+    .intro-pic--snake :global(img) { object-position: 50% 65%; }
+    /* порядок как в Figma: текст, мышь, текст, змея */
+    .intro-text--1 { order: 1; } .intro-pic--bat { order: 2; } .intro-text--2 { order: 3; } .intro-pic--snake { order: 4; }
+    .intro-title { order: 0; }
+    .intro-brands { margin-top: 6.5rem; }
+  }
+</style>
