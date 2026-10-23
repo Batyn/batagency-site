@@ -423,3 +423,5 @@
 }
 /* Plex на 16 px визуально мельче пиксельного: воздух между строками побольше */
 :root[data-theme="term"] body :not(svg, svg *, h1, h1 *) { line-height: 1.6 !important; }
+/* кнопки под планом — Plex, как ссылка «Отправить на почту» рядом (Batın 2026-10-24); #plan — правило пиксельного шрифта выше с id */
+:root[data-theme="term"] #plan .pl-buttons .btn { font-family: var(--font) !important; -webkit-font-smoothing: antialiased; }
