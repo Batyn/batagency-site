@@ -13,23 +13,34 @@
 </script>
 
 <style>
+  /* зона нажатия 44×44, а плашка наведения и включённого состояния — 28×24, по высоте как плашка текущего пункта меню
+     (Batın 2026-10-24: «квадратик слишком большой») */
   .tt {
+    position: relative;
     display: none;
     place-items: center; width: 2.75rem; height: 2.75rem; padding: 0;
-    background: transparent; border: 0; border-radius: var(--r-sm); cursor: pointer;
-    transition: background-color 160ms ease, color 160ms ease;
+    background: transparent; border: 0; cursor: pointer;
+    transition: color 160ms ease;
   }
+  .tt::before {
+    content: ""; position: absolute; inset: 0.625rem 0.5rem;
+    border-radius: var(--r-sm); background: transparent;
+    transition: background-color 160ms ease;
+  }
+  .tt svg { position: relative; }
   :global(.js) .tt { display: grid; }
   .tt svg { width: 1.25rem; height: auto; }
-  .tt[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+  .tt[aria-pressed="true"] { color: var(--bg); }
+  .tt[aria-pressed="true"]::before { background: var(--ink); }
   @media (hover: hover) and (pointer: fine) {
-    .tt:hover { background: var(--ink); color: var(--bg); }
+    .tt:hover { color: var(--bg); }
+    .tt:hover::before { background: var(--ink); }
   }
   @media (max-width: 760px) {
     /* рядом с «Меню»: прижимается вправо к бургеру */
     .tt { margin: -0.1875rem 0.25rem -0.1875rem auto; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .tt { transition: none; }
+    .tt, .tt::before { transition: none; }
   }
 </style>

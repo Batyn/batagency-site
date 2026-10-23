@@ -191,6 +191,8 @@
 :root[data-theme="term"] :is(.hdr, .hero-bar) :is(.nav-a.is-current, .nav-a:hover, .tt:hover) { background: var(--bg); color: var(--ink); text-decoration: none; }
 :root[data-theme="term"] :is(.hdr, .hero-bar) .tt { width: 2.75rem; height: var(--header-h); margin: 0 0 0 auto !important; transform: none !important; }
 :root[data-theme="term"] :is(.hdr, .hero-bar) .tt[aria-pressed="true"] { background: var(--bg); color: var(--ink); }
+/* в меню-строке кнопка выделяется целиком, как пункты меню: малая плашка обычной темы не нужна */
+:root[data-theme="term"] .tt::before { content: none; }
 :root[data-theme="term"] :is(.hdr, .hero-bar) .menu-btn { height: var(--header-h); margin: 0 -0.8125rem 0 0; }
 /* место под меню-строку: главная — у первого экрана, остальные — у страницы */
 :root[data-theme="term"] body { padding-top: var(--header-h); }
