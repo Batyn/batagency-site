@@ -2,7 +2,7 @@
 // Подвал с брифом, вариант A, размер S (Figma Components «Footer · desktop (brief)» 502:7233, «Footer · mobile (brief)» 502:7234;
 // решение Batın 2026-10-13). Чёрный фон — единственное исключение из «без цветных фонов секций» (RULES.md §5).
 // Десктоп: бриф в колонках 1–5, «Навигация» в 8–9, «Связь» в 10–12 (политики напротив «Вопросов» и «Календаря премий»),
-// внизу «©» в 1–3 и «2026» с 4-й; сверху, снизу и между рядами 96.
+// внизу «©2026 Bat Agency. Все права защищены» одной строкой (Batın 2026-10-23); сверху, снизу и между рядами 96.
 // Телефон: бриф на всю ширину, «Навигация» и «Связь» в две колонки, ниже линия, политики и «©» — ссылки на политики в разметке дважды.
 import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL, PRIVACY_PATH, PERSONAL_DATA_PATH, contactsHref } from '../data/site';
 import Brief from './Brief.astro';
@@ -34,8 +34,7 @@ const nav = FOOTER_NAV.map((l) => (l.label === 'Контакты' ? { ...l, href
         <a class="ft-a" href={PRIVACY_PATH}>Политика конфиденциальности</a>
         <a class="ft-a" href={PERSONAL_DATA_PATH}>Обработка персональных данных</a>
       </p>
-      <p class="ft-copy">©&nbsp;Bat Agency. Все права защищены</p>
-      <p class="ft-year">2026</p>
+      <p class="ft-copy">©2026 Bat Agency. Все права защищены</p>
     </div>
   </div>
 </footer>
@@ -54,28 +53,25 @@ const nav = FOOTER_NAV.map((l) => (l.label === 'Контакты' ? { ...l, href
   .ft-group--contact { grid-column: 10 / 13; }
   .ft-group { display: flex; flex-direction: column; gap: 0.75rem; }
   .ft-h { font: 400 0.8125rem/1.2 var(--font); color: var(--soft); }
-  .ft-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  /* обе колонки — одна сетка строк 22 + 8, иначе строки «Навигации» выше на пару пикселей и политики встают криво */
+  .ft-list { display: grid; grid-auto-rows: 1.375rem; row-gap: 0.5rem; }
   .ft-a { font: 400 0.9375rem/1.45 var(--font); }
   @media (hover: hover) and (pointer: fine) {
     .ft-a:hover { text-decoration: underline; text-underline-offset: 0.25rem; }
   }
   /* «Связь» — сетка в шаг строк «Навигации» (22 + 8): политики встают в 6-ю и 7-ю строки, напротив «Вопросов» и «Календаря премий» */
-  .ft-list--contact { display: grid; grid-template-rows: repeat(7, 1.375rem); row-gap: 0.5rem; }
+  .ft-list--contact { grid-template-rows: repeat(7, 1.375rem); }
   .ft-legal-d:nth-last-child(2) { grid-row: 6; }
   .ft-legal-d:last-child { grid-row: 7; }
   .ft-bottom { margin-top: var(--section-top); }
   .ft-legal { display: none; }
-  .ft-copy, .ft-year { font: 400 0.9375rem/1.45 var(--font); color: var(--soft); }
-  .ft-copy { grid-column: 1 / 4; }
-  .ft-year { grid-column: 4 / 7; }
+  .ft-copy { grid-column: 1 / 7; font: 400 0.9375rem/1.45 var(--font); color: var(--soft); }
 
   /* 761–1279: бриф остаётся в колонках 1–5, как на 1440 (на 1–7 карточка была шире половины экрана, Batın 2026-10-13);
      узкую карточку перестраивает сам бриф. Политики в узкой «Связи» переносятся, поэтому идут столбиком после почты */
   @media (max-width: 1279px) and (min-width: 761px) {
-    .ft-list--contact { display: flex; }
+    .ft-list--contact { display: flex; flex-direction: column; gap: 0.5rem; }
     .ft-legal-d:nth-last-child(2) { margin-top: 1rem; }
-    .ft-copy { grid-column: 1 / 6; }
-    .ft-year { grid-column: 6 / 8; }
   }
   /* 761–899: в пяти колонках карточка уже 330 px — даём шестую */
   @media (max-width: 899px) and (min-width: 761px) {
@@ -90,13 +86,11 @@ const nav = FOOTER_NAV.map((l) => (l.label === 'Контакты' ? { ...l, href
     .ft-group--nav, .ft-group--contact { grid-column: auto; }
     .ft-group { gap: 0; }
     .ft-h { font: 500 0.75rem/1.2 var(--font); }
-    .ft-list, .ft-list--contact { display: flex; gap: 0; }
+    .ft-list, .ft-list--contact { display: flex; flex-direction: column; gap: 0; }
     .ft-legal-d { display: none; }
     .ft-a { display: flex; align-items: center; min-height: 2.75rem; font-size: 0.875rem; overflow-wrap: anywhere; }
-    .ft-bottom { margin-top: 2.5rem; grid-template-columns: 1fr auto; border-top: 1px solid var(--grey); }
+    .ft-bottom { margin-top: 2.5rem; grid-template-columns: 1fr; border-top: 1px solid var(--grey); }
     .ft-legal { grid-row: 1; grid-column: 1 / -1; display: flex; flex-direction: column; align-items: flex-start; }
-    .ft-copy, .ft-year { grid-row: 2; display: flex; align-items: center; min-height: 2.75rem; font-size: 0.875rem; line-height: 1.2; }
-    .ft-copy { grid-column: 1; }
-    .ft-year { grid-column: 2; }
+    .ft-copy { grid-row: 2; grid-column: 1; display: flex; align-items: center; min-height: 2.75rem; font-size: 0.875rem; line-height: 1.2; }
   }
 </style>

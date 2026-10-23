@@ -93,17 +93,25 @@
   .snake-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
   /* фона нет: кнопка — сама змея; наведение и открытая игра — инверсия (чёрный круг, белая змея) */
   .snake-circle {
-    display: block; width: 100%; height: 100%; border-radius: 50%;
+    position: relative; display: block; width: 100%; height: 100%;
     color: var(--ink);
-    transition: background-color 160ms ease, color 160ms ease, scale 160ms var(--ease-out);
+    transition: color 160ms ease, scale 160ms var(--ease-out);
   }
-  .snake-art { display: block; width: 100%; height: 100%; fill: currentColor; }
+  /* чёрный круг — отдельный слой на 6 px шире с каждой стороны (диаметр +12): змея остаётся в прежнем размере (Batın 2026-10-23) */
+  .snake-circle::before {
+    content: ''; position: absolute; inset: -6px; border-radius: 50%;
+    background: var(--ink); opacity: 0;
+    transition: opacity 160ms ease;
+  }
+  .snake-art { position: relative; display: block; width: 100%; height: 100%; fill: currentColor; }
   /* глаз — красный, как радужка в логотипе (решение Batın 2026-10-14), во всех состояниях */
   .snake-eye { fill: var(--eye); }
   .snake-art-s, .snake-art-xl { display: none; }
-  .snake.is-open .snake-circle { background: var(--ink); color: var(--bg); }
+  .snake.is-open .snake-circle { color: var(--bg); }
+  .snake.is-open .snake-circle::before { opacity: 1; }
   @media (hover: hover) and (pointer: fine) {
-    .snake-btn:hover .snake-circle { background: var(--ink); color: var(--bg); }
+    .snake-btn:hover .snake-circle { color: var(--bg); }
+    .snake-btn:hover .snake-circle::before { opacity: 1; }
   }
   .snake-btn:active .snake-circle { scale: 0.96; }
 

@@ -17,15 +17,15 @@ import { BRIEF_HASH } from '../data/site';
     position: fixed; right: var(--gutter); bottom: 1.5rem; z-index: 65;
     display: inline-flex; align-items: center; justify-content: center;
     min-height: 3.8125rem; padding: 1.25rem 1.75rem;
-    border: 1px solid var(--ink); border-radius: var(--r-md);
-    /* белая обводка 1 px снаружи — чтобы не сливалась с чёрной раскрытой строкой услуги */
-    box-shadow: 0 0 0 1px var(--bg);
+    /* без обводок (Batın 2026-10-23) */
+    border-radius: var(--r-md);
     background: var(--ink); color: var(--bg);
     font: 400 1.0625rem/1.2 var(--font); white-space: nowrap;
     transition: background-color 160ms ease, color 160ms ease, opacity 200ms var(--ease-out), transform 200ms var(--ease-out), visibility 0s;
   }
   @media (hover: hover) and (pointer: fine) {
-    .scta:hover { background: var(--bg); color: var(--ink); }
+    /* светло-серая #EDEDED (токен ph), текст Ink (Batın 2026-10-23) */
+    .scta:hover { background: var(--ph); color: var(--ink); }
   }
   .scta:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: var(--r-md); }
   :global(html.js) .scta:not(.is-in) {

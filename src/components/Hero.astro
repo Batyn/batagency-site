@@ -11,7 +11,7 @@ import Snake from './Snake.astro';
 import { NAV } from '../data/site';
 
 // вариант B (Figma «Home hero · Apple variants», 603:9067 / 603:9176; задача 87, проба): под заголовком лид 26 в два тона —
-// первая фраза чёрным, продолжение серым; змейка справа от лида, внизу пусто
+// весь чёрным (до 2026-10-23 продолжение было серым); змейка справа от лида, внизу пусто
 interface Props { variant?: 'b' }
 const { variant } = Astro.props;
 const b = variant === 'b';
@@ -32,7 +32,7 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
   </div>
   <div class="hero-space" aria-hidden="true"></div>
   <h1 class="hero-title t-display">Маркетинг и PR для <span class="nowrap">дизайн‑ и</span> digital-агентств</h1>
-  {b && <p class="hero-lead t-lead"><span class="hero-lead-key">Вы делаете проекты, мы рассказываем о них клиентам, жюри и отраслевым СМИ.</span> Пишем кейсы и заявки на премии, ведём соцсети и рассылку, готовим спикеров и вебинары.</p>}
+  {b && <p class="hero-lead t-lead">Вы делаете проекты, мы рассказываем о них клиентам, жюри и отраслевым СМИ. Пишем кейсы и заявки на премии, ведём соцсети и рассылку, готовим спикеров и вебинары.</p>}
   <Snake />
   {!b && <div class="hero-bottom">
     <p class="hero-sub t-body-sm">Вы делаете проекты, мы рассказываем о них клиентам, жюри и отраслевым СМИ. Пишем кейсы и заявки на премии, ведём соцсети и рассылку, готовим спикеров и вебинары.</p>
@@ -71,26 +71,10 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
     ? (firstBlock ? firstBlock.getBoundingClientRect().top + scrollY - bar.offsetHeight : Infinity)
     : bar.offsetHeight);
 
-  // B, десктоп: в игре заголовок и лид вместе уменьшаются до 0,6 и уезжают в левый верхний угол — под логотип,
-  // через 3rem (образец Batın 2026-10-23). Меряем раскладку без transform (offsetTop) и отдаём сдвиги в CSS
-  const heroEl = document.querySelector<HTMLElement>('.hero--b');
-  const GAME_SCALE = 0.6;
-  function fitGame() {
-    if (!heroEl) return;
-    const title = heroEl.querySelector<HTMLElement>('.hero-title')!;
-    const lead = heroEl.querySelector<HTMLElement>('.hero-lead')!;
-    const space = heroEl.querySelector<HTMLElement>('.hero-space')!;
-    const top = space.offsetTop + space.offsetHeight + 3 * rem;
-    heroEl.style.setProperty('--game-scale', String(GAME_SCALE));
-    heroEl.style.setProperty('--game-title-y', `${Math.round(top - title.offsetTop)}px`);
-    heroEl.style.setProperty('--game-lead-y', `${Math.round(top + (lead.offsetTop - title.offsetTop) * GAME_SCALE - lead.offsetTop)}px`);
-  }
-
   function measure() {
     rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
     // в большом виде меню стоит вровень с верхом логотипа (y = 44), в шапке — по её середине
     navLift = 2.75 * rem - nav.offsetTop;
-    fitGame();
   }
 
   function render() {
@@ -151,18 +135,13 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
   .hero-bottom { grid-row: 5; grid-column: 1; display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem; }
   .hero-sub { max-width: 29.75rem; }
 
-  /* B: лид в колонках 1–7 (47,5rem) сразу под заголовком; в игре на десктопе уменьшается и уезжает вверх вместе с заголовком (fitGame) */
+  /* B: лид в колонках 1–7 (47,5rem) сразу под заголовком; в игре на десктопе стоит на месте — вверх уезжает только
+     заголовок, без уменьшения (Batın 2026-10-23: уменьшение заголовка и лида отменено) */
   .hero-lead {
     grid-row: 4; grid-column: 1; align-self: start;
     max-width: 47.5rem; margin-top: var(--s-5xl);
-    color: var(--grey); text-wrap: pretty;
+    text-wrap: pretty;
     transition: transform 500ms var(--ease-in-out);
-  }
-  .hero-lead-key { color: var(--ink); }
-  @media (min-width: 761px) {
-    .hero--b .hero-title, .hero--b .hero-lead { transform-origin: 0 0; }
-    .hero--b.is-game .hero-title { transform: translateY(var(--game-title-y, 0px)) scale(var(--game-scale, 1)); }
-    .hero--b.is-game .hero-lead { transform: translateY(var(--game-lead-y, 0px)) scale(var(--game-scale, 1)); }
   }
   /* змейка справа от лида, а не от короткого подзаголовка: лид 47,5rem + зазор 2rem */
   .hero--b :global(.snake) { width: max(0px, min(36rem, 100% - 49.5rem)); }

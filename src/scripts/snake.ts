@@ -191,18 +191,15 @@ export function init(root: HTMLElement) {
     ctx!.clearRect(0, 0, canvas.width, canvas.height);
     if (mode === 'closed') return;
     ctx!.fillStyle = fg;
-    const g = 2, s = cell - g * 2;
-    for (let i = 0; i < snake.length; i++) {
-      const [x, y] = snake[i];
-      ctx!.fillRect(ox + x * cell + g, oy + y * cell + g, s, s);
-      // перемычка к следующему звену — тело сплошное; через стенку перемычки нет, там виден разрыв
-      const n = snake[i + 1];
-      if (n && Math.abs(n[0] - x) + Math.abs(n[1] - y) === 1) {
-        const mx = Math.min(x, n[0]), my = Math.min(y, n[1]);
-        if (n[0] !== x) ctx!.fillRect(ox + mx * cell + g + s, oy + y * cell + g, g * 2, s);
-        else ctx!.fillRect(ox + x * cell + g, oy + my * cell + g + s, s, g * 2);
-      }
+    // звенья — отдельные квадратики со скруглением, между ними зазор 2 — пропорции образца Batın
+    // 2026-10-23 (28 + 4); раньше тело было сплошным
+    const g = 1, s = cell - g * 2, r = 2.5;
+    ctx!.beginPath();
+    for (const [x, y] of snake) {
+      const px = ox + x * cell + g, py = oy + y * cell + g;
+      if (ctx!.roundRect) ctx!.roundRect(px, py, s, s, r); else ctx!.rect(px, py, s, s);
     }
+    ctx!.fill();
     // еда — пустой квадрат с контуром: круглых форм в игре нет
     const f = 3, lw = 1.5;
     ctx!.lineWidth = lw; ctx!.strokeStyle = fg;
