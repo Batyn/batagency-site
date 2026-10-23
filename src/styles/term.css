@@ -138,3 +138,221 @@
   :root[data-theme="term"] body { text-shadow: none; }
   :root[data-theme="term"] { --grey: #5cff7e; }
 }
+
+/* =====================================================================================================
+   Раскладка «документ из списков» (Batın 2026-10-24): не копия Notion, а документ в духе старых программ.
+   Одна колонка в 80 знакомест; блоки — окна в двойной рамке с заголовком на рамке (инверсия, как активное окно);
+   сетки и мозаики — списки; выпадающие — [+] / [-]; сверху меню-строка, снизу строка состояния с путём.
+   Компоненты свёрстаны под свою сетку, поэтому раскладку перебиваем !important — только внутри этой темы.
+   ===================================================================================================== */
+:root[data-theme="term"] {
+  --max: 47rem;            /* 80 знакомест по 9 px + поля */
+  --gutter: 1rem;
+  --section-top: 0;
+  --section-bottom: 0;
+  --header-h: 2rem;
+  --bar-h: 2rem;
+  --frame: 3px double var(--soft);
+}
+:root[data-theme="term"] body { padding-bottom: var(--bar-h); }
+/* заголовки окон и строк меню — без «##» */
+:root[data-theme="term"] body h1 { font-size: 2rem !important; }
+:root[data-theme="term"] .section-rule,
+:root[data-theme="term"] .brands-rule { display: none; }
+/* в документе нет картинок и игры: только текст */
+:root[data-theme="term"] :is(.ill, .intro-pic, .snake, .hero-space, .svc-hint, .faq-sign, .acc-sign) { display: none !important; }
+
+/* ---------- меню-строка сверху ---------- */
+:root[data-theme="term"] :is(.hdr, .hero-bar) {
+  position: fixed !important; top: 0; left: 0; right: 0; z-index: 60;
+  height: var(--header-h) !important; padding: 0 !important; max-width: none !important;
+  background: var(--ink); color: var(--bg); text-shadow: none;
+  transform: none !important;
+}
+:root[data-theme="term"] .hdr { display: flex; padding-inline: max(var(--gutter), (100% - var(--max)) / 2 + var(--gutter)) !important; }
+:root[data-theme="term"] .hero-top { padding: 0 !important; height: 100%; justify-content: flex-start !important; gap: 0; max-width: var(--max); }
+:root[data-theme="term"] :is(.hdr, .hero-bar) .glass { display: none; }
+:root[data-theme="term"] :is(.hdr-logo, .hero-logo) {
+  position: static !important; width: 3rem !important; margin: 0 1.5rem 0 0 !important; padding: 0 !important;
+  transform: none !important;
+}
+:root[data-theme="term"] :is(.hdr, .hero-bar) :is(.logo-svg [fill="#0A0A0A"], .logo-svg [fill="#C51B1E"]) { fill: var(--bg); }
+:root[data-theme="term"] :is(.hdr, .hero-bar) :is(.logo-svg [fill="#FFFFFF"], .logo-svg [fill="#C51B1E"] + path) { fill: var(--ink); }
+:root[data-theme="term"] :is(.hdr, .hero-bar) .logo-svg { filter: none; }
+:root[data-theme="term"] :is(.hdr, .hero-bar) .nav { margin: 0 auto 0 0 !important; gap: 0 !important; transform: none !important; }
+:root[data-theme="term"] :is(.hdr, .hero-bar) .nav-a { margin: 0 !important; padding: 0 0.5625rem !important; line-height: var(--header-h) !important; }
+:root[data-theme="term"] :is(.hdr, .hero-bar) .nav-a::before,
+:root[data-theme="term"] :is(.hdr, .hero-bar) .nav-a::after { content: none; }
+:root[data-theme="term"] :is(.hdr, .hero-bar) :is(.nav-a.is-current, .nav-a:hover, .tt:hover) { background: var(--bg); color: var(--ink); text-decoration: none; }
+:root[data-theme="term"] :is(.hdr, .hero-bar) .tt { width: 2.75rem; height: var(--header-h); margin: 0 0 0 auto !important; transform: none !important; }
+:root[data-theme="term"] :is(.hdr, .hero-bar) .tt[aria-pressed="true"] { background: var(--bg); color: var(--ink); }
+:root[data-theme="term"] :is(.hdr, .hero-bar) .menu-btn { height: var(--header-h); margin: 0 -0.8125rem 0 0; }
+/* место под меню-строку: главная — у первого экрана, остальные — у страницы */
+:root[data-theme="term"] body { padding-top: var(--header-h); }
+
+/* ---------- строка состояния снизу: путь слева, «Оставить заявку» справа ---------- */
+.dos-bar { display: none; }
+:root[data-theme="term"] .dos-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 64;
+  display: flex; align-items: center; height: var(--bar-h);
+  padding-inline: max(var(--gutter), (100% - var(--max)) / 2 + var(--gutter));
+  background: var(--ink); color: var(--bg); text-shadow: none;
+}
+:root[data-theme="term"] .dos-caret { display: inline-block; width: 0.5625rem; height: 1rem; margin-left: 0.125rem; background: currentColor; animation: term-blink 1.06s steps(1) infinite; }
+:root[data-theme="term"] body .scta {
+  left: auto !important; right: max(var(--gutter), (100% - var(--max)) / 2 + var(--gutter)) !important; bottom: 0 !important;
+  min-height: var(--bar-h) !important; height: var(--bar-h); padding: 0 0.5625rem !important;
+  background: var(--ink); color: var(--bg); border-radius: 0;
+}
+:root[data-theme="term"] body .scta:hover { background: var(--bg); color: var(--ink); }
+:root[data-theme="term"] body .scta:focus-visible { outline-color: var(--bg); outline-offset: -4px; }
+
+/* ---------- окна: каждый блок — рамка с заголовком на ней ---------- */
+:root[data-theme="term"] :is(.hero, main > section, main > div > section, .ft-in) {
+  position: relative;
+  display: block !important;
+  width: min(100% - 2 * var(--gutter), var(--max) - 2 * var(--gutter)); max-width: none !important;
+  min-height: 0 !important;
+  margin: 2.5rem auto 0 !important; padding: 2rem 1.5rem 1.5rem !important;
+  border: var(--frame);
+}
+:root[data-theme="term"] .hero { margin-top: 2rem !important; border-color: var(--ink); }
+:root[data-theme="term"] :is(#uslugi-h, #plan-h, #proc-h, #consult-h, #faq-h, #team-h, #bf-h) {
+  position: absolute !important; top: -0.875rem; left: 1rem; margin: 0 !important;
+  padding: 0 0.5625rem; background: var(--ink); color: var(--bg); text-shadow: none;
+  font-size: 1rem !important; line-height: 1.5 !important;
+}
+:root[data-theme="term"] :is(#uslugi-h, #plan-h, #proc-h, #consult-h, #faq-h, #team-h, #bf-h)::before { content: none; }
+/* всё внутри окна — в одну колонку */
+:root[data-theme="term"] :is(main, .ft) :is(.row, .svc-grid, .svc-desc, .svc-desc-top, .svc-desc-text, .mosaic, .intro-b, .intro-b-grid, .intro-grid,
+  .brands, .brands-content, .faq-grid, .steps, .ft-top, .ft-bottom, .consult-main, .pl-col, .pl-buttons) {
+  display: block !important; position: static !important;
+  width: auto !important; height: auto !important; min-height: 0 !important;
+  margin: 0 !important; padding: 0 !important; border: 0 !important;
+  background: none !important; color: inherit;
+}
+:root[data-theme="term"] :is(main, .ft) :is(.row, .svc-grid, .faq-grid, .steps, .ft-top, .ft-bottom) > * { grid-column: auto !important; grid-row: auto !important; }
+:root[data-theme="term"] :is(main, .ft, .hero) :is(p, ul, ol, dl, .brands, .faq-list, .contacts) + :is(p, ul, ol, dl, .brands, .faq-list, .contacts, div) { margin-top: 1.5rem !important; }
+:root[data-theme="term"] .measure, :root[data-theme="term"] .hero-lead { max-width: none !important; }
+
+/* ---------- первый экран — шапка документа ---------- */
+:root[data-theme="term"] .hero > * { margin: 0 !important; transform: none !important; }
+:root[data-theme="term"] .hero-title { margin-bottom: 1.5rem !important; }
+
+/* ---------- описание и бренды ---------- */
+:root[data-theme="term"] .intro-b-title { margin-bottom: 1.5rem !important; }
+:root[data-theme="term"] .intro-brands { margin-top: 1.5rem !important; padding: 0 !important; }
+:root[data-theme="term"] .brands-label { margin-bottom: 0.5rem; color: var(--grey); }
+:root[data-theme="term"] .brands-label .logo-inline { display: none; }
+:root[data-theme="term"] .brands-label .sr { position: static; width: auto; height: auto; clip: auto; clip-path: none; }
+/* маркированные списки — «- » как в маркдауне */
+:root[data-theme="term"] :is(.brands-list, .ft-list, .acc-list, .team-list) li { display: block !important; padding-left: 2ch; text-indent: -2ch; }
+:root[data-theme="term"] :is(.brands-list, .ft-list, .acc-list) li::before,
+:root[data-theme="term"] .brands-list li + li::before { content: "- "; color: var(--grey); }
+
+/* ---------- услуги: список с раскрытием [+] / [-] ---------- */
+:root[data-theme="term"] body .cell {
+  display: block !important; width: auto !important; height: auto !important;
+  padding: 0 !important; border: 0 !important; background: none !important; color: var(--ink) !important;
+  overflow: visible; transform: none !important;
+}
+:root[data-theme="term"] body .cell + .cell { margin-top: 0.25rem; }
+:root[data-theme="term"] body .cell-top { display: flex !important; flex-direction: row !important; align-items: baseline; gap: 1ch !important; cursor: pointer; }
+:root[data-theme="term"] body .cell-top::before { content: "[+]"; flex: none; color: var(--grey); }
+:root[data-theme="term"] body .cell.is-unfold .cell-top::before { content: "[-]"; color: inherit; }
+:root[data-theme="term"] body .cell-top:hover .cell-title { background: var(--ink); color: var(--bg); text-shadow: none; }
+:root[data-theme="term"] body .cell-n { display: none; }
+:root[data-theme="term"] body .cell-title::before { content: none; }
+:root[data-theme="term"] body .cell-bottom { display: block !important; padding-left: 4ch; }
+:root[data-theme="term"] body .cell-caption { opacity: 1 !important; color: var(--grey) !important; }
+:root[data-theme="term"] body .cell-more { display: none !important; }
+:root[data-theme="term"] body .cell.is-unfold .cell-more { display: block !important; opacity: 1 !important; transform: none !important; margin-top: 0.5rem; }
+:root[data-theme="term"] body .cell.is-unfold .cell-caption { display: none; }
+:root[data-theme="term"] body .cell-lead { padding: 0 !important; }
+:root[data-theme="term"] body .cell-link { min-height: 0 !important; margin-top: 0.5rem; }
+:root[data-theme="term"] body .cell-link::after { content: "]" !important; position: static !important; color: var(--grey); }
+:root[data-theme="term"] body .cell-link::before { content: "["; color: var(--grey); }
+:root[data-theme="term"] .cell-panel { display: none !important; }
+:root[data-theme="term"] .only-d, :root[data-theme="term"] .only-m { display: none !important; }
+
+/* ---------- «Как работаем»: нумерованный список ---------- */
+:root[data-theme="term"] .step { display: flex !important; flex-direction: row !important; gap: 1ch !important; border: 0 !important; padding: 0 !important; }
+:root[data-theme="term"] .step-body { display: block !important; }
+:root[data-theme="term"] .step + .step { margin-top: 1rem !important; }
+:root[data-theme="term"] .step-n { flex: none !important; color: var(--grey); }
+:root[data-theme="term"] .step-n::after { content: "."; }
+:root[data-theme="term"] .step-t { display: inline; }
+:root[data-theme="term"] .step-t::before { content: none; }
+:root[data-theme="term"] .step-t::after { content: " — "; color: var(--grey); }
+:root[data-theme="term"] .step-d { display: inline; color: var(--ink) !important; }
+
+/* ---------- выпадающие (вопросы, услуги на /uslugi/) ---------- */
+:root[data-theme="term"] :is(.faq-row, .acc-row) { border: 0 !important; overflow: visible; transform: none !important; }
+:root[data-theme="term"] :is(.faq-row, .acc-row) + :is(.faq-row, .acc-row) { margin-top: 0.25rem; }
+:root[data-theme="term"] :is(.faq-q, .acc-sum) { display: flex !important; gap: 1ch !important; padding: 0 !important; background: none !important; color: var(--ink) !important; }
+:root[data-theme="term"] :is(.faq-q, .acc-sum)::before { content: "[+]"; flex: none; color: var(--grey); }
+:root[data-theme="term"] [open] > :is(.faq-q, .acc-sum)::before { content: "[-]"; color: inherit; }
+:root[data-theme="term"] :is(.faq-q-text, .acc-title)::before { content: none; }
+:root[data-theme="term"] :is(.faq-q, .acc-sum):hover :is(.faq-q-text, .acc-title) { background: var(--ink); color: var(--bg); text-shadow: none; }
+:root[data-theme="term"] :is(.faq-a, .acc-body) { margin: 0.5rem 0 1rem !important; padding: 0 0 0 4ch !important; background: none !important; color: var(--ink) !important; }
+
+/* ---------- консультация: контакты строками «Telegram: @…» ---------- */
+:root[data-theme="term"] .contacts, :root[data-theme="term"] .contacts-row { display: block !important; border: 0 !important; padding: 0 !important; }
+:root[data-theme="term"] .contacts dt { display: inline; color: var(--grey); }
+:root[data-theme="term"] .contacts dt::after { content: ": "; }
+:root[data-theme="term"] .contacts dd { display: inline; margin: 0; }
+:root[data-theme="term"] body .contacts .t-contact { font-size: 1rem !important; line-height: 1.5 !important; }
+:root[data-theme="term"] .consult-actions { margin-top: 1.5rem !important; }
+:root[data-theme="term"] .btn { min-height: 0 !important; padding: 0.25rem 0.5625rem !important; }
+:root[data-theme="term"] .btn + .btn, :root[data-theme="term"] .btn + .pl-mail { margin-left: 1ch; }
+
+/* ---------- план: таблица с сеткой месяцев ---------- */
+:root[data-theme="term"] .section-head { padding: 0 !important; }
+:root[data-theme="term"] body .plan { --split: 1fr; }
+@media (min-width: 761px) {
+  /* колонка названий — 26 знаков (влезает «Пример плана на полгода» и кнопка очистки), дальше шесть месяцев */
+  :root[data-theme="term"] body .plan { --cols: 15rem repeat(6, minmax(0, 1fr)); --row: 2rem; }
+}
+:root[data-theme="term"] .pl-nojs { margin: 1.5rem 0 0 !important; }
+:root[data-theme="term"] .pl-app { margin-top: 1.5rem; }
+:root[data-theme="term"] .pl-palette { border-top: 0 !important; padding: 0 0 1.5rem !important; }
+:root[data-theme="term"] .pl-label { padding: 0 0 0.75rem !important; flex-direction: row !important; flex-wrap: wrap; gap: 0 1ch !important; }
+:root[data-theme="term"] .pl-label small { max-width: none !important; }
+:root[data-theme="term"] .pl-label > span::after { content: ":"; }
+:root[data-theme="term"] .pl-row { border-bottom: 1px solid var(--hairline); }
+:root[data-theme="term"] .pl-title::before { content: none; }
+:root[data-theme="term"] .pl-chip { border-radius: 0 !important; }
+:root[data-theme="term"] .pl-bar { border-radius: 0 !important; }
+:root[data-theme="term"] .pl-actions { display: block !important; margin-top: 1.5rem !important; padding: 0 !important; }
+:root[data-theme="term"] .pl-note { margin-top: 0.75rem !important; }
+
+/* ---------- подвал: окно «Расскажите о задаче» и списки ссылок ---------- */
+:root[data-theme="term"] .ft { background: none !important; padding: 0 0 1rem; }
+:root[data-theme="term"] .ft-in { border-color: var(--soft); }
+:root[data-theme="term"] body .bf { position: static !important; padding: 0 !important; border: 0 !important; container-type: normal; }
+:root[data-theme="term"] .ft-group { margin-top: 2rem !important; }
+:root[data-theme="term"] .ft-h { color: var(--grey) !important; }
+:root[data-theme="term"] .ft-list { display: block !important; }
+:root[data-theme="term"] .ft-a { display: inline !important; min-height: 0 !important; }
+:root[data-theme="term"] .ft-legal { display: none !important; }
+:root[data-theme="term"] .ft-legal-d { display: block !important; }
+:root[data-theme="term"] .ft-bottom { margin-top: 2rem !important; color: var(--grey); }
+/* поля ввода — подсвеченная строка, как в старых формах */
+:root[data-theme="term"] .bf-input { border: 0 !important; background: var(--cell-empty) !important; box-shadow: none !important; height: 2rem; padding: 0 0.5625rem; }
+:root[data-theme="term"] .bf-area { height: 6rem; padding-block: 0.25rem; }
+:root[data-theme="term"] .bf-input:focus { outline: 2px solid var(--ink); outline-offset: 0; background: var(--ph) !important; }
+
+/* ---------- ссылки: наведение — инверсия, как выделение в меню ---------- */
+@media (hover: hover) and (pointer: fine) {
+  :root[data-theme="term"] :is(main, .ft, .hero) a:not(.btn, .cell-link):hover { background: var(--ink); color: var(--bg); text-shadow: none; text-decoration: none; }
+}
+
+@media (max-width: 760px) {
+  :root[data-theme="term"] :is(.hero, main > section, main > div > section, .ft-in) { padding: 1.75rem 1rem 1.25rem !important; }
+  :root[data-theme="term"] :is(.hdr, .hero-bar) .nav { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme="term"] .dos-caret { animation: none; }
+}
+/* курсор один — в строке состояния, у заголовка его нет */
+:root[data-theme="term"] h1::after { content: none; }

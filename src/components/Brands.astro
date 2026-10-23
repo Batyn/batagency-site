@@ -4,12 +4,14 @@
 import LogoInline from './LogoInline.astro';
 interface Props { page?: boolean }
 const { page = false } = Astro.props;
+const BRANDS = ['ONY', 'ЦУМ', 'Glamour', 'Elle', 'Time Out', 'VC.RU', 'МТС Live', "Sotheby's International Realty", 'Instamart (Kuper)', 'Amkal', 'Театр на Таганке', 'Sound\u00a0Up'];
 ---
 <div class:list={['brands', { 'brands--page': page }]}>
   <p class="brands-label t-label-md">Где мы работали <span class="nowrap">до<span class="sr"> bat</span><LogoInline uid={page ? 'brands-page' : 'brands'} /></span></p>
   <div class="brands-content">
     {!page && <div class="brands-rule"></div>}
-    <p class="t-lead">ONY · ЦУМ · Glamour · Elle · Time Out · VC.RU · МТС Live · Sotheby's International Realty · Instamart (Kuper) · Amkal · Театр на Таганке · Sound&nbsp;Up</p>
+    <!-- список, а не строка: в теме Fallout бренды — маркированный список; в обычной теме точки-разделители рисует CSS -->
+    <ul class="t-lead brands-list">{BRANDS.map((b) => <li>{b}</li>)}</ul>
   </div>
 </div>
 
@@ -17,6 +19,8 @@ const { page = false } = Astro.props;
   .brands { display: grid; grid-template-columns: var(--col-3) minmax(0, 1fr); column-gap: var(--col-gap); }
   .brands-content { display: flex; flex-direction: column; gap: 1rem; }
   .brands-rule { height: 1px; background: var(--ink); }
+  .brands-list li { display: inline; }
+  .brands-list li + li::before { content: " · "; }
 
   @media (max-width: 760px) {
     .brands { grid-template-columns: 1fr; row-gap: 0.75rem; }

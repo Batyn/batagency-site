@@ -47,6 +47,8 @@ import { SERVICES } from '../data/services';
 
   // Телефон: нажатие на ячейку раскрывает её описание под рядом. Открыта одна услуга (как в наборе «Mobile services»).
   const phone = matchMedia('(max-width: 760px)');
+  // тема Fallout: мозаика становится списком, ячейка раскрывается на месте — [+] / [-] (styles/term.css)
+  const doc = () => document.documentElement.dataset.theme === 'term';
   const mosaic = document.querySelector<HTMLElement>('[data-mosaic]')!;
   const cells = [...mosaic.querySelectorAll<HTMLElement>('.cell')];
   const panel = document.createElement('li');
@@ -90,23 +92,31 @@ import { SERVICES } from '../data/services';
   cells.forEach((cell) => {
     const top = cell.querySelector<HTMLElement>('.cell-top')!;
     const toggle = () => {
+      if (doc()) {
+        const on = cell.classList.toggle('is-unfold');
+        top.setAttribute('aria-expanded', String(on));
+        if (on) goal('service_open');
+        return;
+      }
       if (!phone.matches) return;
       const was = openCell === cell;
       close();
       if (!was) open(cell);
     };
     cell.addEventListener('click', (e) => {
-      if (!phone.matches || (e.target as Element).closest('a')) return;
+      if (!(phone.matches || doc()) || (e.target as Element).closest('a')) return;
       toggle();
     });
     // на телефоне ячейка — кнопка для клавиатуры и читалок
     const sync = () => {
-      if (phone.matches) { top.setAttribute('role', 'button'); top.tabIndex = 0; top.setAttribute('aria-expanded', String(openCell === cell)); }
+      if (doc()) { top.setAttribute('role', 'button'); top.tabIndex = 0; top.setAttribute('aria-expanded', String(cell.classList.contains('is-unfold'))); }
+      else if (phone.matches) { top.setAttribute('role', 'button'); top.tabIndex = 0; top.setAttribute('aria-expanded', String(openCell === cell)); }
       else { top.removeAttribute('role'); top.removeAttribute('tabindex'); top.removeAttribute('aria-expanded'); }
     };
     sync();
     phone.addEventListener('change', () => { close(); sync(); });
-    top.addEventListener('keydown', (e) => { if (phone.matches && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(); } });
+    addEventListener('themechange', () => { close(); cell.classList.remove('is-unfold'); sync(); });
+    top.addEventListener('keydown', (e) => { if ((phone.matches || doc()) && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggle(); } });
   });
 
   // десктоп: наведение на ячейку — цель service_open (один раз на услугу)

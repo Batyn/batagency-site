@@ -4,6 +4,7 @@ import '../styles/global.css';
 import MobileMenu from '../components/MobileMenu.astro';
 import CookieBanner from '../components/CookieBanner.astro';
 import StickyCta from '../components/StickyCta.astro';
+import DosBar from '../components/DosBar.astro';
 
 interface Props {
   title: string;
@@ -35,6 +36,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
 </head>
 <body>
   <slot />
+  <DosBar />
   <StickyCta />
   <MobileMenu />
   <CookieBanner />

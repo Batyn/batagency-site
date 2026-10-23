@@ -1,0 +1,6 @@
+---
+// Строка состояния темы Fallout, как у программ DOS: путь страницы в виде c:\bat\uslugi>. В обычной теме скрыта.
+// Справа в неё встаёт липкая «Оставить заявку» (styles/term.css). Декор: для читалок путь дублирует хлебные крошки.
+const path = 'c:\\bat' + Astro.url.pathname.replace(/\/$/, '').replace(/\//g, '\\') + '>';
+---
+<div class="dos-bar" aria-hidden="true"><span class="dos-path">{path}</span><span class="dos-caret"></span></div>
