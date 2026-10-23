@@ -1,0 +1,35 @@
+---
+// Кнопка темы «Терминал» в шапке (Batın 2026-10-23): сайт становится маркдаун-документом на зелёном мониторе IBM
+// (styles/term.css). Значок — пиксельный «>_», включённое состояние — инверсия. Без JS кнопки нет: тема только улучшение.
+---
+<button class="tt" type="button" data-theme-toggle aria-pressed="false" aria-label="Режим терминала" title="Режим терминала">
+  <svg viewBox="0 0 10 7" width="20" height="14" aria-hidden="true" focusable="false" shape-rendering="crispEdges">
+    <path d="M1 1h2v1h-2zM2 2h2v1h-2zM3 3h2v1h-2zM2 4h2v1h-2zM1 5h2v1h-2zM5 5h4v1h-4z" fill="currentColor" />
+  </svg>
+</button>
+
+<script>
+  import '../scripts/theme';
+</script>
+
+<style>
+  .tt {
+    display: none;
+    place-items: center; width: 2.75rem; height: 2.75rem; padding: 0;
+    background: transparent; border: 0; border-radius: var(--r-sm); cursor: pointer;
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+  :global(.js) .tt { display: grid; }
+  .tt svg { width: 1.25rem; height: auto; }
+  .tt[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+  @media (hover: hover) and (pointer: fine) {
+    .tt:hover { background: var(--ink); color: var(--bg); }
+  }
+  @media (max-width: 760px) {
+    /* рядом с «Меню»: прижимается вправо к бургеру */
+    .tt { margin: -0.1875rem 0.25rem -0.1875rem auto; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tt { transition: none; }
+  }
+</style>

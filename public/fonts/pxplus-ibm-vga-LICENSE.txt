@@ -1,0 +1,7 @@
+PxPlus IBM VGA 9x16 — из The Ultimate Oldschool PC Font Pack v2.2
+Автор: VileR, https://int10h.org/oldschool-pc-fonts/
+Лицензия: Creative Commons Attribution-ShareAlike 4.0 International
+https://creativecommons.org/licenses/by-sa/4.0/
+
+Изменения: оставлены латиница, кириллица, пунктуация и псевдографика; неразрывный дефис (U+2011)
+привязан к знаку обычного дефиса; файл переведён в WOFF2. Изменённый шрифт распространяется на тех же условиях.

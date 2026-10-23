@@ -30,7 +30,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonical} />
   <meta name="theme-color" content="#ffffff" />
-  <script is:inline>document.documentElement.classList.add('js')</script>
+  <!-- тема «Терминал» ставится до отрисовки, чтобы не мигал белый сайт (scripts/theme.ts) -->
+  <script is:inline>(function(d){d.classList.add('js');try{if(localStorage.getItem('bat-theme')==='term'){d.dataset.theme='term';document.querySelector('meta[name="theme-color"]').content='#031006'}}catch(e){}})(document.documentElement)</script>
 </head>
 <body>
   <slot />

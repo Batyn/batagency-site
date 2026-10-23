@@ -28,8 +28,15 @@ export function init(root: HTMLElement) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const coarse = matchMedia('(pointer: coarse)');
   const desk = matchMedia('(min-width: 761px)');
-  const css = getComputedStyle(root);
-  const INK = css.getPropertyValue('--ink').trim() || '#0a0a0a', PAPER = css.getPropertyValue('--bg').trim() || '#fff';
+  // цвета — из токенов; при смене темы (scripts/theme.ts) перечитываем
+  let INK = '#0a0a0a', PAPER = '#fff';
+  const readColors = () => {
+    const css = getComputedStyle(root);
+    INK = css.getPropertyValue('--ink').trim() || '#0a0a0a';
+    PAPER = css.getPropertyValue('--bg').trim() || '#fff';
+  };
+  readColors();
+  addEventListener('themechange', () => { readColors(); draw(); });
 
   let best = 0;
   try { best = Number(localStorage.getItem('snake-best')) || 0; } catch { /* хранилище недоступно — рекорд только на сессию */ }

@@ -1,0 +1,140 @@
+/* ---------- тема Fallout (в разговоре — «Терминал»), ветка fallout ----------
+   Batın 2026-10-23 (RULES v18, исключение из «чёрное и белое» и «один шрифт»): весь сайт — маркдаун-документ
+   на зелёном мониторе IBM. Включается кнопкой в шапке (ThemeToggle), выбор — в localStorage (scripts/theme.ts).
+   Основа — подмена токенов: компоненты красятся через --ink и --bg, поэтому инверсия состояний работает как есть.
+   Шрифт PxPlus IBM VGA 9x16 (VileR, CC BY-SA 4.0, public/fonts/pxplus-ibm-vga-LICENSE.txt) родной на 16 px,
+   поэтому размеры только 16, 32 и 48 — иначе пиксели мылятся. Браузер качает его, только когда тема включена. */
+@font-face {
+  font-family: "PxPlus IBM VGA";
+  src: url("/fonts/pxplus-ibm-vga.woff2") format("woff2");
+  font-display: swap;
+}
+
+:root[data-theme="term"] {
+  --ink: #5cff7e;
+  --bg: #031006;
+  --grey: #34b856;
+  /* 5,3:1 к фону: --soft в подвале — текст */
+  --soft: #2b9947;
+  --hairline: #18562a;
+  --cell-empty: #0a2410;
+  --ph: #0d2e15;
+  --eye: #5cff7e;
+  --glass: var(--bg);
+  --glow: 0 0 0.375rem rgba(92, 255, 126, 0.4);
+  --r-sm: 0;
+  --r-md: 0;
+  --font: "PxPlus IBM VGA", ui-monospace, Menlo, Consolas, monospace;
+  --track-tight: 0;
+  /* пунктир маркдауна «- - -»: шаг в два знакоместа */
+  --dash: linear-gradient(90deg, var(--soft) 50%, transparent 0) 0 0 / 1.125rem 2px repeat-x;
+  color-scheme: dark;
+  /* выше 1440 сайт масштабируется (global.css) — здесь нет: шрифт чёткий только на целых 16 px */
+  font-size: 100%;
+}
+:root[data-theme="term"] body {
+  font-synthesis: none;
+  text-shadow: var(--glow);
+  -webkit-font-smoothing: none;
+}
+:root[data-theme="term"] ::selection { background: var(--ink); color: var(--bg); text-shadow: none; }
+
+/* ---------- одна гарнитура, один кегль: 16; заголовки 32 и 48 ---------- */
+:root[data-theme="term"] body :not(svg, svg *) {
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0 !important;
+  font-weight: 400 !important;
+}
+:root[data-theme="term"] body h1 { font-size: 3rem !important; line-height: 1.25 !important; }
+:root[data-theme="term"] body :is(.t-display, .t-h-lg, .t-contact):not(h1) { font-size: 2rem !important; line-height: 1.25 !important; }
+/* внутри заголовков (например, «дизайн‑ и» в span) — кегль заголовка */
+:root[data-theme="term"] body :is(h1, h2, h3, .t-display, .t-h-lg, .t-contact) * { font-size: inherit !important; line-height: inherit !important; }
+@media (max-width: 760px) {
+  :root[data-theme="term"] body h1 { font-size: 2rem !important; }
+}
+
+/* ---------- разметка маркдауна ---------- */
+:root[data-theme="term"] :is(h1, h2, h3)::before { color: var(--grey); white-space: pre; }
+:root[data-theme="term"] h1::before { content: "# "; }
+:root[data-theme="term"] h2::before { content: "## "; }
+:root[data-theme="term"] h3::before { content: "### "; }
+/* курсор только у H1 — один на страницу */
+:root[data-theme="term"] h1::after {
+  content: ""; display: inline-block;
+  width: 0.5625em; height: 0.875em; margin-left: 0.25em; vertical-align: -0.0625em;
+  background: currentColor; box-shadow: var(--glow);
+  animation: term-blink 1.06s steps(1) infinite;
+}
+@keyframes term-blink { 50% { opacity: 0; } }
+
+/* ссылки в тексте — подчёркнуты, ссылки-пункты — в квадратных скобках, как [текст](адрес) */
+:root[data-theme="term"] :is(p, li, label, dd, td) a:not(.btn, [class*="ft-"], [class*="nav-"], [class*="mm-"]) {
+  text-decoration: underline; text-underline-offset: 0.25em;
+}
+:root[data-theme="term"] :is(.nav-a, .mm-a, .ft-a)::before { content: "["; color: var(--grey); }
+:root[data-theme="term"] :is(.nav-a, .mm-a, .ft-a)::after { content: "]"; color: var(--grey); }
+:root[data-theme="term"] .nav-a.is-current::before,
+:root[data-theme="term"] .nav-a.is-current::after { color: inherit; }
+/* кнопки — [ Текст ] */
+:root[data-theme="term"] :is(.btn, .scta, .ck-accept, .bf-btn, .bf-fail-btn)::before { content: "[\00a0"; }
+:root[data-theme="term"] :is(.btn, .scta, .ck-accept, .bf-btn, .bf-fail-btn)::after { content: "\00a0]"; }
+:root[data-theme="term"] :is(.btn, .scta, .ck-accept, .bf-btn, .bf-fail-btn, [aria-pressed="true"], .is-current) { text-shadow: none; }
+
+/* линия секции — горизонтальная черта маркдауна */
+:root[data-theme="term"] .section-rule { height: 2px; background: var(--dash); }
+
+/* ---------- шапка: вместо стекла — экран с пунктиром снизу ---------- */
+:root[data-theme="term"] .glass {
+  background: var(--dash), var(--bg);
+  background-position: 0 100%, 0 0;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  box-shadow: none;
+}
+
+/* ---------- подвал: не чёрный, а тот же экран; бриф — окно в рамке ---------- */
+:root[data-theme="term"] .ft { background: var(--bg); color: var(--ink); background-image: var(--dash); background-repeat: repeat-x; }
+:root[data-theme="term"] .ft :focus-visible { outline-color: var(--ink); }
+:root[data-theme="term"] .bf { border: 4px double var(--ink); }
+
+/* ---------- места, где цвета заданы не токенами ---------- */
+/* --soft на инверсии (раскрытая ячейка) не набирает контраста — там текст цветом фона */
+:root[data-theme="term"] body :is(.cell.is-open .cell-n, .cell:focus-within .cell-n, .cell.is-open .cell-caption, .acc-row[open] .acc-n) { color: var(--bg); }
+@media (hover: hover) and (pointer: fine) {
+  :root[data-theme="term"] body .cell:hover .cell-n { color: var(--bg); }
+}
+:root[data-theme="term"] .pl-trash { background: rgba(3, 16, 6, 0.95); }
+:root[data-theme="term"] :is(.pl-bar.is-placeholder, .pl-ghost) {
+  background: repeating-linear-gradient(135deg, transparent 0 0.375rem, rgba(92, 255, 126, 0.15) 0.375rem 0.4375rem);
+}
+:root[data-theme="term"] .pl-cell:active { background: var(--hairline); }
+
+/* ---------- логотип и картинки — в один цвет люминофора ---------- */
+:root[data-theme="term"] :is(.logo-svg, .logo-inline) [fill="#0A0A0A"] { fill: var(--ink); }
+:root[data-theme="term"] :is(.logo-svg, .logo-inline) [fill="#FFFFFF"] { fill: var(--bg); }
+:root[data-theme="term"] :is(.logo-svg, .logo-inline) [fill="#C51B1E"] { fill: var(--ink); }
+:root[data-theme="term"] :is(.logo-svg, .logo-inline) [fill="#C51B1E"] + path { fill: var(--bg); }
+:root[data-theme="term"] :is(.logo-svg, .logo-inline) { filter: drop-shadow(0 0 0.25rem rgba(92, 255, 126, 0.35)); }
+/* чёрные рисунки на прозрачном и фото: инверсия → зелёный монохром */
+:root[data-theme="term"] main :is(img, video) { filter: invert(1) brightness(0.5) sepia(1) saturate(4) hue-rotate(85deg) brightness(1.9); }
+
+/* ---------- включение: вспышка развёртки ---------- */
+:root.term-boot::after {
+  content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  background: var(--ink);
+  animation: term-on 450ms var(--ease-out) forwards;
+}
+@keyframes term-on {
+  0% { transform: scaleY(0.004); opacity: 1; }
+  35% { transform: scaleY(1); opacity: 0.45; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme="term"] h1::after { animation: none; }
+  :root.term-boot::after { display: none; }
+}
+@media (prefers-contrast: more) {
+  :root[data-theme="term"] body { text-shadow: none; }
+  :root[data-theme="term"] { --grey: #5cff7e; }
+}

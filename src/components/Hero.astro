@@ -8,6 +8,7 @@
 import Logo from './Logo.astro';
 import MenuButton from './MenuButton.astro';
 import Snake from './Snake.astro';
+import ThemeToggle from './ThemeToggle.astro';
 import { NAV } from '../data/site';
 
 // вариант B (Figma «Home hero · Apple variants», 603:9067 / 603:9176; задача 87, проба): под заголовком лид 26 в два тона —
@@ -27,6 +28,7 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
       <nav class="nav" aria-label="Разделы" data-bar-nav>
         {nav.map((n) => <a class="nav-a t-label-md" href={n.href}>{n.label}</a>)}
       </nav>
+      <ThemeToggle />
       <MenuButton />
     </div>
   </div>
@@ -63,6 +65,8 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const logo = document.querySelector<HTMLElement>('[data-bar-logo]')!;
   const nav = document.querySelector<HTMLElement>('[data-bar-nav]')!;
+  // кнопка темы стоит в строке меню и ездит вместе с ним
+  const tt = document.querySelector<HTMLElement>('[data-bar] [data-theme-toggle]');
   const glass = document.querySelector<HTMLElement>('[data-bar-glass]')!;
   const bar = document.querySelector<HTMLElement>('[data-bar]')!;
   const firstBlock = document.querySelector<HTMLElement>('main > :first-child');
@@ -81,11 +85,12 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
     queued = false;
     const y = Math.max(0, scrollY);
     hide(y);
-    if (!desk.matches) { logo.style.transform = nav.style.transform = ''; glass.style.opacity = y > 0 ? '1' : '0'; return; }
+    if (!desk.matches) { logo.style.transform = nav.style.transform = ''; if (tt) tt.style.transform = ''; glass.style.opacity = y > 0 ? '1' : '0'; return; }
     const p = reduced.matches ? (y > 0 ? 1 : 0) : Math.min(1, y / DIST);
     // из точки (0, 44) от поля в (0, 14): логотип на поле и в большом виде (выравнивание отступов, Batın 2026-10-15)
     logo.style.transform = `translateY(${(-1.875 * rem * p).toFixed(2)}px) scale(${(1 - (1 - SCALE) * p).toFixed(4)})`;
     nav.style.transform = `translateY(${(navLift * (1 - p)).toFixed(2)}px)`;
+    if (tt) tt.style.transform = nav.style.transform;
     glass.style.opacity = String(p);
   }
   const queue = () => { if (!queued) { queued = true; requestAnimationFrame(render); } };
@@ -125,6 +130,7 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
   }
   .hero-logo :global(svg) { width: 100%; height: auto; }
   .nav { display: flex; align-items: center; gap: 1.75rem; }
+  .hero-top :global(.tt) { margin-left: 1rem; margin-right: -0.75rem; }
   .nav-a { padding: 0.1875rem 0.5rem; margin: -0.1875rem -0.5rem; border-radius: var(--r-sm); }
   @media (hover: hover) and (pointer: fine) {
     .nav-a:hover { text-decoration: underline; text-underline-offset: 0.25rem; }
@@ -156,6 +162,7 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
       padding-top: 0; padding-bottom: clamp(3rem, 18svh, 9.5rem);
     }
     .nav { display: none; }
+    .hero-top :global(.tt) { margin: -0.1875rem 0.25rem -0.1875rem auto; }
     /* шапка 62: отступы 16 и 8, логотип 76×38; место под ней держит .hero-space */
     .hero-space { height: 3.875rem; }
     .hero-bar { height: auto; }
