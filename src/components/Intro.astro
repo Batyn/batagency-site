@@ -7,16 +7,51 @@ import Brands from './Brands.astro';
 import bat from '../assets/illustrations/letuchaya-mysh.png';
 import snake from '../assets/illustrations/zmeya.png';
 
+// вариант B (задача 87, проба; раскладка по скрину Batın 2026-10-23): заголовок 56 в колонках 1–8, абзацы lead в колонках
+// 1–5 и 7–11, под каждым рисунок. Нажатие на рисунок меняет его на случайный из набора (Figma 601:9753 + мышь и змея),
+// не повторяя те, что уже на экране
+import figura from '../assets/illustrations/figura.png';
+import zayac from '../assets/illustrations/zayac.png';
+import porosenok from '../assets/illustrations/porosenok.png';
+import ptica from '../assets/illustrations/ptica.png';
+import ryba from '../assets/illustrations/ryba.png';
+import krolik from '../assets/illustrations/krolik.png';
+import gusenica from '../assets/illustrations/gusenica.png';
+import batK from '../assets/illustrations/letuchaya-mysh-kontur.png';
+import snakeK from '../assets/illustrations/zmeya-kontur.png';
+interface Props { variant?: 'b' }
+const b = Astro.props.variant === 'b';
+const ills = { 'letuchaya-mysh': batK, zmeya: snakeK, figura, zayac, porosenok, ptica, ryba, krolik, gusenica };
+const illPic = { formats: ['avif', 'webp'] as const, widths: [400, 800], sizes: '(max-width: 760px) 80vw, 25rem', loading: 'lazy' as const, decoding: 'async' as const, alt: '' };
+
 const pic = { formats: ['avif', 'webp'] as const, widths: [520, 1080], sizes: '(max-width: 760px) 260px, 45vw', loading: 'lazy' as const, decoding: 'async' as const, alt: '' };
 ---
 <section class="intro wrap" id="agentstvo" aria-labelledby="intro-h">
+  {b ? (
+    <div class="intro-b">
+      <h2 class="intro-b-title" id="intro-h">bat — независимое адаптивное агентство маркетинга и коммуникаций.</h2>
+      <div class="intro-b-grid">
+        <p class="t-lead intro-b-text intro-b-text--1"><span class="key">Мы небольшая команда с большим профессиональным опытом и возможностью масштабироваться под задачи проекта.</span> За нашими плечами — годы работы в медиа, моде, брендинге, недвижимости и культурных проектах, а также внутри креативных и <span class="nowrap">digital-агентств</span>.</p>
+        <p class="t-lead intro-b-text intro-b-text--2"><span class="key">Выстраиваем коммуникации системно: от исследования и стратегии до производства контента, публикаций и продюсирования ивентов.</span> Можем взять на себя отдельную задачу или полностью заниматься маркетингом агентства, сохраняя единый подход ко всем каналам коммуникации.</p>
+        {(['letuchaya-mysh', 'zmeya'] as const).map((k, i) => (
+          <button class:list={['ill', `ill--${i + 1}`]} type="button" data-ill-slot data-current={k} aria-label="Показать другой рисунок">
+            <span class="ill-layer"><Picture src={ills[k]} {...illPic} /></span>
+          </button>
+        ))}
+      </div>
+      {Object.entries(ills).map(([k, src]) => (
+        <template data-ill={k}><span class="ill-layer"><Picture src={src} {...illPic} /></span></template>
+      ))}
+    </div>
+  ) : (
   <div class="intro-grid">
-    <h2 class="intro-title" id="intro-h">bat — независимое адаптивное агентство маркетинга и коммуникаций.</h2>
-    <p class="t-lead intro-text intro-text--1">Мы небольшая команда с большим профессиональным опытом и возможностью масштабироваться под задачи проекта. За нашими плечами — годы работы в медиа, моде, брендинге, недвижимости и культурных проектах, а также внутри креативных и <span class="nowrap">digital-агентств</span>.</p>
-    <div class="intro-pic intro-pic--bat"><Picture src={bat} {...pic} /></div>
-    <div class="intro-pic intro-pic--snake"><Picture src={snake} {...pic} /></div>
-    <p class="t-lead intro-text intro-text--2">Выстраиваем коммуникации системно: от исследования и стратегии до производства контента, публикаций и продюсирования ивентов. Можем взять на себя отдельную задачу или полностью заниматься маркетингом агентства, сохраняя единый подход ко всем каналам коммуникации.</p>
-  </div>
+      <h2 class="intro-title" id="intro-h">bat — независимое адаптивное агентство маркетинга и коммуникаций.</h2>
+      <p class="t-lead intro-text intro-text--1">Мы небольшая команда с большим профессиональным опытом и возможностью масштабироваться под задачи проекта. За нашими плечами — годы работы в медиа, моде, брендинге, недвижимости и культурных проектах, а также внутри креативных и <span class="nowrap">digital-агентств</span>.</p>
+      <div class="intro-pic intro-pic--bat"><Picture src={bat} {...pic} /></div>
+      <div class="intro-pic intro-pic--snake"><Picture src={snake} {...pic} /></div>
+      <p class="t-lead intro-text intro-text--2">Выстраиваем коммуникации системно: от исследования и стратегии до производства контента, публикаций и продюсирования ивентов. Можем взять на себя отдельную задачу или полностью заниматься маркетингом агентства, сохраняя единый подход ко всем каналам коммуникации.</p>
+    </div>
+  )}
   <div class="intro-brands"><Brands /></div>
 </section>
 
@@ -43,6 +78,30 @@ const pic = { formats: ['avif', 'webp'] as const, widths: [520, 1080], sizes: '(
   .intro-pic--bat { aspect-ratio: 648 / 480; }
   .intro-pic--snake { aspect-ratio: 648 / 631; }
 
+  /* B: заголовок 56 в колонках 1–8; абзацы в 1–5 и 7–11, ниже рисунки по центру своих колонок, высота 360 */
+  .intro-b-title { max-width: 57rem; font: 700 3.5rem/1.02 var(--font); letter-spacing: var(--track-tight); }
+  .intro-b-grid {
+    display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--col-gap); row-gap: 6rem;
+    margin-top: 7.5rem;
+  }
+  /* два тона: главная фраза чёрным, продолжение серым */
+  .intro-b-text { color: var(--grey); }
+  .intro-b-text .key { color: var(--ink); }
+  .intro-b-text--1 { grid-column: 1 / 6; grid-row: 1; }
+  .intro-b-text--2 { grid-column: 7 / 12; grid-row: 1; }
+  .ill--1 { grid-column: 1 / 6; grid-row: 2; }
+  .ill--2 { grid-column: 7 / 12; grid-row: 2; }
+  .ill {
+    position: relative; display: block; width: 100%; height: 22.5rem;
+    padding: 0; border: 0; background: none; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* смена (Batın 2026-10-23): старый рисунок уходит целиком, потом новый «прилепляется» как стикер — скрипт ниже, Web Animations.
+     На нажатие рисунок чуть поддаётся — отклик сразу, на pointer-down */
+  .ill-layer { position: absolute; inset: 0; transition: transform 160ms var(--ease-out); }
+  .ill:active .ill-layer { transform: scale(0.97); }
+  .ill-layer :global(img) { width: 100%; height: 100%; object-fit: contain; }
+
   /* от змеи до брендов 72 + 24 + 72, как в Figma */
   .intro-brands { margin-top: 10.5rem; }
 
@@ -56,7 +115,28 @@ const pic = { formats: ['avif', 'webp'] as const, widths: [520, 1080], sizes: '(
     .intro-text { font-size: 1.25rem; }
   }
 
+  @media (min-width: 761px) and (max-width: 1279px) {
+    .intro-b-title { font-size: clamp(2.5rem, 4.4vw, 3.5rem); }
+  }
+  @media (min-width: 761px) and (max-width: 1099px) {
+    .intro-b-text--1, .ill--1 { grid-column: 1 / 7; }
+    .intro-b-text--2, .ill--2 { grid-column: 7 / 13; }
+    .intro-b-text { font-size: 1.25rem; }
+    .ill { height: 17.5rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ill-layer { transition: none; }
+    .ill:active .ill-layer { transform: none; }
+  }
+
   @media (max-width: 760px) {
+    .intro-b-title { font-size: 2.125rem; line-height: 1.04; letter-spacing: -0.02em; }
+    .intro-b-grid { grid-template-columns: minmax(0, 1fr); row-gap: var(--s-2xl); margin-top: var(--s-4xl); }
+    .intro-b-text--1, .intro-b-text--2, .ill--1, .ill--2 { grid-column: 1; grid-row: auto; }
+    /* столбиком: текст, рисунок, текст, рисунок */
+    .intro-b-text--1 { order: 1; } .ill--1 { order: 2; } .intro-b-text--2 { order: 3; margin-top: var(--s-4xl); } .ill--2 { order: 4; }
+    .ill { height: 15rem; }
     .intro-grid { grid-template-columns: minmax(0, 1fr); row-gap: var(--s-4xl); }
     .intro-title, .intro-text--1, .intro-text--2, .intro-pic { grid-column: 1; grid-row: auto; }
     .intro-title { margin-bottom: 0; font-size: 2.125rem; line-height: 1.04; letter-spacing: -0.02em; }
@@ -71,3 +151,56 @@ const pic = { formats: ['avif', 'webp'] as const, widths: [520, 1080], sizes: '(
     .intro-brands { margin-top: 6.5rem; }
   }
 </style>
+
+<script>
+  // смена рисунка: случайный из набора, кроме тех, что уже на экране. Старый уходит полностью (растворяется и чуть
+  // уменьшается), и только потом новый «прилепляется», как стикер: падает чуть крупнее и с поворотом, прижимается
+  // с лёгким отскоком и встаёт ровно. Новый грузится, пока уходит старый. Только transform и opacity.
+  // При reduced-motion — просто растворение и проявление
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const slots = [...document.querySelectorAll<HTMLButtonElement>('[data-ill-slot]')];
+  const pool = [...document.querySelectorAll<HTMLTemplateElement>('template[data-ill]')];
+  const OUT = 220, IN = 520;
+
+  function leave(el: HTMLElement) {
+    const frames = reduced.matches
+      ? [{ opacity: 1 }, { opacity: 0 }]
+      : [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(0.94)' }];
+    return el.animate(frames, { duration: OUT, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' }).finished;
+  }
+  function stick(el: HTMLElement) {
+    if (reduced.matches) return el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: OUT, easing: 'ease-out' }).finished;
+    // наклон каждый раз свой, в пределах 4–8°, в случайную сторону
+    const tilt = (4 + Math.random() * 4) * (Math.random() < 0.5 ? -1 : 1);
+    return el.animate([
+      { opacity: 0, transform: `scale(1.18) rotate(${tilt}deg)`, offset: 0 },
+      { opacity: 1, transform: `scale(0.95) rotate(${(-tilt * 0.2).toFixed(2)}deg)`, offset: 0.55, easing: 'cubic-bezier(0.3, 0, 0.2, 1)' },
+      { opacity: 1, transform: 'scale(1.015) rotate(0deg)', offset: 0.8 },
+      { opacity: 1, transform: 'scale(1) rotate(0deg)', offset: 1 },
+    ], { duration: IN, easing: 'cubic-bezier(0.55, 0, 0.6, 1)' }).finished;
+  }
+
+  for (const slot of slots) {
+    let busy = false;
+    slot.addEventListener('click', async () => {
+      if (busy) return;
+      const used = new Set(slots.map((s) => s.dataset.current));
+      const free = pool.filter((t) => !used.has(t.dataset.ill));
+      const t = free[Math.floor(Math.random() * free.length)];
+      if (!t) return;
+      busy = true;
+      slot.dataset.current = t.dataset.ill;
+      const old = slot.querySelector<HTMLElement>('.ill-layer');
+      const layer = t.content.firstElementChild!.cloneNode(true) as HTMLElement;
+      const img = layer.querySelector('img');
+      if (img) img.loading = 'eager';
+      layer.style.opacity = '0';
+      slot.append(layer);
+      await Promise.all([old ? leave(old) : null, img?.decode().catch(() => {})]);
+      old?.remove();
+      layer.style.opacity = '';
+      await stick(layer);
+      busy = false;
+    });
+  }
+</script>

@@ -75,6 +75,12 @@ export function init(root: HTMLElement) {
     // слой свайпа на телефоне тянется до низа первого экрана (Snake.astro, .snake-swipe)
     const below = desk.matches ? 0 : hero!.getBoundingClientRect().bottom - root.getBoundingClientRect().bottom;
     root.style.setProperty('--snake-below', `${Math.max(0, Math.round(below))}px`);
+    // сверху слой начинается с лида (вариант B; он уже уехал вверх на s), чтобы свайпать можно было и по нему; листать
+    // страницу — за заголовок (Batın 2026-10-23). Без лида — прежние 2rem над полем
+    const lead = hero!.querySelector<HTMLElement>('.hero-lead');
+    const swipeTop = lead && !desk.matches ? lead.offsetTop - s - 12 - root.offsetTop : null;
+    if (swipeTop === null) root.style.removeProperty('--snake-swipe-top');
+    else root.style.setProperty('--snake-swipe-top', `${Math.round(swipeTop)}px`);
     // мало места (телефон 360×640, ширины 761–~1100) — ни кнопки, ни игры
     small = W < MIN_W || H - HINT_H < MIN_H || H - s < b + 16;
     root.classList.toggle('is-small', small);
@@ -306,6 +312,12 @@ export function init(root: HTMLElement) {
   play.addEventListener('pointercancel', end);
 
   new IntersectionObserver(([e]) => { visible = e.isIntersecting; last = 0; loop(); ring.update(); }).observe(root);
+  // телефон: открытая игра ловит свайпы от текста над ней до низа экрана (Snake.astro, .snake-swipe). Если страницу
+  // прокрутили (за текст над игрой или за шапку) и поле наполовину ушло за экран, игру закрываем — дальше обычная
+  // прокрутка (Batın 2026-10-23)
+  new IntersectionObserver(([e]) => {
+    if (!desk.matches && mode !== 'closed' && e.intersectionRatio < 0.5) close(false);
+  }, { threshold: [0, 0.5] }).observe(field);
   document.addEventListener('visibilitychange', () => { last = 0; loop(); ring.update(); });
   reduced.addEventListener('change', () => { if (mode === 'auto' || mode === 'wait') toAuto(); ring.update(); });
   coarse.addEventListener('change', text);
