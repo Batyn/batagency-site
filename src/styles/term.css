@@ -142,7 +142,7 @@
 }
 
 /* =====================================================================================================
-   Раскладка «документ из списков» (Batın 2026-10-24): не копия Notion, а документ в духе старых программ.
+   Вёрстка Markdown — так её назвал Batın 2026-10-24. Раскладка «документ из списков» (Batın 2026-10-24): не копия Notion, а документ в духе старых программ.
    Одна колонка в 80 знакомест; блоки — окна в двойной рамке с заголовком на рамке (инверсия, как активное окно);
    сетки и мозаики — списки; выпадающие — [+] / [-]; сверху меню-строка, снизу строка состояния с путём.
    Компоненты свёрстаны под свою сетку, поэтому раскладку перебиваем !important — только внутри этой темы.
@@ -171,8 +171,11 @@
   background: var(--ink); color: var(--bg); text-shadow: none;
   transform: none !important;
 }
-:root[data-theme="term"] .hdr { display: flex; padding-inline: max(var(--gutter), (100% - var(--max)) / 2 + var(--gutter)) !important; }
-:root[data-theme="term"] .hero-top { padding: 0 !important; height: 100%; justify-content: flex-start !important; gap: 0; max-width: var(--max); }
+:root[data-theme="term"] .hdr { display: flex; }
+:root[data-theme="term"] .hdr,
+:root[data-theme="term"] .hero-bar { padding-inline: max(var(--gutter), (100% - var(--max)) / 2 + var(--gutter)) !important; }
+/* на главной строка меню вложена в .hero-top (.wrap): без своих полей и ширины — края как у шапки внутренних страниц и у рамок */
+:root[data-theme="term"] .hero-top { padding: 0 !important; margin: 0 !important; height: 100%; max-width: none !important; justify-content: flex-start !important; gap: 0; }
 :root[data-theme="term"] :is(.hdr, .hero-bar) .glass { display: none; }
 :root[data-theme="term"] :is(.hdr-logo, .hero-logo) {
   position: static !important; width: 3rem !important; margin: 0 1.5rem 0 0 !important; padding: 0 !important;
