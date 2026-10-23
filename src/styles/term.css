@@ -11,17 +11,18 @@
 }
 
 :root[data-theme="term"] {
-  --ink: #5cff7e;
-  --bg: #031006;
-  --grey: #34b856;
+  /* 2026-10-24 Batın: зелёный «вырвиглазный» — белое на чёрном */
+  --ink: #ffffff;
+  --bg: #0a0a0a;
+  --grey: #a8a8a8;
   /* 5,3:1 к фону: --soft в подвале — текст */
-  --soft: #2b9947;
-  --hairline: #18562a;
-  --cell-empty: #0a2410;
-  --ph: #0d2e15;
-  --eye: #5cff7e;
+  --soft: #8c8c8c;
+  --hairline: #3a3a3a;
+  --cell-empty: #1c1c1c;
+  --ph: #2a2a2a;
+  --eye: #ffffff;
   --glass: var(--bg);
-  --glow: 0 0 0.375rem rgba(92, 255, 126, 0.4);
+  --glow: none;
   --r-sm: 0;
   --r-md: 0;
   --font: "PxPlus IBM VGA", ui-monospace, Menlo, Consolas, monospace;
@@ -103,9 +104,9 @@
 @media (hover: hover) and (pointer: fine) {
   :root[data-theme="term"] body .cell:hover .cell-n { color: var(--bg); }
 }
-:root[data-theme="term"] .pl-trash { background: rgba(3, 16, 6, 0.95); }
+:root[data-theme="term"] .pl-trash { background: rgba(10, 10, 10, 0.95); }
 :root[data-theme="term"] :is(.pl-bar.is-placeholder, .pl-ghost) {
-  background: repeating-linear-gradient(135deg, transparent 0 0.375rem, rgba(92, 255, 126, 0.15) 0.375rem 0.4375rem);
+  background: repeating-linear-gradient(135deg, transparent 0 0.375rem, rgba(255, 255, 255, 0.15) 0.375rem 0.4375rem);
 }
 :root[data-theme="term"] .pl-cell:active { background: var(--hairline); }
 
@@ -114,9 +115,9 @@
 :root[data-theme="term"] :is(.logo-svg, .logo-inline) [fill="#FFFFFF"] { fill: var(--bg); }
 :root[data-theme="term"] :is(.logo-svg, .logo-inline) [fill="#C51B1E"] { fill: var(--ink); }
 :root[data-theme="term"] :is(.logo-svg, .logo-inline) [fill="#C51B1E"] + path { fill: var(--bg); }
-:root[data-theme="term"] :is(.logo-svg, .logo-inline) { filter: drop-shadow(0 0 0.25rem rgba(92, 255, 126, 0.35)); }
+:root[data-theme="term"] :is(.logo-svg, .logo-inline) { filter: none; }
 /* чёрные рисунки на прозрачном и фото: инверсия → зелёный монохром */
-:root[data-theme="term"] main :is(img, video) { filter: invert(1) brightness(0.5) sepia(1) saturate(4) hue-rotate(85deg) brightness(1.9); }
+:root[data-theme="term"] main :is(img, video) { filter: invert(1) grayscale(1); }
 
 /* ---------- включение: вспышка развёртки ---------- */
 :root.term-boot::after {
@@ -136,7 +137,7 @@
 }
 @media (prefers-contrast: more) {
   :root[data-theme="term"] body { text-shadow: none; }
-  :root[data-theme="term"] { --grey: #5cff7e; }
+  :root[data-theme="term"] { --grey: #ffffff; }
 }
 
 /* =====================================================================================================
@@ -266,7 +267,7 @@
 :root[data-theme="term"] body .cell-bottom { display: block !important; padding-left: 4ch; }
 :root[data-theme="term"] body .cell-caption { opacity: 1 !important; color: var(--grey) !important; }
 :root[data-theme="term"] body .cell-more { display: none !important; }
-:root[data-theme="term"] body .cell.is-unfold .cell-more { display: block !important; opacity: 1 !important; transform: none !important; margin-top: 0.5rem; }
+:root[data-theme="term"] body .cell.is-unfold .cell-more { display: block !important; opacity: 1 !important; transform: none !important; margin-top: 0.25rem !important; }
 :root[data-theme="term"] body .cell.is-unfold .cell-caption { display: none; }
 :root[data-theme="term"] body .cell-lead { padding: 0 !important; }
 :root[data-theme="term"] body .cell-link { min-height: 0 !important; margin-top: 0.5rem; }
@@ -287,7 +288,9 @@
 :root[data-theme="term"] .step-d { display: inline; color: var(--ink) !important; }
 
 /* ---------- выпадающие (вопросы, услуги на /uslugi/) ---------- */
-:root[data-theme="term"] :is(.faq-row, .acc-row) { border: 0 !important; overflow: visible; transform: none !important; }
+:root[data-theme="term"] :is(.faq-row, .acc-row) { border: 0 !important; overflow: visible; transform: none !important; background: none !important; color: var(--ink) !important; }
+/* раскрытая строка в обычной теме — инверсия; в документе инверсии нет, номер остаётся серым */
+:root[data-theme="term"] body .acc-row .acc-n { color: var(--grey) !important; }
 :root[data-theme="term"] :is(.faq-row, .acc-row) + :is(.faq-row, .acc-row) { margin-top: 0.25rem; }
 :root[data-theme="term"] :is(.faq-q, .acc-sum) { display: flex !important; gap: 1ch !important; padding: 0 !important; background: none !important; color: var(--ink) !important; }
 :root[data-theme="term"] :is(.faq-q, .acc-sum)::before { content: "[+]"; flex: none; color: var(--grey); }
@@ -295,6 +298,16 @@
 :root[data-theme="term"] :is(.faq-q-text, .acc-title)::before { content: none; }
 :root[data-theme="term"] :is(.faq-q, .acc-sum):hover :is(.faq-q-text, .acc-title) { background: var(--ink); color: var(--bg); text-shadow: none; }
 :root[data-theme="term"] :is(.faq-a, .acc-body) { margin: 0.5rem 0 1rem !important; padding: 0 0 0 4ch !important; background: none !important; color: var(--ink) !important; }
+
+/* раскрытая услуга на /uslugi/: одна колонка, шаги — «1.», выгоды — «- », без линий */
+:root[data-theme="term"] body .acc-body { display: block !important; }
+:root[data-theme="term"] body .acc-inner { display: block !important; }
+:root[data-theme="term"] body .acc-inner > * + * { margin-top: 1rem; }
+:root[data-theme="term"] body .acc-h { margin-bottom: 0.25rem; }
+:root[data-theme="term"] body :is(.acc-steps, .acc-list, .acc-steps li, .acc-list li) { border: 0 !important; padding-block: 0 !important; }
+:root[data-theme="term"] body .acc-steps li { gap: 1ch !important; }
+:root[data-theme="term"] body .acc-step-n { flex: none !important; color: var(--grey) !important; }
+:root[data-theme="term"] body .acc-step-n::after { content: "."; }
 
 /* ---------- консультация: контакты строками «Telegram: @…» ---------- */
 :root[data-theme="term"] .contacts, :root[data-theme="term"] .contacts-row { display: block !important; border: 0 !important; padding: 0 !important; }
@@ -311,7 +324,7 @@
 :root[data-theme="term"] body .plan { --split: 1fr; }
 @media (min-width: 761px) {
   /* колонка названий — 26 знаков (влезает «Пример плана на полгода» и кнопка очистки), дальше шесть месяцев */
-  :root[data-theme="term"] body .plan { --cols: 15rem repeat(6, minmax(0, 1fr)); --row: 2rem; }
+  :root[data-theme="term"] body .plan { --cols: 17rem repeat(6, minmax(0, 1fr)); --row: 2rem; }
 }
 :root[data-theme="term"] .pl-nojs { margin: 1.5rem 0 0 !important; }
 :root[data-theme="term"] .pl-app { margin-top: 1.5rem; }
