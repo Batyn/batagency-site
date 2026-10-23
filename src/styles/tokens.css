@@ -50,10 +50,10 @@
   --t-header: 300ms;
   --t-header-out: 340ms;
 
-  /* Шапка десктопа: липкая, 68, фон — матовое стекло (Figma color/glass, glass/blur; решение Batın 2026-10-09) */
+  /* Шапка десктопа: липкая, 68, фон — жидкое стекло (Figma color/glass, glass/blur; Batın 2026-10-09, блик — 2026-10-23) */
   --header-h: 4.25rem;
-  --glass: rgba(255, 255, 255, 0.72);
-  --glass-blur: 24px;
+  --glass: rgba(255, 255, 255, 0.5);
+  --glass-blur: 10px;
 }
 
 @media (max-width: 760px) {

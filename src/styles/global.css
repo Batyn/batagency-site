@@ -102,15 +102,22 @@ img, svg { display: block; max-width: 100%; }
   .btn--block-m { width: 100%; }
 }
 
-/* ---------- стекло липкой шапки (десктоп) ----------
-   Полупрозрачный белый и размытие того, что под шапкой, без линии снизу (Batın 2026-10-09: полоска выглядит грубо).
+/* ---------- стекло липкой шапки ----------
+   Жидкое стекло: полупрозрачный белый, лёгкое размытие с насыщенностью и блик по верхнему краю
+   (Batın 2026-10-23, исключение из «без бликов»). Кромки снизу и тени нет — выбивались.
+   clip-path режет размытие ровно по краю шапки, без мутной полосы снизу (приём Batın из Readymag).
    Видно только после начала прокрутки.
    Без backdrop-filter, при «уменьшить прозрачность» и «повысить контраст» — сплошной белый. */
 .glass {
   position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 55%),
+    var(--glass);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(1.04);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(1.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  -webkit-clip-path: inset(0);
+  clip-path: inset(0);
   opacity: 0;
   transition: opacity 200ms var(--ease-out);
 }
@@ -121,7 +128,7 @@ img, svg { display: block; max-width: 100%; }
   .glass { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 @media (prefers-contrast: more) {
-  .glass { background: var(--bg); border-bottom: 1px solid var(--ink); }
+  .glass { background: var(--bg); box-shadow: none; border-bottom: 1px solid var(--ink); }
 }
 
 /* ---------- секция: линия Ink, слева колонка 312, справа контент с x = 336 ---------- */
