@@ -36,6 +36,11 @@ import { BRIEF_HASH } from '../data/site';
 
   @media (max-width: 760px) {
     .scta { left: var(--gutter); right: var(--gutter); bottom: calc(1rem + env(safe-area-inset-bottom)); }
+    /* открыта змейка: поле до низа экрана, кнопка легла бы на него и уводила бы из игры касанием (Batın 2026-10-24) */
+    :global(html.js:has(.hero.is-game)) .scta {
+      opacity: 0; transform: translateY(1rem); visibility: hidden; pointer-events: none;
+      transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out), visibility 0s 200ms;
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     .scta, :global(html.js) .scta:not(.is-in) { transform: none; }

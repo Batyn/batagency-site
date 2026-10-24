@@ -175,6 +175,9 @@ const nav = NAV.map((n) => ({ ...n, href: n.key === 'kak-rabotaem' || n.key === 
     .hero-lead { grid-row: 3; margin-top: var(--s-2xl); }
     /* на телефоне поле под лидом: лид уезжает вверх вместе с заголовком, иначе игре мало места */
     .hero.is-game .hero-lead { transform: translateY(calc(-1 * var(--snake-shift, 0px))); }
+    /* в игре поле тянется до низа первого экрана: запас под липкую кнопку не нужен — она спрятана (StickyCta.astro),
+       остаётся поле экрана 24 (Batın 2026-10-24). Низ первого экрана за краем — прыжка не видно */
+    .hero.is-game { padding-bottom: var(--s-2xl); }
     .hero--b :global(.snake) { grid-row: 4; width: auto; }
   }
   @media (prefers-reduced-motion: reduce) {

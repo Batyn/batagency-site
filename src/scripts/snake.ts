@@ -263,6 +263,8 @@ export function init(root: HTMLElement) {
     btn.setAttribute('aria-label', btn.dataset.label || '');
     if (refocus) btn.focus({ preventScroll: true });
     ring.resume();
+    // на телефоне закрытый первый экран ниже открытого — место круга пересчитываем сразу, чтобы он не ехал дважды
+    if (!small) layout();
     draw();
   }
 
