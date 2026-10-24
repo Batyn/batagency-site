@@ -5,12 +5,17 @@
 // не поможет), и промокод; «Использовать промокод» подставляет его в бриф. Правая кнопка мыши — стрелки и отметки клеток
 // (как на lichess и chess.com), в панели — съеденные фигуры и перевес в очках.
 import { Chess, type Move, type Square } from 'chess.js';
-import { PIECES, PIECE_VIEWBOX, type PieceType } from '../data/chess-pieces';
+import { PIECES, PIECE_VIEWBOX, type PieceType } from '../data/chess-pieces-pixel';
 
 type Side = 'w' | 'b';
 const ENGINE = '/stockfish/stockfish.js';
 // «Легко» — слабейший уровень Stockfish и почти без раздумий: любитель выигрывает; «Сложно» — в полную силу
-const LEVELS = [{ skill: 0, time: 150, off: 5 }, { skill: 6, time: 400, off: 10 }, { skill: 20, time: 1200, off: 20 }];
+// elo — условная сила Bat на уровне (Stockfish 10, один поток в браузере, ход по времени); оценка, не замер
+const LEVELS = [
+  { skill: 0, time: 150, off: 5, elo: 1000 },
+  { skill: 6, time: 400, off: 10, elo: 1500 },
+  { skill: 20, time: 1200, off: 15, elo: 2500 },
+];
 const KEY = 'bat-chess';
 const FILES = 'abcdefgh';
 const NAMES: Record<PieceType, string> = { p: 'пешка', n: 'конь', b: 'слон', r: 'ладья', q: 'ферзь', k: 'король' };
@@ -18,11 +23,12 @@ const FEM = new Set<PieceType>(['p', 'r']);
 const PROMO: PieceType[] = ['q', 'r', 'b', 'n'];
 const VALUE: Record<PieceType, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 const ORDER: PieceType[] = ['q', 'r', 'b', 'n', 'p'];
+const LOSS_OFF = 5; // скидка за поражение и ничью, на любом уровне
 const LOAD_TIMEOUT = 15000, MIN_THINK = 350, DRAG = 4;
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 function pieceSvg(color: Side, type: PieceType, cls = 'pc'): string {
-  return `<svg class="${cls}" viewBox="${PIECE_VIEWBOX}" aria-hidden="true">${PIECES[color + type]}</svg>`;
+  return `<svg class="${cls}" viewBox="${PIECE_VIEWBOX}" shape-rendering="crispEdges" aria-hidden="true">${PIECES[color + type]}</svg>`;
 }
 
 function makeCode(off: number): string {
@@ -48,6 +54,7 @@ export function init(root: HTMLElement, btn: HTMLButtonElement) {
   const title = root.querySelector<HTMLElement>('#chess-title')!;
   const status = root.querySelector<HTMLElement>('[data-chess-status]')!;
   const sub = root.querySelector<HTMLElement>('[data-chess-sub]')!;
+  const rating = root.querySelector<HTMLElement>('[data-chess-rating]')!;
   const scoreBat = root.querySelector<HTMLElement>('[data-chess-score="bat"]')!;
   const scoreYou = root.querySelector<HTMLElement>('[data-chess-score="you"]')!;
   const levels = [...root.querySelectorAll<HTMLInputElement>('input[name="chess-level"]')];
@@ -244,8 +251,9 @@ export function init(root: HTMLElement, btn: HTMLButtonElement) {
       if (el.dataset.key === key) return;
       el.dataset.key = key;
       const pcs = el.querySelector<HTMLElement>('.chess-taken')!, plus = el.querySelector<HTMLElement>('.chess-plus')!;
-      // на чёрном подвале чёрная фигура не видна — все съеденные белыми силуэтами, чьи они, ясно по строке
-      pcs.innerHTML = list.map((t) => pieceSvg('w', t, 'tk')).join('');
+      // фигуры цвета того, кто их потерял; видны на чёрном подвале за счёт белой плашки (Batın 2026-10-25)
+      const lost: Side = who === 'w' ? 'b' : 'w';
+      pcs.innerHTML = list.map((t) => pieceSvg(lost, t, `tk tk-${t}`)).join('');
       plus.textContent = adv > 0 ? `+${adv}` : '';
       const names = list.length ? list.map((t) => NAMES[t]).join(', ') : 'ничего';
       el.setAttribute('aria-label', `${who === side ? 'Вы съели' : 'Bat съел'}: ${names}${adv > 0 ? `, перевес ${adv}` : ''}`);
@@ -287,19 +295,31 @@ export function init(root: HTMLElement, btn: HTMLButtonElement) {
   function say(main: string, extra = '') {
     if (status.textContent !== main) status.textContent = main;
     if (sub.textContent !== extra) sub.textContent = extra;
+    renderRating();
+  }
+
+  // после партии — уровень игры по формуле турнирного перфоманса для одной партии: сила Bat ±400 (Batın 2026-10-25)
+  function renderRating() {
+    let text = '';
+    if (game.isGameOver() && game.history().length >= 2) {
+      const won = game.isCheckmate() && game.turn() !== side, lost = game.isCheckmate() && !won;
+      const elo = Math.max(400, LEVELS[minLevel].elo + (won ? 400 : lost ? -400 : 0));
+      text = `Ваш уровень в этой партии — около\u00a0${elo}\u00a0Эло`;
+    }
+    if (rating.textContent !== text) rating.textContent = text;
   }
 
   function renderStatus(last?: Move) {
     if (engineState === 'failed') return say('Не получилось загрузить соперника', 'Попробуйте позже');
     if (game.isCheckmate()) {
-      if (game.turn() === side) return say('Мат. Победил Bat', 'Сыграем ещё?');
+      if (game.turn() === side) return say('Мат. Победил Bat', `Вы проиграли, но сыграли — это уже круто. Вот скидка ${LOSS_OFF}%`);
       return say('Мат. Вы выиграли', `Ваша скидка — ${LEVELS[minLevel].off}%`);
     }
     if (game.isDraw()) {
       const why = game.isStalemate() ? 'Пат'
         : game.isThreefoldRepetition() ? 'Троекратное повторение'
         : game.isInsufficientMaterial() ? 'Не хватает фигур для мата' : 'Правило 50 ходов';
-      return say('Ничья', why);
+      return say('Ничья', `${why}. Вот скидка ${LOSS_OFF}%`);
     }
     if (game.turn() !== side) {
       if (engineState !== 'ready') return say('Загружаем соперника…', last ? `Ваш ход: ${describe(last)}` : '');
@@ -309,12 +329,13 @@ export function init(root: HTMLElement, btn: HTMLButtonElement) {
     say('Ваш ход', last ? `Bat сходил: ${describe(last)}` : '');
   }
 
-  // выигрыш: промокод один на партию, переживает перезагрузку
+  // промокод за любой конец партии: победа — скидка уровня, поражение и ничья — 5% на любом уровне (Batın 2026-10-25);
+  // один на партию, переживает перезагрузку
   function renderPrize() {
-    const won = game.isCheckmate() && game.turn() !== side;
-    if (won && !code) { code = makeCode(LEVELS[minLevel].off); save(); }
-    prize.hidden = !won;
-    if (won) codeEl.textContent = code;
+    const over = game.isCheckmate() || game.isDraw(), won = game.isCheckmate() && game.turn() !== side;
+    if (over && !code) { code = makeCode(won ? LEVELS[minLevel].off : LOSS_OFF); save(); }
+    prize.hidden = !over;
+    if (over) codeEl.textContent = code;
   }
 
   // плавный ход: фигура встаёт на новую клетку и доезжает туда со старой (только transform)
@@ -508,6 +529,18 @@ export function init(root: HTMLElement, btn: HTMLButtonElement) {
   sides.forEach((i) => i.addEventListener('change', () => { side = i.value as Side; newGame(); }));
   root.querySelector('[data-chess-new]')!.addEventListener('click', newGame);
   root.querySelector('[data-chess-close]')!.addEventListener('click', () => toggle(false));
+
+  // «Закрыть» — правым краем вровень с фишкой «Сложно» (Batın 2026-10-25); фишки шириной по тексту, поэтому меряем.
+  // На телефоне кнопки по половине ширины — там не трогаем
+  const closeBtn = root.querySelector<HTMLElement>('[data-chess-close]')!;
+  const hardChip = root.querySelector<HTMLElement>('input[name="chess-level"][value="2"]')!.parentElement!;
+  function alignClose() {
+    closeBtn.style.marginLeft = '';
+    if (!open || phone.matches) return;
+    const shift = hardChip.getBoundingClientRect().right - closeBtn.getBoundingClientRect().right;
+    closeBtn.style.marginLeft = `${Math.max(0, shift)}px`;
+  }
+  new ResizeObserver(alignClose).observe(root);
   // промокод — в поле «Опишите задачу» брифа, подвал закрывается, фокус в поле
   root.querySelector('[data-chess-use]')!.addEventListener('click', () => {
     const task = document.querySelector<HTMLTextAreaElement>('#bf-task');
@@ -554,6 +587,7 @@ export function init(root: HTMLElement, btn: HTMLButtonElement) {
     document.dispatchEvent(new Event('chess-change'));
     if (open) {
       render();
+      alignClose();
       if (keyboard) title.focus({ preventScroll: true });
       reveal();
       startEngine().then(() => render());

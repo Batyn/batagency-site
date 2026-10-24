@@ -1,9 +1,10 @@
 ---
 // Шахматы в подвале (задача 97, решения Batın 2026-10-24; Figma — страница «Шахматы»). Кнопка-конь стоит справа в строке «©»
 // (part="button"), доска открывается поверх всего подвала (part="board"). Соперник для посетителя — Bat (под капотом
-// Stockfish 10 в Web Worker, public/stockfish/, GPL-3), правила — chess.js, фигуры — cburnett (data/chess-pieces.ts).
-// Победа даёт скидку по уровню: 5, 10 или 20% и промокод. Без JS ничего этого нет; код игры — отдельный чанк
+// Stockfish 10 в Web Worker, public/stockfish/, GPL-3), правила — chess.js, фигуры — pixel с lichess (data/chess-pieces-pixel.ts, AGPL-3).
+// Победа даёт скидку по уровню: 5, 10 или 15% и промокод; поражение — 5%. Без JS ничего этого нет; код игры — отдельный чанк
 // (scripts/chess.ts), грузится по первому нажатию. Корень доски — плагин (data-plugin): типограф его не трогает.
+import { PIECES, PIECE_VIEWBOX } from '../data/chess-pieces-pixel';
 interface Props { part: 'button' | 'board' }
 const { part } = Astro.props;
 // кнопка — пиксельный конь 16×16 в духе змейки (Batın 2026-10-24): «#» контур, «o» тело, «+» глаз
@@ -42,19 +43,27 @@ const px = (ch: string) => KNIGHT.flatMap((row, y) => [...row].map((c, x) => (c 
           <div class="chess-chips">
             <label class="chess-chip"><input type="radio" name="chess-level" value="0" /><span>Легко <i>5%</i></span></label>
             <label class="chess-chip"><input type="radio" name="chess-level" value="1" checked /><span>Средне <i>10%</i></span></label>
-            <label class="chess-chip"><input type="radio" name="chess-level" value="2" /><span>Сложно <i>20%</i></span></label>
+            <label class="chess-chip"><input type="radio" name="chess-level" value="2" /><span>Сложно <i>15%</i></span></label>
           </div>
         </fieldset>
         <fieldset class="chess-group">
           <legend class="chess-label">Играете за</legend>
           <div class="chess-chips">
-            <label class="chess-chip"><input type="radio" name="chess-side" value="w" checked /><span>Белых</span></label>
-            <label class="chess-chip"><input type="radio" name="chess-side" value="b" /><span>Чёрных</span></label>
+            <!-- вместо слов — пешки (Batın 2026-10-25): белая плитка как клетка доски, выбранная — рамка Ink внутрь -->
+            {[['w', 'Белыми', true], ['b', 'Чёрными', false]].map(([v, name, on]) => (
+              <label class="chess-chip chess-chip--side">
+                <input type="radio" name="chess-side" value={v} checked={on} aria-label={name} />
+                <span><svg viewBox={PIECE_VIEWBOX} shape-rendering="crispEdges" aria-hidden="true" set:html={PIECES[v + 'p']} /></span>
+              </label>
+            ))}
           </div>
         </fieldset>
+        <!-- статус, промокод и кнопки — внизу панели, по низу доски (Batın 2026-10-25) -->
+        <div class="chess-foot">
         <div class="chess-status" aria-live="polite">
           <p class="chess-status-main" data-chess-status>Загружаем соперника…</p>
           <p class="chess-status-sub" data-chess-sub></p>
+          <p class="chess-status-sub" data-chess-rating></p>
         </div>
         <div class="chess-prize" data-chess-prize hidden>
           <p class="chess-code-label">Ваш промокод</p>
@@ -65,6 +74,7 @@ const px = (ch: string) => KNIGHT.flatMap((row, y) => [...row].map((c, x) => (c 
         <div class="chess-actions">
           <button class="chess-action" type="button" data-chess-new>Новая партия</button>
           <button class="chess-action" type="button" data-chess-close>Закрыть</button>
+        </div>
         </div>
       </div>
     </div>
@@ -116,18 +126,26 @@ const px = (ch: string) => KNIGHT.flatMap((row, y) => [...row].map((c, x) => (c 
   .chess :focus-visible { outline-color: var(--bg); }
   .chess-in {
     min-height: 100%; padding-block: 4rem;
-    display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--col-gap); align-items: start;
+    display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--col-gap); align-items: start; align-content: start;
   }
   /* колонка доски: строка съеденного сверху (1,5rem), доска, строка снизу; между ними по 0,5rem */
   .chess-play { grid-column: 1 / 9; display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
   .chess-board {
     display: grid; grid-template: repeat(8, minmax(0, 1fr)) / repeat(8, minmax(0, 1fr));
     position: relative;
-    width: min(100%, calc(100cqh - 12rem), calc(100svh - 8rem)); min-width: 18rem; aspect-ratio: 1;
+    width: min(100%, calc(100cqh - 12.5rem), calc(100svh - 8rem)); min-width: 18rem; aspect-ratio: 1;
     border-radius: var(--r-md); overflow: hidden;
     touch-action: none; user-select: none; -webkit-user-select: none;
   }
-  .chess-panel { grid-column: 9 / 13; display: flex; flex-direction: column; gap: 1.5rem; }
+  /* панель строго в границах доски: сверху и снизу отступ на строку счёта и зазор (1,75 + 0,5rem); между блоками 32,
+     над статусом не меньше 48 воздуха (Batın 2026-10-25) */
+  .chess-panel { grid-column: 9 / 13; align-self: stretch; display: flex; flex-direction: column; gap: 2rem; padding-block: 2.25rem; }
+  .chess-foot { margin-top: auto; padding-top: 1rem; display: flex; flex-direction: column; gap: 1.5rem; }
+  /* выигрыш добавляет промокод — панель плотнее, чтобы всё осталось в высоте доски */
+  .chess-panel:has(.chess-prize:not([hidden])) { gap: 1rem; }
+  .chess-panel:has(.chess-prize:not([hidden])) .chess-foot { padding-top: 0; gap: 1rem; }
+  /* лид «…победите и получите скидку» после мата уже сказал своё — убираем, освобождая место промокоду */
+  .chess-panel:has(.chess-prize:not([hidden])) .chess-lead { display: none; }
 
   .chess-board :global(.sq) {
     position: relative; display: grid; place-items: center;
@@ -179,7 +197,8 @@ const px = (ch: string) => KNIGHT.flatMap((row, y) => [...row].map((c, x) => (c 
   .chess-board :global(.pc.slide) { transition: transform 200ms var(--ease-out); }
 
   .chess-head { display: flex; flex-direction: column; gap: 0.5rem; }
-  .chess-title { font: 700 1.375rem/1.2 var(--font); }
+  /* верх букв заголовка — ровно по верху доски, без межстрочного зазора (где браузер умеет text-box) */
+  .chess-title { font: 700 1.375rem/1.2 var(--font); text-box: trim-start cap alphabetic; }
   .chess-title:focus { outline: none; }
   .chess-lead { font: 400 0.9375rem/1.45 var(--font); color: var(--soft); }
   .chess-group { border: 0; padding: 0; margin: 0; min-width: 0; }
@@ -199,12 +218,21 @@ const px = (ch: string) => KNIGHT.flatMap((row, y) => [...row].map((c, x) => (c 
   .chess-chip input:focus-visible + span { outline: 2px solid var(--bg); outline-offset: 2px; }
   @media (hover: hover) and (pointer: fine) {
     .chess-chip:hover input:not(:checked) + span { background: var(--grey); }
+    .chess-chip--side:hover input:not(:checked) + span { background: var(--hairline); }
   }
+  /* выбор стороны: пешки на белых плитках, выбранная — рамка 4 px Ink внутрь, как выбранная клетка доски */
+  .chess-chip--side span { width: 2.75rem; padding: 0; justify-content: center; background: var(--bg); }
+  .chess-chip--side svg { width: 2rem; height: 2rem; }
+  .chess-chip--side input:checked + span { box-shadow: inset 0 0 0 0.25rem var(--ink); }
 
   /* съеденные фигуры: мелкие, внахлёст по типу, перевес справа */
-  .chess-score-row { display: flex; align-items: center; height: 1.5rem; }
-  .chess-taken { display: flex; flex-wrap: wrap; }
-  .chess-taken :global(.tk) { width: 1.5rem; height: 1.5rem; margin-right: -0.375rem; color: var(--ink); }
+  /* фигуры цвета того, кто их потерял; чёрные на чёрном подвале не видны — поэтому белая плашка (Batın 2026-10-25) */
+  .chess-score-row { display: flex; align-items: center; height: 1.75rem; }
+  .chess-taken { display: flex; }
+  .chess-taken:not(:empty) { padding: 0.125rem 0.625rem 0.125rem 0.25rem; background: var(--bg); border-radius: var(--r-sm); }
+  .chess-taken :global(.tk) { width: 1.5rem; height: 1.5rem; margin-right: -0.375rem; }
+  /* фигуры шире пешек — внахлёст меньше, иначе ферзь и ладья слипаются (Batın 2026-10-25) */
+  .chess-taken :global(.tk:not(.tk-p)) { margin-right: -0.0625rem; }
   .chess-plus { margin-left: 0.5rem; font: 400 0.875rem/1 var(--font); color: var(--soft); }
 
   .chess-status { display: flex; flex-direction: column; gap: 0.25rem; min-height: 3.25rem; }
@@ -219,6 +247,7 @@ const px = (ch: string) => KNIGHT.flatMap((row, y) => [...row].map((c, x) => (c 
   .chess-prize .chess-action--main { margin-top: 0.5rem; }
   .chess-prize-note { font: 400 0.8125rem/1.4 var(--font); color: var(--soft); }
 
+  /* «Закрыть» правым краем вровень с «Сложно» — отступ слева ставит chess.ts (Batın 2026-10-25) */
   .chess-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
   .chess-action {
     min-height: 2.75rem; padding: 0 1.25rem;
@@ -241,7 +270,7 @@ const px = (ch: string) => KNIGHT.flatMap((row, y) => [...row].map((c, x) => (c 
     /* телефон: столбиком, доска во всю ширину сразу под заголовком */
     /* подвал на телефоне выше игры — игра прижата к низу, к коню, а не к верху подвала (Batın 2026-10-24) */
     .chess-in { padding-block: 3rem; display: flex; flex-direction: column; justify-content: flex-end; gap: 1.5rem; }
-    .chess-panel { display: contents; }
+    .chess-panel, .chess-foot { display: contents; }
     .chess-head { order: 1; }
     .chess-title { font-size: 1.25rem; }
     /* на телефоне текст не мельче 16 (RULES.md §6.2) */
@@ -258,6 +287,7 @@ const px = (ch: string) => KNIGHT.flatMap((row, y) => [...row].map((c, x) => (c 
     .chess-chips { flex-wrap: nowrap; }
     .chess-chip { flex: 1 1 0; min-width: 0; }
     .chess-chip span { justify-content: center; padding: 0 0.25rem; }
+    .chess-chip--side { flex: 0 0 auto; }
   }
   @media (prefers-reduced-motion: reduce) {
     .chess-board :global(.pc.slide) { transition: none; }

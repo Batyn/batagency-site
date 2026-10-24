@@ -4,7 +4,7 @@ Stockfish 10 (stockfish.js, stockfish.wasm) — шахматный движок,
 Сборка для браузера — Nathan Rugg, npm-пакет stockfish@10.0.2 без изменений.
 Исходный код: https://github.com/nmrugg/stockfish.js и https://github.com/official-stockfish/Stockfish
 
-Фигуры — набор cburnett, автор Colin M.L. Burnett, GNU GPL v2 или новее.
-Источник: https://github.com/lichess-org/lila/tree/master/public/piece/cburnett
+Фигуры — набор pixel, автор therealqtpi, GNU AGPL v3 или новее (COPYING-AGPL.txt в этой папке).
+Рисунок без изменений. Исходник: https://github.com/lichess-org/lila/tree/master/public/piece/pixel
 
 Правила игры — chess.js 1.4.0, лицензия BSD-2-Clause: https://github.com/jhlywa/chess.js

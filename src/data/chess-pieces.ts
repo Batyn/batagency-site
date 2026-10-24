@@ -1,3 +1,4 @@
+// Не используется (задача 98, 2026-10-25: на сайте набор pixel), хранится как история.
 // Шахматные фигуры (задача 97): классический набор cburnett — Colin M.L. Burnett, GPLv2+
 // (https://github.com/lichess-org/lila/tree/master/public/piece/cburnett, решение Batın 2026-10-24: «как на chess.com»,
 // а их собственный набор брать нельзя). Рисунок 45×45, чёрное — currentColor (Ink через CSS), белое — #fff.
