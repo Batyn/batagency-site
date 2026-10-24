@@ -289,7 +289,7 @@
 :root[data-theme="term"] .brands-label .sr { position: static; width: auto; height: auto; clip: auto; clip-path: none; }
 /* маркированные списки — «- » как в маркдауне */
 :root[data-theme="term"] :is(.brands-list, .ft-list, .acc-list, .team-list) li { display: block !important; padding-left: 2ch; text-indent: -2ch; }
-:root[data-theme="term"] :is(.ft-list, .acc-list) li::before { content: "- "; color: var(--grey); }
+:root[data-theme="term"] body :is(.ft-list, .acc-list) li::before { content: "- "; color: var(--grey); }
 /* бренды — «• » у всех (Batın 2026-10-24); !important — иначе у второго и дальше остаётся « · » из Brands.astro */
 :root[data-theme="term"] .brands-list li::before { content: "• " !important; color: var(--grey); }
 
