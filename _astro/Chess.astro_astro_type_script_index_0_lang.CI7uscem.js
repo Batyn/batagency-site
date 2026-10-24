@@ -1,0 +1,1 @@
+import{t as e}from"./preload-helper.DHhhL8Zf.js";var t=document.querySelector(`[data-chess-btn]`),n=document.querySelector(`[data-chess]`);if(t&&n&&`Worker`in window&&`WebAssembly`in window){t.hidden=!1;let r=null;t.addEventListener(`click`,()=>{r??=e(()=>import(`./chess.D7kUfSNy.js`).then(e=>e.init(n,t)),[]),r.then(e=>e.toggle())})}
