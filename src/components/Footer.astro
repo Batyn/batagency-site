@@ -6,6 +6,7 @@
 // Телефон: бриф на всю ширину, «Навигация» и «Связь» в две колонки, ниже линия, политики и «©» — ссылки на политики в разметке дважды.
 import { FOOTER_NAV, TELEGRAM, TELEGRAM_URL, EMAIL, PRIVACY_PATH, PERSONAL_DATA_PATH, contactsHref } from '../data/site';
 import Brief from './Brief.astro';
+import Chess from './Chess.astro';
 const isHome = Astro.url.pathname === '/';
 const nav = FOOTER_NAV.map((l) => (l.label === 'Контакты' ? { ...l, href: contactsHref(isHome) } : l));
 ---
@@ -35,12 +36,16 @@ const nav = FOOTER_NAV.map((l) => (l.label === 'Контакты' ? { ...l, href
         <a class="ft-a" href={PERSONAL_DATA_PATH}>Обработка персональных данных</a>
       </p>
       <p class="ft-copy">©2026 Bat Agency. Все права защищены</p>
+      <Chess part="button" />
     </div>
   </div>
+  <Chess part="board" />
 </footer>
 
 <style>
-  .ft { background: var(--ink); color: var(--bg); }
+  /* relative — для шахмат: доска открывается поверх всего подвала (Chess.astro) */
+  .ft { position: relative; background: var(--ink); color: var(--bg); }
+  .ft-bottom > :global(.chess-btn) { grid-column: 12 / 13; grid-row: 1; }
   .ft :global(:focus-visible) { outline-color: var(--bg); }
   .ft .ft-brief :global(:focus-visible) { outline-color: var(--ink); }
   .ft-in { padding-block: var(--section-top); }
@@ -91,6 +96,7 @@ const nav = FOOTER_NAV.map((l) => (l.label === 'Контакты' ? { ...l, href
     .ft-a { display: flex; align-items: center; min-height: 2.75rem; font-size: 0.875rem; overflow-wrap: anywhere; }
     .ft-bottom { margin-top: 2.5rem; grid-template-columns: 1fr; border-top: 1px solid var(--grey); }
     .ft-legal { grid-row: 1; grid-column: 1 / -1; display: flex; flex-direction: column; align-items: flex-start; }
+    .ft-bottom > :global(.chess-btn) { grid-row: 2; grid-column: 1; margin: 0; }
     .ft-copy { grid-row: 2; grid-column: 1; display: flex; align-items: center; min-height: 2.75rem; font-size: 0.875rem; line-height: 1.2; }
   }
 </style>

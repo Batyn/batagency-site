@@ -1,0 +1,265 @@
+---
+// Шахматы в подвале (задача 97, решения Batın 2026-10-24; Figma — страница «Шахматы»). Кнопка-конь стоит справа в строке «©»
+// (part="button"), доска открывается поверх всего подвала (part="board"). Соперник для посетителя — Bat (под капотом
+// Stockfish 10 в Web Worker, public/stockfish/, GPL-3), правила — chess.js, фигуры — cburnett (data/chess-pieces.ts).
+// Победа даёт скидку по уровню: 5, 10 или 20% и промокод. Без JS ничего этого нет; код игры — отдельный чанк
+// (scripts/chess.ts), грузится по первому нажатию. Корень доски — плагин (data-plugin): типограф его не трогает.
+interface Props { part: 'button' | 'board' }
+const { part } = Astro.props;
+// кнопка — пиксельный конь 16×16 в духе змейки (Batın 2026-10-24): «#» контур, «o» тело, «+» глаз
+const KNIGHT = [
+  '................', '......#.#.......', '.....#o#o#......', '....#ooooo#.....',
+  '...#oo+oooo#....', '..#ooooooooo#...', '.#oooooooooo#...', '.#ooo##ooooo#...',
+  '..###.#ooooo#...', '.....#oooooo#...', '....#ooooooo#...', '....#oooooo#....',
+  '...#oooooooo#...', '..#oooooooooo#..', '..############..', '................',
+];
+const px = (ch: string) => KNIGHT.flatMap((row, y) => [...row].map((c, x) => (c === ch ? `M${x} ${y}h1v1h-1z` : ''))).join('');
+---
+{part === 'button' ? (
+  <button class="chess-btn" type="button" data-chess-btn aria-expanded="false" aria-controls="chess" aria-label="Сыграть в шахматы" hidden>
+    <svg viewBox="0 0 16 16" width="32" height="32" aria-hidden="true" shape-rendering="crispEdges">
+      <path class="chess-btn-line" d={px('#') + px('+')} />
+      <path class="chess-btn-body" d={px('o')} />
+    </svg>
+  </button>
+) : (
+  <section class="chess" id="chess" data-chess data-plugin aria-labelledby="chess-title" hidden>
+    <div class="chess-in wrap">
+      <div class="chess-play">
+        <!-- как на chess.com: над доской — что съел соперник, под доской — что съели вы; без имён и аватарок -->
+        <p class="chess-score-row" data-chess-score="bat"><span class="chess-taken"></span><span class="chess-plus"></span></p>
+        <div class="chess-board" data-chess-board role="group"
+          aria-label="Шахматная доска. Стрелки — выбор клетки, Enter — взять или поставить фигуру, Esc — закрыть"></div>
+        <p class="chess-score-row" data-chess-score="you"><span class="chess-taken"></span><span class="chess-plus"></span></p>
+      </div>
+      <div class="chess-panel">
+        <div class="chess-head">
+          <h2 class="chess-title" id="chess-title" tabindex="-1">Шахматы</h2>
+          <p class="chess-lead">Сыграйте в шахматы, победите и получите скидку.</p>
+        </div>
+        <fieldset class="chess-group">
+          <legend class="chess-label">Сложность и скидка</legend>
+          <div class="chess-chips">
+            <label class="chess-chip"><input type="radio" name="chess-level" value="0" /><span>Легко <i>5%</i></span></label>
+            <label class="chess-chip"><input type="radio" name="chess-level" value="1" checked /><span>Средне <i>10%</i></span></label>
+            <label class="chess-chip"><input type="radio" name="chess-level" value="2" /><span>Сложно <i>20%</i></span></label>
+          </div>
+        </fieldset>
+        <fieldset class="chess-group">
+          <legend class="chess-label">Играете за</legend>
+          <div class="chess-chips">
+            <label class="chess-chip"><input type="radio" name="chess-side" value="w" checked /><span>Белых</span></label>
+            <label class="chess-chip"><input type="radio" name="chess-side" value="b" /><span>Чёрных</span></label>
+          </div>
+        </fieldset>
+        <div class="chess-status" aria-live="polite">
+          <p class="chess-status-main" data-chess-status>Загружаем соперника…</p>
+          <p class="chess-status-sub" data-chess-sub></p>
+        </div>
+        <div class="chess-prize" data-chess-prize hidden>
+          <p class="chess-code-label">Ваш промокод</p>
+          <p class="chess-code" data-chess-code></p>
+          <button class="chess-action chess-action--main" type="button" data-chess-use>Использовать промокод</button>
+          <p class="chess-prize-note">Или назовите промокод на первом созвоне.</p>
+        </div>
+        <div class="chess-actions">
+          <button class="chess-action" type="button" data-chess-new>Новая партия</button>
+          <button class="chess-action" type="button" data-chess-close>Закрыть</button>
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
+<script>
+  // Кнопка видна только с JS и там, где есть Worker и WebAssembly; код игры и chess.js — по первому нажатию
+  const btn = document.querySelector<HTMLButtonElement>('[data-chess-btn]');
+  const root = document.querySelector<HTMLElement>('[data-chess]');
+  if (btn && root && 'Worker' in window && 'WebAssembly' in window) {
+    btn.hidden = false;
+    let game: Promise<{ toggle: (want?: boolean) => void }> | null = null;
+    btn.addEventListener('click', () => {
+      game ??= import('../scripts/chess').then((m) => m.init(root, btn));
+      game.then((g) => g.toggle());
+    });
+  }
+</script>
+
+<style>
+  /* кнопка в строке «©»: пиксельный белый конь на чёрном, при наведении — инверсия (плашка белая, конь чёрный) */
+  .chess-btn {
+    justify-self: end; display: grid; place-items: center;
+    width: 2.75rem; height: 2.75rem; margin: -0.6875rem 0; padding: 0; border: 0; background: none;
+    border-radius: var(--r-sm);
+    transition: background-color 160ms var(--ease-out);
+  }
+  .chess-btn svg { width: 2rem; height: 2rem; }
+  .chess-btn-line { fill: var(--ink); }
+  .chess-btn-body { fill: var(--bg); }
+  @media (hover: hover) and (pointer: fine) {
+    .chess-btn:hover { background: var(--bg); }
+    .chess-btn:hover .chess-btn-line { fill: var(--bg); }
+    .chess-btn:hover .chess-btn-body { fill: var(--ink); }
+  }
+  .chess-btn[aria-expanded="true"] { visibility: hidden; }
+
+  /* игра поверх всего подвала и строго в его высоту: подвал не растёт, экран не ездит (Batın 2026-10-24).
+     Доска — главное: 8 колонок, но не выше подвала за вычетом полей (контейнер — сам слой, единицы cqh) */
+  /* доска держится за подвал: правило здесь, а не только в Footer.astro, — иначе без него слой встаёт от начала страницы */
+  :global(.ft) { position: relative; }
+  .chess {
+    position: absolute; inset: 0; z-index: 2;
+    background: var(--ink); color: var(--bg);
+    container-type: size; overflow: hidden auto;
+  }
+  .chess[hidden] { display: none; }
+  .chess :focus-visible { outline-color: var(--bg); }
+  .chess-in {
+    min-height: 100%; padding-block: 4rem;
+    display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--col-gap); align-items: start;
+  }
+  /* колонка доски: строка съеденного сверху (1,5rem), доска, строка снизу; между ними по 0,5rem */
+  .chess-play { grid-column: 1 / 9; display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
+  .chess-board {
+    display: grid; grid-template: repeat(8, minmax(0, 1fr)) / repeat(8, minmax(0, 1fr));
+    position: relative;
+    width: min(100%, calc(100cqh - 12rem), calc(100svh - 8rem)); min-width: 18rem; aspect-ratio: 1;
+    border-radius: var(--r-md); overflow: hidden;
+    touch-action: none; user-select: none; -webkit-user-select: none;
+  }
+  .chess-panel { grid-column: 9 / 13; display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .chess-board :global(.sq) {
+    position: relative; display: grid; place-items: center;
+    padding: 0; border: 0; border-radius: 0; background: var(--bg); color: var(--ink);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .chess-board :global(.sq.dark) { background: var(--hairline); }
+  .chess-board :global(.sq.last) { background: var(--soft); }
+  .chess-board :global(.sq.check) { background: var(--grey); }
+  .chess-board :global(.sq.sel)::after { content: ""; position: absolute; inset: 0; border: 0.25rem solid var(--ink); }
+  .chess-board :global(.sq:focus-visible) { outline: 2px dashed var(--ink); outline-offset: -0.5rem; }
+  /* отметка правой кнопкой — рамка Grey внутрь; стрелки — Grey поверх фигур */
+  .chess-board :global(.sq.mark) { box-shadow: inset 0 0 0 0.25rem var(--grey); }
+  .chess-board :global(.arrows) {
+    position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%;
+    fill: var(--grey); opacity: 0.85; pointer-events: none;
+  }
+  /* превращение: столбик из четырёх клеток над пешкой, остальные фигуры приглушены */
+  .chess-board :global(.promo) {
+    position: absolute; top: 0; z-index: 4; width: 12.5%; height: 50%;
+    display: grid; grid-template-rows: repeat(4, 1fr);
+  }
+  .chess-board :global(.promo[hidden]) { display: none; }
+  .chess-board :global(.promo button) {
+    display: grid; place-items: center; padding: 0;
+    border: 0; background: var(--bg); color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  .chess-board :global(.promo button:is(:hover, :focus-visible)) { background: var(--hairline); outline: none; box-shadow: inset 0 0 0 0.25rem var(--ink); }
+  .chess-board :global(.promo .pc) { width: 90%; height: 90%; pointer-events: none; }
+  .chess-board:global(.promoting) :global(.sq .pc) { opacity: 0.3; }
+  /* возможный ход — квадрат в центре; взятие — четыре квадрата по углам (круглых точек нет) */
+  .chess-board :global(.sq.move)::before {
+    content: ""; position: absolute; width: 18.75%; height: 18.75%; background: var(--ink);
+  }
+  .chess-board :global(.sq.take)::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      linear-gradient(var(--ink), var(--ink)) top left / 18.75% 18.75% no-repeat,
+      linear-gradient(var(--ink), var(--ink)) top right / 18.75% 18.75% no-repeat,
+      linear-gradient(var(--ink), var(--ink)) bottom left / 18.75% 18.75% no-repeat,
+      linear-gradient(var(--ink), var(--ink)) bottom right / 18.75% 18.75% no-repeat;
+  }
+  .chess-board :global(.pc) {
+    position: relative; z-index: 1; width: 90%; height: 90%;
+    color: var(--ink); pointer-events: none;
+  }
+  .chess-board :global(.pc.drag) { z-index: 3; }
+  .chess-board :global(.pc.slide) { transition: transform 200ms var(--ease-out); }
+
+  .chess-head { display: flex; flex-direction: column; gap: 0.5rem; }
+  .chess-title { font: 700 1.375rem/1.2 var(--font); }
+  .chess-title:focus { outline: none; }
+  .chess-lead { font: 400 0.9375rem/1.45 var(--font); color: var(--soft); }
+  .chess-group { border: 0; padding: 0; margin: 0; min-width: 0; }
+  .chess-label { padding: 0; margin-bottom: 0.5rem; font: 400 0.8125rem/1.2 var(--font); color: var(--soft); }
+  .chess-chips { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+  .chess-chip { position: relative; cursor: pointer; }
+  .chess-chip input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+  .chess-chip span {
+    display: flex; align-items: center; gap: 0.375rem; min-height: 2.75rem; padding: 0 0.875rem;
+    border: 1px solid var(--bg); border-radius: var(--r-sm);
+    font: 400 0.875rem/1 var(--font); white-space: nowrap;
+    transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out);
+  }
+  .chess-chip i { font-style: normal; color: var(--soft); }
+  .chess-chip input:checked + span { background: var(--bg); color: var(--ink); }
+  .chess-chip input:checked + span i { color: var(--grey); }
+  .chess-chip input:focus-visible + span { outline: 2px solid var(--bg); outline-offset: 2px; }
+  @media (hover: hover) and (pointer: fine) {
+    .chess-chip:hover input:not(:checked) + span { background: var(--grey); }
+  }
+
+  /* съеденные фигуры: мелкие, внахлёст по типу, перевес справа */
+  .chess-score-row { display: flex; align-items: center; height: 1.5rem; }
+  .chess-taken { display: flex; flex-wrap: wrap; }
+  .chess-taken :global(.tk) { width: 1.5rem; height: 1.5rem; margin-right: -0.375rem; color: var(--ink); }
+  .chess-plus { margin-left: 0.5rem; font: 400 0.875rem/1 var(--font); color: var(--soft); }
+
+  .chess-status { display: flex; flex-direction: column; gap: 0.25rem; min-height: 3.25rem; }
+  .chess-prize[hidden] { display: none; }
+  .chess-status-main { font: 500 1.25rem/1.3 var(--font); }
+  .chess-status-sub { font: 400 0.9375rem/1.45 var(--font); color: var(--soft); min-height: 1.45em; }
+
+  /* выигрыш: промокод крупно, белая кнопка — к брифу с подставленным кодом */
+  .chess-prize { display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  .chess-code-label { font: 400 0.8125rem/1.2 var(--font); color: var(--soft); }
+  .chess-code { font: 700 1.75rem/1.1 var(--font); letter-spacing: 0.02em; user-select: all; }
+  .chess-prize .chess-action--main { margin-top: 0.5rem; }
+  .chess-prize-note { font: 400 0.8125rem/1.4 var(--font); color: var(--soft); }
+
+  .chess-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .chess-action {
+    min-height: 2.75rem; padding: 0 1.25rem;
+    border: 1px solid var(--bg); border-radius: var(--r-md); background: none; color: inherit;
+    font: 400 1rem/1 var(--font);
+    transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out);
+  }
+  .chess-action--main { background: var(--bg); color: var(--ink); }
+  @media (hover: hover) and (pointer: fine) {
+    .chess-action:hover { background: var(--bg); color: var(--ink); }
+    .chess-action--main:hover { background: var(--hairline); }
+  }
+
+  /* 761–1279: доска 7 колонок, панель 5 */
+  @media (max-width: 1279px) and (min-width: 761px) {
+    .chess-play { grid-column: 1 / 8; }
+    .chess-panel { grid-column: 8 / 13; }
+  }
+  @media (max-width: 760px) {
+    /* телефон: столбиком, доска во всю ширину сразу под заголовком */
+    /* подвал на телефоне выше игры — игра прижата к низу, к коню, а не к верху подвала (Batın 2026-10-24) */
+    .chess-in { padding-block: 3rem; display: flex; flex-direction: column; justify-content: flex-end; gap: 1.5rem; }
+    .chess-panel { display: contents; }
+    .chess-head { order: 1; }
+    .chess-title { font-size: 1.25rem; }
+    /* на телефоне текст не мельче 16 (RULES.md §6.2) */
+    .chess-lead, .chess-chip span, .chess-status-sub { font-size: 1rem; }
+    .chess-group { order: 2; }
+    .chess-play { order: 4; }
+    .chess-board { width: 100%; min-width: 0; }
+    .chess-status, .chess-prize { order: 5; }
+    .chess-actions { order: 6; }
+    .chess-action { flex: 1 1 0; }
+    /* fieldset в колонке сам не растягивается — задаём ширину; три уровня в один ряд, равной ширины */
+    .chess-group, .chess-actions { width: 100%; }
+    .chess-action { white-space: nowrap; }
+    .chess-chips { flex-wrap: nowrap; }
+    .chess-chip { flex: 1 1 0; min-width: 0; }
+    .chess-chip span { justify-content: center; padding: 0 0.25rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .chess-board :global(.pc.slide) { transition: none; }
+  }
+</style>

@@ -13,7 +13,9 @@ if (cta && 'IntersectionObserver' in window) {
 
   const sync = () => {
     const cookieOpen = phone.matches && cookie !== null && !cookie.hidden;
-    cta.classList.toggle('is-in', !briefReached && !cookieOpen);
+    // открытые шахматы закрывают бриф: заявку там не оставить, и кнопка не должна лежать поверх доски
+    const chessOpen = document.documentElement.hasAttribute('data-chess-open');
+    cta.classList.toggle('is-in', !briefReached && !cookieOpen && !chessOpen);
   };
 
   // у скрытого элемента (форма после «Спасибо») прямоугольник нулевой — его не считаем
@@ -31,6 +33,7 @@ if (cta && 'IntersectionObserver' in window) {
   }
 
   document.addEventListener('cookie-accepted', sync);
+  document.addEventListener('chess-change', sync);
   phone.addEventListener('change', sync);
   sync();
 } else cta?.classList.add('is-in');
