@@ -197,7 +197,7 @@
 :root[data-theme="term"] .section-rule,
 :root[data-theme="term"] .brands-rule { display: none; }
 /* в документе нет картинок и игры: только текст */
-:root[data-theme="term"] :is(.ill, .intro-pic, .snake, .hero-space, .svc-hint, .faq-sign, .acc-sign) { display: none !important; }
+:root[data-theme="term"] :is(.ill, .intro-pic, .snake, .hero-space, .faq-sign, .acc-sign) { display: none !important; }
 
 /* ---------- меню-строка сверху ---------- */
 :root[data-theme="term"] :is(.hdr, .hero-bar) {
