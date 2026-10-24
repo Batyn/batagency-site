@@ -21,7 +21,7 @@ const clearIcon = clearSvg.replace(/fill="#0A0A0A"/g, 'fill="currentColor"').rep
 
   <p class="pl-nojs t-body-lg measure">Соберите план на консультации: расскажите, какие задачи важны, и мы предложим, что и когда делать.</p>
 
-  <div class="pl-app" data-plan-app>
+  <div class="pl-app" data-plan-app data-plugin>
     <div class="pl-palette" id="pl-palette">
       <div class="pl-label">
         <span class="t-label-md">Услуги</span>
@@ -41,7 +41,7 @@ const clearIcon = clearSvg.replace(/fill="#0A0A0A"/g, 'fill="currentColor"').rep
     <p class="sr" id="pl-keys">Стрелки влево и вправо двигают плашку, с Shift меняют длину, Delete убирает.</p>
   </div>
 
-  <div class="pl-actions">
+  <div class="pl-actions" data-plugin>
     <div class="pl-col">
       <div class="pl-buttons">
         <a class="btn btn--lg btn--block-m" id="pl-tg" href={TELEGRAM_URL} target="_blank" rel="noopener">Обсудить план в Telegram</a>

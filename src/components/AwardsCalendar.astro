@@ -9,7 +9,7 @@ import { todayNum, renderSummary, renderFilter, renderTimeline, renderList, data
 const built = todayNum();
 const date = dataDateText();
 ---
-<section class="aw wrap" data-aw data-built={built} aria-label="Календарь премий">
+<section class="aw wrap" data-aw data-plugin data-built={built} aria-label="Календарь премий">
   <!-- Сводка только на десктопе: в макете телефона её нет (вопрос Batın, MEMORY.md) -->
   <div class="aw-sum" data-sum set:html={renderSummary(built)} />
 
