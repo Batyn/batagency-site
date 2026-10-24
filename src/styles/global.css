@@ -140,6 +140,8 @@ img, svg { display: block; max-width: 100%; }
 /* ---------- секция: линия Ink, слева колонка 312, справа контент с x = 336 ---------- */
 .section { padding-bottom: var(--section-bottom); }
 .section-rule { height: 1px; background: var(--ink); border: 0; margin: 0; }
+/* вариант «без дивайдеров»: блоки разделяет только воздух, линии остаются внутри текста */
+.section-rule, .brands-rule { display: none; }
 .row {
   display: grid;
   grid-template-columns: var(--col-3) minmax(0, 1fr);
