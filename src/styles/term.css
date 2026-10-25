@@ -275,7 +275,7 @@
 }
 :root[data-theme="term"] :is(main, .ft) :is(.row, .svc-grid, .faq-grid, .steps, .ft-top, .ft-bottom) > * { grid-column: auto !important; grid-row: auto !important; }
 :root[data-theme="term"] :is(main, .ft, .hero) :is(p, ul, ol, dl, .brands, .faq-list, .contacts) + :is(p, ul, ol, dl, .brands, .faq-list, .contacts, div) { margin-top: 1.5rem !important; }
-:root[data-theme="term"] .measure, :root[data-theme="term"] .hero-lead { max-width: none !important; }
+:root[data-theme="term"] .measure, :root[data-theme="term"] .hero-lead, :root[data-theme="term"] .proc-intro { max-width: none !important; }
 
 /* ---------- первый экран — шапка документа ---------- */
 :root[data-theme="term"] .hero > * { margin: 0 !important; transform: none !important; }

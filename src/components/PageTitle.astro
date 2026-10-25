@@ -15,8 +15,10 @@ const { title } = Astro.props;
 <style>
   .ptitle { padding-top: 3.5rem; }
   .ptitle-main > :global(* + *) { margin-top: 1.75rem; }
+  /* абзацы между собой 24, как в шапках секций */
+  .ptitle-main > :global(p + p) { margin-top: var(--s-2xl); }
   @media (max-width: 760px) {
     .ptitle { padding-top: 2rem; }
-    .ptitle-main > :global(* + *) { margin-top: 1rem; }
+    .ptitle-main > :global(* + *), .ptitle-main > :global(p + p) { margin-top: 1rem; }
   }
 </style>

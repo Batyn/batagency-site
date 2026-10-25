@@ -1,20 +1,32 @@
 ---
-// «Как работаем» (Figma Final «3 · Как работаем» 278:4774 / 278:5199). Тексты — content/site-texts.md, раздел 4.
-// На «Календаре премий» тот же блок с другим заголовком и шагами («Как мы подаём заявку», раздел 7).
+// «Как работаем» (Figma Final «3 · Как работаем» 588:9098 / 588:9279). Тексты — content/site-texts.md, раздел 4.
+// На «Календаре премий» тот же блок с другим заголовком и шагами («Как мы подаём заявку», раздел 7) — без вводного текста.
+// Вводный текст — Figma Final, вариант A (задача 100, Batın 2026-10-26): lead в колонках 4–10, на телефоне Mobile/lead.
 interface Step { t: string; d: string }
-interface Props { title?: string; steps?: Step[]; id?: string }
+interface Props { title?: string; steps?: Step[]; intro?: string[]; id?: string }
+const DEFAULT_INTRO = [
+  'Всегда основательно погружаемся в проекты и рассчитываем на взаимную вовлечённость. Для нас важно понимать, что происходит внутри компании, какие задачи стоят перед командой и как меняются приоритеты.',
+  'Берём на себя организацию работы, соблюдаем договорённости и держим клиента в курсе происходящего. Обсуждаем решения, объясняем расходы и регулярно делимся результатами — чтобы обе стороны понимали, куда движется проект и что предстоит делать дальше.',
+];
 const DEFAULT_STEPS: Step[] = [
-  { t: 'Консультация', d: 'Бесплатно смотрим, что у агентства уже есть: сайт, кейсы, премии, публикации, соцсети.' },
-  { t: 'План', d: 'Присылаем работы, сроки и цены на одну задачу или на полгода. Начинаем после вашего «да».' },
-  { t: 'Работа', d: 'Пишем тексты и заявки, ведём каналы. Каждый материал согласуем до публикации, деньги на рекламу и взносы тратим только на согласованную цель.' },
-  { t: 'Отчёт', d: 'Раз в месяц рассказываем, что сделано и что изменилось в обращениях и охватах.' },
+  { t: 'Знакомство', d: 'Начинаем с разговора о вашем агентстве: чем занимаетесь, как устроен маркетинг, какие задачи стоят сейчас. Изучаем существующие материалы и обсуждаем, где наша помощь будет полезнее всего.' },
+  { t: 'Предложение', d: 'Готовим план работы с конкретными задачами, сроками и бюджетом. Объясняем, почему предлагаем именно такую последовательность действий и какого результата рассчитываем достичь.' },
+  { t: 'Реализация', d: 'Берём организацию процессов на себя. Работаем по согласованному плану, поддерживаем связь с командой и заранее обсуждаем изменения, которые могут повлиять на сроки, бюджет или результат.' },
+  { t: 'Результаты', d: 'Регулярно показываем, что сделано, как меняются показатели и какие выводы можно сделать. Обсуждаем дальнейшие шаги и при необходимости корректируем план.' },
 ];
 const { title = 'Как работаем', steps = DEFAULT_STEPS, id = 'kak-rabotaem' } = Astro.props;
+// свои шаги — свой блок: вводный текст главной туда не переносим
+const intro = Astro.props.intro ?? (Astro.props.steps ? [] : DEFAULT_INTRO);
 ---
 <section class="proc wrap section" id={id} aria-labelledby="proc-h">
   <div class="section-rule"></div>
   <div class="section-head">
-    <div class="row"><div class="col-main"><h2 class="t-h-lg" id="proc-h">{title}</h2></div></div>
+    <div class="row"><div class="col-main">
+      <h2 class="t-h-lg" id="proc-h">{title}</h2>
+      {intro.length > 0 && (
+        <div class="proc-intro">{intro.map((p) => <p class="t-lead">{p}</p>)}</div>
+      )}
+    </div></div>
   </div>
   <ol class="steps">
     {steps.map((s, i) => (
@@ -30,6 +42,8 @@ const { title = 'Как работаем', steps = DEFAULT_STEPS, id = 'kak-rabo
 </section>
 
 <style>
+  .proc-intro { max-width: 47.5rem; }
+  .proc-intro > p + p { margin-top: var(--s-2xl); }
   .steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: var(--col-gap); margin-top: 4.5rem; }
   .step { display: flex; flex-direction: column; gap: var(--s-lg); border-top: 1px solid var(--ink); padding-top: var(--s-lg); }
   .step-n { font: 700 4rem/1 var(--font); letter-spacing: -0.03em; }
@@ -38,6 +52,7 @@ const { title = 'Как работаем', steps = DEFAULT_STEPS, id = 'kak-rabo
   .step-d { font: 400 1rem/1.5 var(--font); color: var(--grey); }
 
   @media (max-width: 760px) {
+    .proc-intro > p + p { margin-top: var(--s-lg); }
     .steps { grid-template-columns: 1fr; row-gap: 1.5rem; margin-top: 2rem; }
     .step { flex-direction: row; gap: 0.625rem; padding-top: 0.75rem; }
     .step-n { flex: 0 0 5rem; font: 500 2rem/1 var(--font); letter-spacing: 0; }
